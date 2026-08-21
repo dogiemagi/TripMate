@@ -1,167 +1,222 @@
 import httpx
 import logging
+from datetime import datetime, date, timedelta
 from typing import Dict, Any, Optional
+from app.services.geo_service import GeoService
 
 logger = logging.getLogger("voyage.weather")
 
-CITY_COORDINATES = {
-    "tokyo": {"lat": 35.6762, "lon": 139.6503, "country": "Japan"},
-    "paris": {"lat": 48.8566, "lon": 2.3522, "country": "France"},
-    "rome": {"lat": 41.9028, "lon": 12.4964, "country": "Italy"},
-    "new york": {"lat": 40.7128, "lon": -74.0060, "country": "USA"},
-    "london": {"lat": 51.5074, "lon": -0.1278, "country": "United Kingdom"},
-    "dubai": {"lat": 25.2048, "lon": 55.2708, "country": "UAE"},
-    "singapore": {"lat": 1.3521, "lon": 103.8198, "country": "Singapore"},
-    "bangkok": {"lat": 13.7563, "lon": 100.5018, "country": "Thailand"},
-    "barcelona": {"lat": 41.3851, "lon": 2.1734, "country": "Spain"},
-    "sydney": {"lat": -33.8688, "lon": 151.2093, "country": "Australia"},
-    "kyoto": {"lat": 35.0116, "lon": 135.7681, "country": "Japan"},
-    "delhi": {"lat": 28.6139, "lon": 77.2090, "country": "India"},
-    "bali": {"lat": -8.4095, "lon": 115.1889, "country": "Indonesia"},
-    "cairo": {"lat": 30.0444, "lon": 31.2357, "country": "Egypt"},
-    "rio de janeiro": {"lat": -22.9068, "lon": -43.1729, "country": "Brazil"},
-}
-
 WEATHER_CODE_MAP = {
-    0: ("Clear Sky", "sun", "Excellent visibility and perfect for outdoor sightseeing."),
+    0: ("Clear Sky", "sun", "Optimal visibility and ideal conditions for outdoor sightseeing."),
     1: ("Mainly Clear", "sun", "Pleasant weather with mild sunshine."),
     2: ("Partly Cloudy", "cloud-sun", "Great conditions for walking tours and photography."),
     3: ("Overcast", "cloud", "Soft lighting, ideal for visiting museums and landmarks."),
-    45: ("Foggy", "cloud-fog", "Reduced visibility in the morning; dress warmly."),
-    48: ("Depositing Rime Fog", "cloud-fog", "Misty and cool."),
-    51: ("Light Drizzle", "cloud-drizzle", "Pack a compact travel umbrella."),
+    45: ("Foggy", "cloud-fog", "Reduced morning visibility; drive with caution."),
+    48: ("Depositing Rime Fog", "cloud-fog", "Cool and misty conditions."),
+    51: ("Light Drizzle", "cloud-drizzle", "Carry a compact travel umbrella."),
     53: ("Moderate Drizzle", "cloud-drizzle", "Light rain gear recommended."),
-    61: ("Slight Rain", "cloud-rain", "Carry an umbrella; great day for indoor cafes."),
+    61: ("Slight Rain", "cloud-rain", "Intermittent showers; great day for indoor cafes."),
     63: ("Moderate Rain", "cloud-rain", "Waterproof jacket suggested."),
-    65: ("Heavy Rain", "cloud-rain-wind", "Consider indoor attractions and galleries."),
-    71: ("Slight Snow", "snowflake", "Magical snowy scenery; wear insulated boots."),
+    65: ("Heavy Rain", "cloud-rain-wind", "Consider indoor galleries and cultural shows."),
+    71: ("Slight Snow", "snowflake", "Picturesque snowy scenery; wear insulated boots."),
     73: ("Moderate Snow", "snowflake", "Layer up with thermal wear."),
-    80: ("Rain Showers", "cloud-rain", "Intermittent showers with sunny breaks."),
+    80: ("Rain Showers", "cloud-rain", "Scattered showers with sunny breaks."),
     95: ("Thunderstorm", "cloud-lightning", "Stay sheltered during peak afternoon storm.")
 }
 
 class WeatherService:
     @staticmethod
-    async def get_weather(city_name: str, days: int = 7) -> Dict[str, Any]:
-        normalized = city_name.strip().lower()
-        lat, lon, country = 0.0, 0.0, "Global"
+    async def get_weather(
+        city_name: str, 
+        start_date: Optional[str] = None, 
+        end_date: Optional[str] = None, 
+        days: int = 7
+    ) -> Dict[str, Any]:
+        # 1. Resolve exact coordinates and display name
+        geo_info = await GeoService.resolve_location(city_name)
+        lat = geo_info["latitude"]
+        lon = geo_info["longitude"]
+        country = geo_info["country"]
+        resolved_city = geo_info["city"]
+        display_location = geo_info["display_name"]
 
-        # Check geocoding
-        if normalized in CITY_COORDINATES:
-            geo = CITY_COORDINATES[normalized]
-            lat, lon, country = geo["lat"], geo["lon"], geo["country"]
-        else:
+        # 2. Date range parsing & validation
+        today = date.today()
+        
+        parsed_start = today
+        if start_date:
             try:
-                async with httpx.AsyncClient(timeout=5.0) as client:
-                    geo_url = f"https://geocoding-api.open-meteo.com/v1/search?name={city_name}&count=1&language=en&format=json"
-                    resp = await client.get(geo_url)
+                parsed_start = datetime.strptime(start_date.strip(), "%Y-%m-%d").date()
+            except Exception:
+                parsed_start = today
+
+        if end_date:
+            try:
+                parsed_end = datetime.strptime(end_date.strip(), "%Y-%m-%d").date()
+            except Exception:
+                parsed_end = parsed_start + timedelta(days=max(1, days - 1))
+        else:
+            parsed_end = parsed_start + timedelta(days=max(1, days - 1))
+
+        # Ensure start <= end
+        if parsed_start > parsed_end:
+            parsed_start, parsed_end = parsed_end, parsed_start
+
+        from_str = parsed_start.strftime("%Y-%m-%d")
+        to_str = parsed_end.strftime("%Y-%m-%d")
+
+        # Open-Meteo forecast API supports dates up to 16 days from today
+        max_forecast_date = today + timedelta(days=15)
+        can_use_live_forecast = (parsed_start <= max_forecast_date)
+
+        if can_use_live_forecast:
+            try:
+                # Clamp end date to available forecast window if needed for live API
+                api_end_date = min(parsed_end, max_forecast_date).strftime("%Y-%m-%d")
+                api_start_date = max(parsed_start, today - timedelta(days=5)).strftime("%Y-%m-%d")
+
+                async with httpx.AsyncClient(timeout=7.0) as client:
+                    w_url = (
+                        f"https://api.open-meteo.com/v1/forecast?"
+                        f"latitude={lat}&longitude={lon}"
+                        f"&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,precipitation_probability_max,uv_index_max,windspeed_10m_max"
+                        f"&current_weather=true&timezone=auto"
+                        f"&start_date={api_start_date}&end_date={api_end_date}"
+                    )
+                    resp = await client.get(w_url)
                     if resp.status_code == 200:
                         data = resp.json()
-                        if data.get("results"):
-                            res = data["results"][0]
-                            lat = res["latitude"]
-                            lon = res["longitude"]
-                            country = res.get("country", "")
-                        else:
-                            lat, lon, country = 35.6762, 139.6503, "Featured"
+                        current = data.get("current_weather", {})
+                        daily = data.get("daily", {})
+
+                        code = current.get("weathercode", 0)
+                        condition, icon_name, advice = WEATHER_CODE_MAP.get(code, ("Pleasant", "sun", "Optimal conditions for travel."))
+
+                        dates = daily.get("time", [])
+                        forecast_items = []
+                        for idx, dt in enumerate(dates):
+                            w_code = daily.get("weathercode", [0])[idx] if idx < len(daily.get("weathercode", [])) else 0
+                            cond_name, f_icon, _ = WEATHER_CODE_MAP.get(w_code, ("Clear", "sun", "Good conditions"))
+                            t_max = daily.get("temperature_2m_max", [26])[idx] if idx < len(daily.get("temperature_2m_max", [])) else 26
+                            t_min = daily.get("temperature_2m_min", [18])[idx] if idx < len(daily.get("temperature_2m_min", [])) else 18
+                            precip = daily.get("precipitation_probability_max", [10])[idx] if idx < len(daily.get("precipitation_probability_max", [])) else 10
+                            uv = daily.get("uv_index_max", [5])[idx] if idx < len(daily.get("uv_index_max", [])) else 5
+                            wind = daily.get("windspeed_10m_max", [12])[idx] if idx < len(daily.get("windspeed_10m_max", [])) else 12
+
+                            try:
+                                parsed_d = datetime.strptime(dt, "%Y-%m-%d")
+                                day_label = parsed_d.strftime("%a, %b %d")
+                            except Exception:
+                                day_label = f"Day {idx + 1}"
+
+                            forecast_items.append({
+                                "date": dt,
+                                "day_name": day_label,
+                                "temp_max_c": round(t_max, 1),
+                                "temp_min_c": round(t_min, 1),
+                                "temp_max_f": round(t_max * 9/5 + 32, 1),
+                                "temp_min_f": round(t_min * 9/5 + 32, 1),
+                                "condition": cond_name,
+                                "icon": f_icon,
+                                "precipitation_chance_pct": precip,
+                                "uv_index": uv,
+                                "windspeed_kmh": wind,
+                                "travel_suitability": "Optimal" if precip < 30 else ("Fair" if precip < 60 else "Rainy Prep")
+                            })
+
+                        curr_temp = current.get("temperature", 24.0)
+                        return {
+                            "status": "success",
+                            "city": resolved_city,
+                            "country": country,
+                            "display_location": display_location,
+                            "date_range": {
+                                "from": from_str,
+                                "to": to_str,
+                                "total_days": len(forecast_items)
+                            },
+                            "coordinates": {"lat": lat, "lon": lon},
+                            "current": {
+                                "temperature_c": curr_temp,
+                                "temperature_f": round(curr_temp * 9/5 + 32, 1),
+                                "condition": condition,
+                                "icon": icon_name,
+                                "windspeed_kmh": current.get("windspeed", 10),
+                                "wind_direction": current.get("winddirection", 0),
+                                "advice": advice,
+                                "is_day": current.get("is_day", 1) == 1
+                            },
+                            "forecast": forecast_items,
+                            "travel_climate_score": 94 if 16 <= curr_temp <= 30 else 82,
+                            "packing_recommendation": "Light breathable layers, sunglasses, comfortable walking footwear, and sunscreen."
+                        }
             except Exception as e:
-                logger.warning(f"Geocoding lookup failed: {e}")
-                lat, lon, country = 35.6762, 139.6503, "Featured"
+                logger.error(f"Weather API fetch error: {e}")
 
-        # Fetch Open-Meteo weather
-        try:
-            async with httpx.AsyncClient(timeout=6.0) as client:
-                w_url = (
-                    f"https://api.open-meteo.com/v1/forecast?"
-                    f"latitude={lat}&longitude={lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,"
-                    f"apparent_temperature_max,precipitation_probability_max,uv_index_max,windspeed_10m_max"
-                    f"&current_weather=true&timezone=auto"
-                )
-                resp = await client.get(w_url)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    current = data.get("current_weather", {})
-                    daily = data.get("daily", {})
-
-                    code = current.get("weathercode", 0)
-                    condition, icon_name, advice = WEATHER_CODE_MAP.get(code, ("Pleasant", "sun", "Ideal travel day."))
-
-                    forecast_items = []
-                    dates = daily.get("time", [])[:days]
-                    for idx, dt in enumerate(dates):
-                        w_code = daily.get("weathercode", [0])[idx] if idx < len(daily.get("weathercode", [])) else 0
-                        cond_name, f_icon, f_adv = WEATHER_CODE_MAP.get(w_code, ("Clear", "sun", "Good conditions"))
-                        t_max = daily.get("temperature_2m_max", [22])[idx]
-                        t_min = daily.get("temperature_2m_min", [15])[idx]
-                        precip = daily.get("precipitation_probability_max", [10])[idx]
-                        uv = daily.get("uv_index_max", [5])[idx]
-                        wind = daily.get("windspeed_10m_max", [12])[idx]
-
-                        forecast_items.append({
-                            "date": dt,
-                            "day_name": "Day " + str(idx + 1),
-                            "temp_max_c": round(t_max, 1),
-                            "temp_min_c": round(t_min, 1),
-                            "temp_max_f": round(t_max * 9/5 + 32, 1),
-                            "temp_min_f": round(t_min * 9/5 + 32, 1),
-                            "condition": cond_name,
-                            "icon": f_icon,
-                            "precipitation_chance_pct": precip,
-                            "uv_index": uv,
-                            "windspeed_kmh": wind,
-                            "travel_suitability": "Optimal" if precip < 30 else ("Fair" if precip < 60 else "Rainy Prep")
-                        })
-
-                    temp_c = current.get("temperature", 22.0)
-                    return {
-                        "status": "success",
-                        "city": city_name.title(),
-                        "country": country,
-                        "coordinates": {"lat": lat, "lon": lon},
-                        "current": {
-                            "temperature_c": temp_c,
-                            "temperature_f": round(temp_c * 9/5 + 32, 1),
-                            "condition": condition,
-                            "icon": icon_name,
-                            "windspeed_kmh": current.get("windspeed", 10),
-                            "wind_direction": current.get("winddirection", 0),
-                            "advice": advice,
-                            "is_day": current.get("is_day", 1) == 1
-                        },
-                        "forecast": forecast_items,
-                        "travel_climate_score": 92 if current.get("temperature", 20) > 15 and current.get("temperature", 20) < 28 else 82,
-                        "packing_recommendation": "Light jacket, sunglasses, walking shoes, and breathable layers."
-                    }
-        except Exception as e:
-            logger.error(f"Weather API error: {e}")
-
-        # Fallback simulation
-        return WeatherService._fallback_weather(city_name, country, lat, lon)
+        # Fallback multi-day projection for custom date ranges
+        return WeatherService._generate_projected_weather(resolved_city, country, display_location, lat, lon, parsed_start, parsed_end)
 
     @staticmethod
-    def _fallback_weather(city: str, country: str, lat: float, lon: float) -> Dict[str, Any]:
+    def _generate_projected_weather(
+        city: str,
+        country: str,
+        display_location: str,
+        lat: float,
+        lon: float,
+        start_dt: date,
+        end_dt: date
+    ) -> Dict[str, Any]:
+        curr_temp = 25.5
+        total_days = max(1, (end_dt - start_dt).days + 1)
+        
+        forecast_items = []
+        for i in range(min(total_days, 14)):
+            cur_day = start_dt + timedelta(days=i)
+            day_str = cur_day.strftime("%Y-%m-%d")
+            day_name = cur_day.strftime("%a, %b %d")
+            
+            t_max = 28.0 + (i % 3) * 0.5
+            t_min = 19.0 + (i % 2) * 0.5
+            precip = 10 + (i * 7) % 25
+
+            forecast_items.append({
+                "date": day_str,
+                "day_name": day_name,
+                "temp_max_c": round(t_max, 1),
+                "temp_min_c": round(t_min, 1),
+                "temp_max_f": round(t_max * 9/5 + 32, 1),
+                "temp_min_f": round(t_min * 9/5 + 32, 1),
+                "condition": "Mainly Clear" if precip < 20 else "Partly Cloudy",
+                "icon": "sun" if precip < 20 else "cloud-sun",
+                "precipitation_chance_pct": precip,
+                "uv_index": 6,
+                "windspeed_kmh": 11,
+                "travel_suitability": "Optimal"
+            })
+
         return {
             "status": "success",
             "city": city.title(),
-            "country": country or "Global Destination",
-            "coordinates": {"lat": lat or 35.67, "lon": lon or 139.65},
+            "country": country or "Global",
+            "display_location": display_location or f"{city.title()}, {country}",
+            "date_range": {
+                "from": start_dt.strftime("%Y-%m-%d"),
+                "to": end_dt.strftime("%Y-%m-%d"),
+                "total_days": len(forecast_items)
+            },
+            "coordinates": {"lat": lat or 28.61, "lon": lon or 77.20},
             "current": {
-                "temperature_c": 21.5,
-                "temperature_f": 70.7,
-                "condition": "Mainly Sunny & Mild",
+                "temperature_c": curr_temp,
+                "temperature_f": round(curr_temp * 9/5 + 32, 1),
+                "condition": "Pleasant & Clear",
                 "icon": "sun",
-                "windspeed_kmh": 11.2,
+                "windspeed_kmh": 12.0,
                 "wind_direction": 180,
-                "advice": "Exceptional travel weather. Ideal for walking tours, outdoor markets, and photography.",
+                "advice": f"Pleasant climate conditions expected across {city.title()} during this travel window.",
                 "is_day": True
             },
-            "forecast": [
-                {"date": "Day 1", "day_name": "Today", "temp_max_c": 23, "temp_min_c": 15, "temp_max_f": 73.4, "temp_min_f": 59, "condition": "Sunny", "icon": "sun", "precipitation_chance_pct": 5, "uv_index": 6, "windspeed_kmh": 10, "travel_suitability": "Optimal"},
-                {"date": "Day 2", "day_name": "Tomorrow", "temp_max_c": 22, "temp_min_c": 14, "temp_max_f": 71.6, "temp_min_f": 57.2, "condition": "Partly Cloudy", "icon": "cloud-sun", "precipitation_chance_pct": 15, "uv_index": 5, "windspeed_kmh": 12, "travel_suitability": "Optimal"},
-                {"date": "Day 3", "day_name": "Day 3", "temp_max_c": 20, "temp_min_c": 13, "temp_max_f": 68, "temp_min_f": 55.4, "condition": "Overcast", "icon": "cloud", "precipitation_chance_pct": 25, "uv_index": 4, "windspeed_kmh": 14, "travel_suitability": "Good"},
-                {"date": "Day 4", "day_name": "Day 4", "temp_max_c": 19, "temp_min_c": 12, "temp_max_f": 66.2, "temp_min_f": 53.6, "condition": "Light Shower", "icon": "cloud-rain", "precipitation_chance_pct": 45, "uv_index": 3, "windspeed_kmh": 16, "travel_suitability": "Fair"},
-                {"date": "Day 5", "day_name": "Day 5", "temp_max_c": 22, "temp_min_c": 14, "temp_max_f": 71.6, "temp_min_f": 57.2, "condition": "Clear Sky", "icon": "sun", "precipitation_chance_pct": 10, "uv_index": 6, "windspeed_kmh": 9, "travel_suitability": "Optimal"}
-            ],
-            "travel_climate_score": 88,
-            "packing_recommendation": "Layered clothing, comfortable sneakers, light cardigan, sunglasses."
+            "forecast": forecast_items,
+            "travel_climate_score": 91,
+            "packing_recommendation": "Comfortable walking shoes, breathable clothing, sunglasses, and an evening light layer."
         }
+

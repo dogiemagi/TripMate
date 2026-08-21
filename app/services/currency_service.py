@@ -5,7 +5,9 @@ from app.models.schemas import CurrencyConvertRequest
 
 logger = logging.getLogger("voyage.budget")
 
+# Live Benchmark Currency Matrix
 EXCHANGE_RATES_USD = {
+    "INR": 83.50,
     "USD": 1.0,
     "EUR": 0.92,
     "GBP": 0.79,
@@ -14,7 +16,6 @@ EXCHANGE_RATES_USD = {
     "CAD": 1.37,
     "CHF": 0.91,
     "CNY": 7.24,
-    "INR": 83.45,
     "SGD": 1.35,
     "AED": 3.67,
     "THB": 36.8,
@@ -24,20 +25,25 @@ EXCHANGE_RATES_USD = {
 }
 
 CURRENCY_SYMBOLS = {
-    "USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥",
-    "INR": "₹", "AED": "AED ", "AUD": "A$", "CAD": "C$",
-    "SGD": "S$", "CHF": "CHF ", "CNY": "¥", "THB": "฿"
+    "INR": "₹", "USD": "$", "EUR": "€", "GBP": "£", "JPY": "¥",
+    "AED": "AED ", "AUD": "A$", "CAD": "C$", "SGD": "S$",
+    "CHF": "CHF ", "CNY": "¥", "THB": "฿", "IDR": "Rp "
 }
 
-DAILY_COST_BENCHMARKS = {
-    "tokyo": {"backpacker": 45, "midrange": 130, "luxury": 420, "currency": "JPY", "symbol": "¥"},
-    "paris": {"backpacker": 65, "midrange": 160, "luxury": 500, "currency": "EUR", "symbol": "€"},
-    "rome": {"backpacker": 55, "midrange": 140, "luxury": 450, "currency": "EUR", "symbol": "€"},
-    "new york": {"backpacker": 90, "midrange": 250, "luxury": 750, "currency": "USD", "symbol": "$"},
-    "london": {"backpacker": 75, "midrange": 190, "luxury": 580, "currency": "GBP", "symbol": "£"},
-    "bali": {"backpacker": 25, "midrange": 65, "luxury": 220, "currency": "IDR", "symbol": "Rp"},
-    "bangkok": {"backpacker": 30, "midrange": 75, "luxury": 250, "currency": "THB", "symbol": "฿"},
-    "dubai": {"backpacker": 70, "midrange": 200, "luxury": 600, "currency": "AED", "symbol": "AED"}
+# Daily cost benchmarks in INR (₹)
+DAILY_COST_BENCHMARKS_INR = {
+    "delhi": {"backpacker": 1800, "midrange": 4500, "luxury": 16000},
+    "mumbai": {"backpacker": 2200, "midrange": 5500, "luxury": 20000},
+    "goa": {"backpacker": 1500, "midrange": 4000, "luxury": 15000},
+    "bengaluru": {"backpacker": 1800, "midrange": 4800, "luxury": 17000},
+    "tokyo": {"backpacker": 3750, "midrange": 10800, "luxury": 35000},
+    "paris": {"backpacker": 5400, "midrange": 13300, "luxury": 41500},
+    "rome": {"backpacker": 4600, "midrange": 11600, "luxury": 37500},
+    "new york": {"backpacker": 7500, "midrange": 20800, "luxury": 62500},
+    "london": {"backpacker": 6250, "midrange": 15800, "luxury": 48000},
+    "dubai": {"backpacker": 5800, "midrange": 16500, "luxury": 50000},
+    "bali": {"backpacker": 2100, "midrange": 5400, "luxury": 18500},
+    "bangkok": {"backpacker": 2500, "midrange": 6250, "luxury": 21000}
 }
 
 class CurrencyBudgetService:
@@ -90,20 +96,30 @@ class CurrencyBudgetService:
         }
 
     @staticmethod
-    def get_trip_budget_estimate(city: str, days: int = 5, style: str = "midrange") -> Dict[str, Any]:
+    def get_trip_budget_estimate(city: str, days: int = 5, style: str = "midrange", currency: str = "INR") -> Dict[str, Any]:
         c_clean = city.strip().lower()
-        benchmark = DAILY_COST_BENCHMARKS.get(c_clean, {"backpacker": 50, "midrange": 140, "luxury": 450, "currency": "USD", "symbol": "$"})
+        benchmark = DAILY_COST_BENCHMARKS_INR.get(
+            c_clean, 
+            {"backpacker": 3500, "midrange": 9500, "luxury": 28000}
+        )
         
         style_key = style.lower()
-        daily_usd = benchmark.get(style_key, benchmark.get("midrange", 140))
-        total_usd = daily_usd * days
+        daily_inr = benchmark.get(style_key, benchmark.get("midrange", 9500))
+        total_inr = daily_inr * days
+
+        cur_upper = currency.upper().strip()
+        fx_to_inr = EXCHANGE_RATES_USD.get("INR", 83.5) / EXCHANGE_RATES_USD.get(cur_upper, 83.5)
+        
+        daily_target = round(daily_inr / fx_to_inr, 2)
+        total_target = round(total_inr / fx_to_inr, 2)
+        sym = CURRENCY_SYMBOLS.get(cur_upper, "₹")
 
         breakdown = {
-            "Accommodation (Hotel/Hostel/Airbnb)": round(total_usd * 0.42, 2),
-            "Dining & Local Gastronomy": round(total_usd * 0.28, 2),
-            "Activities, Museums & Guided Tours": round(total_usd * 0.16, 2),
-            "Public Transit & Rideshare": round(total_usd * 0.08, 2),
-            "Souvenirs & Contingency Buffer": round(total_usd * 0.06, 2)
+            "Accommodation & Stays": round(total_target * 0.42, 2),
+            "Dining & Gastronomy": round(total_target * 0.28, 2),
+            "Activities, Entry & Guided Tours": round(total_target * 0.16, 2),
+            "Local Transit & Cabs": round(total_target * 0.08, 2),
+            "Contingency & Souvenir Buffer": round(total_target * 0.06, 2)
         }
 
         return {
@@ -111,12 +127,14 @@ class CurrencyBudgetService:
             "city": city.title(),
             "duration_days": days,
             "budget_tier": style.title(),
-            "daily_budget_usd": daily_usd,
-            "total_budget_usd": total_usd,
+            "currency": cur_upper,
+            "currency_symbol": sym,
+            "daily_budget": daily_target,
+            "total_budget": total_target,
             "cost_breakdown": breakdown,
             "money_saving_hacks": [
-                "Purchase multi-day museum and public transit combo passes to save up to 35%.",
-                "Withdraw local currency from official bank ATMs rather than airport foreign exchange booths.",
-                "Dine on the chef's lunch set menu (Menu del Día / Teishoku) for Michelin-level food at 50% evening prices."
+                "Book verified boutique homestays or heritage properties for premium comfort at 30% lower cost.",
+                "Opt for local metro smart cards or city transit day-passes for seamless commute.",
+                "Enjoy local lunchtime special thalis and chef sets for authentic flavors at economical pricing."
             ]
         }

@@ -6,7 +6,7 @@
   <title>VoyageAI - Multimodal AI Travel Intelligence Platform</title>
   <meta name="description" content="Production-ready multimodal travel intelligence platform with AI vision, real-time weather radar, smart itinerary builder, gastronomy guide, and currency budgeting." />
 
-  <!-- Fonts & Icons -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -37,11 +37,30 @@
       </a>
 
       <div class="nav-search">
-        <i data-lucide="search"></i>
-        <input type="text" id="global-city-search" placeholder="Search any city (e.g. Tokyo, Paris, Rome, Bali)..." />
+        <i data-lucide="search" id="global-search-icon" style="color: var(--text-muted); cursor: pointer;"></i>
+        <input type="text" id="global-city-search" placeholder="Search any city globally (e.g. Delhi, Chennai, Paris, Tokyo, Goa, New York)..." />
+        <button id="global-search-btn" class="nav-search-btn" title="Search Destination">
+          <i data-lucide="arrow-right"></i>
+        </button>
       </div>
 
       <div class="nav-actions">
+        <!-- Global Currency Switcher (Default: INR) -->
+        <div class="currency-picker-wrapper">
+          <i data-lucide="banknote" class="currency-picker-icon"></i>
+          <select id="global-currency-select" class="currency-select-input" title="Change Base Currency">
+            <option value="INR" selected>INR (₹)</option>
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="AED">AED</option>
+            <option value="JPY">JPY (¥)</option>
+            <option value="SGD">SGD (S$)</option>
+            <option value="AUD">AUD (A$)</option>
+            <option value="CAD">CAD (C$)</option>
+          </select>
+        </div>
+
         <div class="status-badge">
           <span class="status-dot"></span>
           <span>API Cloud Active</span>
@@ -67,7 +86,7 @@
         </li>
         <li>
           <button class="tab-btn" data-tab="tab-itinerary">
-            <i data-lucide="map"></i> Smart Itinerary
+            <i data-lucide="map"></i> Smart Itinerary & Map
           </button>
         </li>
         <li>
@@ -96,7 +115,9 @@
     <!-- Main Dynamic Content Container -->
     <main class="main-wrapper">
 
-      <!-- TAB 1: MULTIMODAL VISION HUB -->
+      <!-- ================================================================= -->
+      <!-- TAB 1: MULTIMODAL VISION HUB                                      -->
+      <!-- ================================================================= -->
       <section id="tab-vision" class="tab-pane active">
         <div class="section-header">
           <div class="section-header-left">
@@ -106,6 +127,7 @@
         </div>
 
         <div class="grid-split">
+          <!-- Upload & Controls -->
           <div class="glass-card">
             <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">Visual Input</h3>
             
@@ -126,26 +148,26 @@
               <div class="form-group">
                 <label class="form-label">Analysis Mode</label>
                 <select id="vision-mode-select" class="form-control">
-                  <option value="landmark">🏛️ Landmark & Heritage Identifier</option>
-                  <option value="menu">🍽️ Restaurant Menu & Allergen Translator</option>
-                  <option value="luggage">🎒 Luggage & Gear Outfit Checker</option>
-                  <option value="scene">📸 Photography & Lighting Scenery</option>
+                  <option value="landmark">Landmark & Heritage Identifier</option>
+                  <option value="menu">Restaurant Menu & Allergen Translator</option>
+                  <option value="luggage">Luggage & Outfit Checker</option>
+                  <option value="scene">Photography & Lighting Analysis</option>
                 </select>
               </div>
 
               <div class="form-group">
                 <label class="form-label">Specific Question / Prompt</label>
-                <input type="text" id="vision-prompt" class="form-control" placeholder="e.g. Is this dish gluten-free? What is the best photo angle?" />
+                <input type="text" id="vision-prompt" class="form-control" placeholder="e.g. Is this dish gluten-free? What is the best photography angle?" />
               </div>
 
               <div>
                 <label class="form-label" style="font-size: 0.75rem;">Quick Sample Testing</label>
                 <div class="sample-chips">
-                  <span class="sample-chip" data-sample="Eiffel Tower Paris">🗼 Eiffel Tower</span>
-                  <span class="sample-chip" data-sample="Colosseum Rome">🏛️ Colosseum</span>
-                  <span class="sample-chip" data-sample="Mount Fuji Japan">🗻 Mount Fuji</span>
-                  <span class="sample-chip" data-sample="Taj Mahal Agra">🕌 Taj Mahal</span>
-                  <span class="sample-chip" data-sample="Italian Trattoria Menu">📜 Italian Menu</span>
+                  <span class="sample-chip" data-sample="Taj Mahal Agra"><i data-lucide="landmark"></i> Taj Mahal</span>
+                  <span class="sample-chip" data-sample="Eiffel Tower Paris"><i data-lucide="landmark"></i> Eiffel Tower</span>
+                  <span class="sample-chip" data-sample="Colosseum Rome"><i data-lucide="landmark"></i> Colosseum</span>
+                  <span class="sample-chip" data-sample="Mount Fuji Japan"><i data-lucide="mountain"></i> Mount Fuji</span>
+                  <span class="sample-chip" data-sample="Italian Trattoria Menu"><i data-lucide="file-text"></i> Trattoria Menu</span>
                 </div>
               </div>
 
@@ -155,6 +177,7 @@
             </div>
           </div>
 
+          <!-- Vision Results Display -->
           <div id="vision-results">
             <div class="glass-card" style="text-align: center; padding: 4rem 2rem;">
               <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
@@ -162,86 +185,192 @@
               </div>
               <h3 style="font-size: 1.25rem; color: #fff; font-weight: 700;">Awaiting Visual Input</h3>
               <p style="color: var(--text-secondary); max-width: 420px; margin: 0.5rem auto 0; font-size: 0.9rem;">
-                Upload an image or pick one of the sample landmarks to trigger real-time AI recognition, cultural guides, and culinary translations.
+                Upload an image or select a sample landmark to trigger real-time AI recognition, cultural guides, and culinary translations.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- TAB 2: WEATHER & FORECAST -->
+      <!-- ================================================================= -->
+      <!-- TAB 2: WEATHER & FORECAST (WITH USER WISABLE FROM-TO DATE PICKER)  -->
+      <!-- ================================================================= -->
       <section id="tab-weather" class="tab-pane">
         <div class="section-header">
           <div class="section-header-left">
             <h1><i data-lucide="cloud-sun"></i> Global Weather & Travel Radar</h1>
-            <p>Live atmospheric metrics, 7-day temperature forecasts, and AI packing climate index.</p>
+            <p>Atmospheric metrics, custom date-range forecast filter (From - To), and AI packing index.</p>
           </div>
-          <div style="display: flex; gap: 0.75rem;">
-            <input type="text" id="weather-city-input" class="form-control" style="width: 220px;" placeholder="City name..." value="Tokyo" />
-            <button id="weather-search-btn" class="btn btn-primary"><i data-lucide="refresh-cw"></i> Update</button>
+        </div>
+
+        <!-- Weather Search & Date Range Toolbar -->
+        <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
+          <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
+            <div style="flex: 1 1 200px;">
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="map-pin"></i> Destination City
+              </label>
+              <input type="text" id="weather-city-input" class="form-control" placeholder="City name..." value="Delhi" />
+            </div>
+
+            <div style="flex: 1 1 160px;">
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="calendar"></i> From Date
+              </label>
+              <input type="date" id="weather-from-date" class="form-control" />
+            </div>
+
+            <div style="flex: 1 1 160px;">
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="calendar-range"></i> To Date
+              </label>
+              <input type="date" id="weather-to-date" class="form-control" />
+            </div>
+
+            <button id="weather-search-btn" class="btn btn-primary" style="height: 44px;">
+              <i data-lucide="refresh-cw"></i> Check Weather Radar
+            </button>
+          </div>
+
+          <!-- Quick Date Range Presets -->
+          <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display:flex; align-items:center; gap:0.3rem;">
+              <i data-lucide="clock" style="width:13px; height:13px;"></i> Quick Date Ranges:
+            </span>
+            <button type="button" class="date-preset-chip" data-preset="today">Today</button>
+            <button type="button" class="date-preset-chip" data-preset="3days">Next 3 Days</button>
+            <button type="button" class="date-preset-chip active" data-preset="7days">Next 7 Days</button>
+            <button type="button" class="date-preset-chip" data-preset="14days">Next 14 Days</button>
+            <button type="button" class="date-preset-chip" data-preset="weekend">This Weekend</button>
+            <button type="button" id="open-calendar-modal-btn" class="date-preset-chip" style="color:var(--accent-cyan); border-color:rgba(6,182,212,0.4); display:inline-flex; align-items:center; gap:0.35rem;">
+              <i data-lucide="calendar"></i> Choose from Calendar
+            </button>
+          </div>
+        </div>
+
+        <!-- Interactive Calendar Range Picker Modal -->
+        <div id="calendar-range-modal" class="modal-overlay" style="display: none;">
+          <div class="glass-card modal-content" style="max-width: 440px; width: 92%; padding: 1.5rem; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem;">
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="calendar" style="color: var(--accent-cyan);"></i> Select Travel Date Range
+              </h3>
+              <button id="close-calendar-modal" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.8rem; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+                <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+              </button>
+            </div>
+
+            <!-- Calendar Month Header & Navigation -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <button id="cal-prev-month" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+                <i data-lucide="chevron-left"></i>
+              </button>
+              <span id="cal-month-year-label" style="font-weight: 700; font-size: 1.05rem; color: #fff;">August 2026</span>
+              <button id="cal-next-month" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+                <i data-lucide="chevron-right"></i>
+              </button>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid-header">
+              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+            </div>
+            <div id="calendar-days-grid" class="calendar-days-grid">
+              <!-- Injected via JS -->
+            </div>
+
+            <!-- Selected Range Summary & Actions -->
+            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Selected Window:</div>
+                <div id="cal-selected-range-text" style="font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan);">
+                  Click start & end dates
+                </div>
+              </div>
+              <div style="display: flex; gap: 0.5rem;">
+                <button id="cal-reset-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">Reset</button>
+                <button id="cal-apply-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.9rem;">
+                  <i data-lucide="check"></i> Apply Range
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         <div id="weather-content">
+          <!-- Injected via JS -->
         </div>
       </section>
 
-      <!-- TAB 3: SMART ITINERARY PLANNER -->
+      <!-- ================================================================= -->
+      <!-- TAB 3: SMART ITINERARY PLANNER & MAP                              -->
+      <!-- ================================================================= -->
       <section id="tab-itinerary" class="tab-pane">
         <div class="section-header">
           <div class="section-header-left">
-            <h1><i data-lucide="map"></i> AI Smart Itinerary Planner</h1>
-            <p>Multi-day custom travel plans with sequenced timelines, cost estimates, and interactive Leaflet map routing.</p>
+            <h1><i data-lucide="map"></i> AI Smart Itinerary & Interactive Map</h1>
+            <p>Multi-day custom travel plans dynamically geocoded to your exact location query, with cost breakdown in <span class="currency-highlight">INR (₹)</span>.</p>
           </div>
         </div>
 
         <div class="grid-split">
+          <!-- Itinerary Controls -->
           <div class="glass-card">
             <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff;">Trip Parameters</h3>
             
             <div class="form-group">
-              <label class="form-label">Destination</label>
-              <input type="text" id="itinerary-dest" class="form-control" value="Tokyo, Japan" />
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="map-pin"></i> Destination Location
+              </label>
+              <input type="text" id="itinerary-dest" class="form-control" value="Delhi, India" placeholder="e.g. Chennai, Paris, Tokyo, Bengaluru, Rome..." />
             </div>
 
             <div class="form-group">
-              <label class="form-label">Duration (Days)</label>
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="clock"></i> Duration (Days)
+              </label>
               <select id="itinerary-days" class="form-control">
                 <option value="1">1 Day Express</option>
-                <option value="2">2 Days Weekend</option>
-                <option value="3" selected>3 Days Classic</option>
+                <option value="2" selected>2 Days Weekend</option>
+                <option value="3">3 Days Classic</option>
                 <option value="5">5 Days In-Depth</option>
                 <option value="7">7 Days Grand Tour</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Travel Style</label>
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="compass"></i> Travel Style
+              </label>
               <select id="itinerary-style" class="form-control">
-                <option value="Balanced" selected>⚖️ Balanced (Sights & Food)</option>
-                <option value="Cultural">🏛️ Cultural & Historical</option>
-                <option value="Adventure">🧗 Active & Adventure</option>
-                <option value="Foodie">🍜 Culinary & Gastronomy</option>
-                <option value="Luxury">💎 Luxury & Relaxation</option>
+                <option value="Balanced" selected>Balanced (Sights & Food)</option>
+                <option value="Cultural">Cultural & Historical</option>
+                <option value="Adventure">Active & Adventure</option>
+                <option value="Foodie">Culinary & Gastronomy</option>
+                <option value="Luxury">Luxury & Relaxation</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Pace</label>
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="activity"></i> Pace
+              </label>
               <select id="itinerary-pace" class="form-control">
-                <option value="Relaxed">🌴 Relaxed</option>
-                <option value="Moderate" selected>🚶 Moderate</option>
-                <option value="Fast-Paced">⚡ Fast-Paced</option>
+                <option value="Relaxed">Relaxed</option>
+                <option value="Moderate" selected>Moderate</option>
+                <option value="Fast-Paced">Fast-Paced</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Budget Tier</label>
+              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                <i data-lucide="wallet"></i> Budget Tier
+              </label>
               <select id="itinerary-budget" class="form-control">
-                <option value="Backpacker">🎒 Backpacker ($45/day)</option>
-                <option value="Moderate" selected>🏨 Moderate ($120/day)</option>
-                <option value="Premium">✨ Premium ($280/day)</option>
-                <option value="Luxury">👑 Luxury ($650/day)</option>
+                <option value="Backpacker">Backpacker (Budget)</option>
+                <option value="Moderate" selected>Moderate (Standard)</option>
+                <option value="Premium">Premium (Comfort)</option>
+                <option value="Luxury">Luxury (Five-Star)</option>
               </select>
             </div>
 
@@ -250,15 +379,33 @@
             </button>
           </div>
 
+          <!-- Itinerary Results & Interactive Map -->
           <div>
-            <div id="itinerary-map" style="margin-bottom: 1.5rem;"></div>
+            <div class="map-card-wrapper">
+              <div class="map-header">
+                <span style="font-weight: 700; font-size: 0.92rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="navigation" style="color: var(--accent-cyan);"></i> Live Geo-Routing Radar
+                </span>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                  <button id="recenter-map-btn" class="btn btn-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+                    <i data-lucide="crosshair"></i> Recenter
+                  </button>
+                  <span id="map-status-badge" class="brand-badge">Map Active</span>
+                </div>
+              </div>
+              <div id="itinerary-map"></div>
+            </div>
+
             <div id="itinerary-results">
+              <!-- Rendered via JS -->
             </div>
           </div>
         </div>
       </section>
 
-      <!-- TAB 4: GASTRONOMY & FOOD EXPLORER -->
+      <!-- ================================================================= -->
+      <!-- TAB 4: GASTRONOMY & FOOD EXPLORER                                 -->
+      <!-- ================================================================= -->
       <section id="tab-food" class="tab-pane">
         <div class="section-header">
           <div class="section-header-left">
@@ -266,7 +413,7 @@
             <p>Signature authentic dishes, pronunciations, curated eateries, and strict dietary filters.</p>
           </div>
           <div style="display: flex; gap: 0.75rem;">
-            <input type="text" id="food-city-input" class="form-control" style="width: 200px;" placeholder="City..." value="Rome" />
+            <input type="text" id="food-city-input" class="form-control" style="width: 200px;" placeholder="City..." value="Delhi" />
             <button id="food-search-btn" class="btn btn-primary"><i data-lucide="search"></i> Explore</button>
           </div>
         </div>
@@ -274,56 +421,60 @@
         <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
           <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
             <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Dietary Filters:</span>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer;">
-              <input type="checkbox" class="diet-filter-cb" value="Vegetarian" /> 🌿 Vegetarian
+            <label class="filter-label">
+              <input type="checkbox" class="diet-filter-cb" value="Vegetarian" /> <i data-lucide="leaf"></i> Vegetarian
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer;">
-              <input type="checkbox" class="diet-filter-cb" value="Vegan" /> 🌱 Vegan
+            <label class="filter-label">
+              <input type="checkbox" class="diet-filter-cb" value="Vegan" /> <i data-lucide="sprout"></i> Vegan
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer;">
-              <input type="checkbox" class="diet-filter-cb" value="Gluten-Free" /> 🌾 Gluten-Free
+            <label class="filter-label">
+              <input type="checkbox" class="diet-filter-cb" value="Gluten-Free" /> <i data-lucide="wheat"></i> Gluten-Free
             </label>
-            <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.88rem; cursor: pointer;">
-              <input type="checkbox" class="diet-filter-cb" value="Halal" /> ☪️ Halal Friendly
+            <label class="filter-label">
+              <input type="checkbox" class="diet-filter-cb" value="Halal" /> <i data-lucide="shield-check"></i> Halal Friendly
             </label>
           </div>
         </div>
 
         <div id="food-content">
+          <!-- Injected via JS -->
         </div>
       </section>
 
-      <!-- TAB 5: CURRENCY & BUDGET CALCULATOR -->
+      <!-- ================================================================= -->
+      <!-- TAB 5: CURRENCY & BUDGET CALCULATOR                               -->
+      <!-- ================================================================= -->
       <section id="tab-budget" class="tab-pane">
         <div class="section-header">
           <div class="section-header-left">
             <h1><i data-lucide="coins"></i> Currency FX & Travel Budgeter</h1>
-            <p>Live foreign exchange conversions and realistic daily travel expense estimators.</p>
+            <p>Live foreign exchange conversions and realistic daily travel expense estimators in INR (₹) and global currencies.</p>
           </div>
         </div>
 
         <div class="grid-2">
+          <!-- FX Converter -->
           <div class="glass-card">
             <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Live Currency Converter</h3>
             
             <div class="form-group">
               <label class="form-label">Amount</label>
-              <input type="number" id="currency-amount" class="form-control" value="100" />
+              <input type="number" id="currency-amount" class="form-control" value="1000" />
             </div>
 
             <div class="grid-2">
               <div class="form-group">
                 <label class="form-label">From Currency</label>
                 <select id="currency-from" class="form-control">
-                  <option value="USD" selected>USD ($)</option>
+                  <option value="INR" selected>INR (₹)</option>
+                  <option value="USD">USD ($)</option>
                   <option value="EUR">EUR (€)</option>
                   <option value="GBP">GBP (£)</option>
+                  <option value="AED">AED</option>
                   <option value="JPY">JPY (¥)</option>
-                  <option value="INR">INR (₹)</option>
                   <option value="AUD">AUD (A$)</option>
                   <option value="CAD">CAD (C$)</option>
                   <option value="SGD">SGD (S$)</option>
-                  <option value="AED">AED</option>
                   <option value="THB">THB (฿)</option>
                 </select>
               </div>
@@ -331,13 +482,14 @@
               <div class="form-group">
                 <label class="form-label">To Currency</label>
                 <select id="currency-to" class="form-control">
-                  <option value="EUR" selected>EUR (€)</option>
-                  <option value="JPY">JPY (¥)</option>
-                  <option value="USD">USD ($)</option>
+                  <option value="USD" selected>USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
                   <option value="GBP">GBP (£)</option>
                   <option value="INR">INR (₹)</option>
-                  <option value="AUD">AUD (A$)</option>
                   <option value="AED">AED</option>
+                  <option value="JPY">JPY (¥)</option>
+                  <option value="SGD">SGD (S$)</option>
+                  <option value="AUD">AUD (A$)</option>
                   <option value="THB">THB (฿)</option>
                   <option value="IDR">IDR (Rp)</option>
                 </select>
@@ -349,19 +501,20 @@
             </button>
 
             <div id="currency-result-box" style="margin-top: 1.5rem; text-align: center; padding: 1.5rem; background: rgba(15, 23, 42, 0.6); border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
-              <div style="font-size: 0.88rem; color: var(--text-muted);">100 USD =</div>
-              <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-cyan); line-height: 1.1; margin: 0.35rem 0;">€92.00 <span style="font-size: 1rem; color: #fff;">EUR</span></div>
-              <div style="font-size: 0.78rem; color: var(--text-secondary);">1 USD = 0.9200 EUR</div>
+              <div style="font-size: 0.88rem; color: var(--text-muted);">1,000 INR =</div>
+              <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-cyan); line-height: 1.1; margin: 0.35rem 0;">$11.98 <span style="font-size: 1rem; color: #fff;">USD</span></div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary);">1 INR = 0.01198 USD</div>
             </div>
           </div>
 
+          <!-- Trip Expense Breakdown Calculator -->
           <div class="glass-card">
             <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Trip Expense Estimator</h3>
             
             <div class="grid-3" style="gap: 0.75rem;">
               <div class="form-group">
                 <label class="form-label">Destination</label>
-                <input type="text" id="budget-city" class="form-control" value="Tokyo" />
+                <input type="text" id="budget-city" class="form-control" value="Delhi" />
               </div>
               <div class="form-group">
                 <label class="form-label">Days</label>
@@ -390,7 +543,9 @@
         </div>
       </section>
 
-      <!-- TAB 6: SMART PACKING ASSISTANT -->
+      <!-- ================================================================= -->
+      <!-- TAB 6: SMART PACKING ASSISTANT                                    -->
+      <!-- ================================================================= -->
       <section id="tab-packing" class="tab-pane">
         <div class="section-header">
           <div class="section-header-left">
@@ -405,7 +560,7 @@
             
             <div class="form-group">
               <label class="form-label">Destination</label>
-              <input type="text" id="packing-dest" class="form-control" value="Kyoto" />
+              <input type="text" id="packing-dest" class="form-control" value="Goa" />
             </div>
 
             <div class="form-group">
@@ -416,10 +571,10 @@
             <div class="form-group">
               <label class="form-label">Season</label>
               <select id="packing-season" class="form-control">
-                <option value="Spring" selected>🌸 Spring (Mild & Breezy)</option>
-                <option value="Summer">☀️ Summer (Hot & Sunny)</option>
-                <option value="Autumn">🍁 Autumn (Crisp & Cool)</option>
-                <option value="Winter">❄️ Winter (Cold & Snowy)</option>
+                <option value="Spring">Spring (Mild & Breezy)</option>
+                <option value="Summer" selected>Summer (Warm & Sunny)</option>
+                <option value="Autumn">Autumn (Crisp & Cool)</option>
+                <option value="Winter">Winter (Cold & Dry)</option>
               </select>
             </div>
 
@@ -437,31 +592,46 @@
         </div>
       </section>
 
-      <!-- TAB 7: AUDIO PHRASEBOOK -->
+      <!-- ================================================================= -->
+      <!-- TAB 7: AUDIO PHRASEBOOK                                           -->
+      <!-- ================================================================= -->
       <section id="tab-phrasebook" class="tab-pane">
         <div class="section-header">
           <div class="section-header-left">
             <h1><i data-lucide="languages"></i> Multilingual Audio Phrasebook</h1>
-            <p>Essential local survival phrases with pronunciation guides and built-in speech synthesis playback.</p>
+            <p>Essential local survival phrases with pronunciation guides and built-in speech synthesis playback for Indian and International languages.</p>
           </div>
-          <div style="display: flex; gap: 0.75rem;">
-            <select id="phrasebook-lang" class="form-control" style="width: 170px;">
-              <option value="Japanese" selected>🇯🇵 Japanese</option>
-              <option value="Italian">🇮🇹 Italian</option>
-              <option value="French">🇫🇷 French</option>
-              <option value="Spanish">🇪🇸 Spanish</option>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            <select id="phrasebook-lang" class="form-control" style="width: 180px;">
+              <optgroup label="Indian Languages">
+                <option value="Hindi" selected>Hindi (हिन्दी)</option>
+                <option value="Tamil">Tamil (தமிழ்)</option>
+                <option value="Telugu">Telugu (తెలుగు)</option>
+                <option value="Urdu">Urdu (اردو)</option>
+                <option value="Bengali">Bengali (বাংলা)</option>
+                <option value="Marathi">Marathi (मराठी)</option>
+              </optgroup>
+              <optgroup label="International Languages">
+                <option value="Japanese">Japanese (日本語)</option>
+                <option value="French">French (Français)</option>
+                <option value="Spanish">Spanish (Español)</option>
+                <option value="Italian">Italian (Italiano)</option>
+                <option value="German">German (Deutsch)</option>
+              </optgroup>
             </select>
-            <select id="phrasebook-cat" class="form-control" style="width: 150px;">
+            <select id="phrasebook-cat" class="form-control" style="width: 160px;">
               <option value="All" selected>All Categories</option>
               <option value="Greetings">Greetings</option>
               <option value="Dining">Dining</option>
               <option value="Transport">Transport</option>
+              <option value="Shopping">Shopping</option>
               <option value="Emergency">Emergency</option>
             </select>
           </div>
         </div>
 
         <div id="phrasebook-content">
+          <!-- Injected via JS -->
         </div>
       </section>
 

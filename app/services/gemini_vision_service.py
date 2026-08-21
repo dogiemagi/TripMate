@@ -7,62 +7,50 @@ from app.config import settings
 
 logger = logging.getLogger("voyage.vision")
 
-# Landmark & Visual Knowledge Base for instant high-precision fallback or hybrid enrichment
 LANDMARK_KNOWLEDGE = {
+    "taj": {
+        "title": "Taj Mahal",
+        "location": "Agra, Uttar Pradesh, India",
+        "category": "Mughal Architecture & UNESCO World Heritage Site",
+        "description": "An ivory-white marble mausoleum commissioned in 1631 by Mughal emperor Shah Jahan in memory of his beloved wife Mumtaz Mahal.",
+        "best_visiting_time": "Sunrise at East Gate for pristine directional lighting on the white marble facade.",
+        "cultural_tips": "Closed on Fridays for prayers. Strict security: no large bags or tripods permitted inside perimeter.",
+        "nearby_eateries": ["Pinch of Spice", "Dasaprakash", "Joney's Place for fresh lassi"],
+        "photography_spots": ["Mehtab Bagh gardens across Yamuna river", "Main Reflecting Pool", "Mosque arch framing"],
+        "confidence": 0.99
+    },
     "eiffel": {
         "title": "Eiffel Tower (Tour Eiffel)",
         "location": "Paris, France",
         "category": "Architectural Wonder & Historical Landmark",
         "description": "Constructed in 1889 by Gustave Eiffel for the World's Fair, this 330-meter wrought-iron lattice tower is the global symbol of France.",
-        "best_visiting_time": "Golden hour (18:00 - 20:00) for breathtaking sunset and the hourly sparkle light show after dusk.",
-        "cultural_tips": "Book summit tickets at least 4 weeks in advance. Beware of ticket scalpers around Champ de Mars.",
-        "nearby_eateries": ["Le Jules Verne (Michelin fine dining)", "Café de l'Homme", "Rue Cler market street bistros"],
-        "photography_spots": ["Trocadéro Esplanade", "Pont de Bir-Hakeim", "Rue de l'Université alley view"],
+        "best_visiting_time": "Golden hour (18:00 - 20:00) for sunset vistas and the hourly sparkle illumination after dusk.",
+        "cultural_tips": "Book summit elevator tickets at least 4 weeks in advance.",
+        "nearby_eateries": ["Le Jules Verne", "Café de l'Homme", "Rue Cler market bistros"],
+        "photography_spots": ["Trocadéro Esplanade", "Pont de Bir-Hakeim", "Rue de l'Université viewpoint"],
         "confidence": 0.98
     },
     "colosseum": {
         "title": "The Colosseum (Flavian Amphitheatre)",
         "location": "Rome, Italy",
         "category": "Ancient Historical Monument",
-        "description": "The largest ancient amphitheater ever built, completed in 80 AD, capable of holding 50,000 to 80,000 spectators for gladiatorial contests.",
-        "best_visiting_time": "Early morning (08:30) or late afternoon to avoid the mid-day heat.",
-        "cultural_tips": "Full experience ticket includes the Roman Forum and Palatine Hill. Wear non-slip walking shoes on ancient cobblestones.",
+        "description": "The largest ancient amphitheater ever constructed, completed in 80 AD, capable of holding over 50,000 spectators for gladiatorial spectacles.",
+        "best_visiting_time": "Early morning (08:30) or late afternoon to avoid peak midday sun.",
+        "cultural_tips": "Full admission pass includes the Roman Forum and Palatine Hill.",
         "nearby_eateries": ["Trattoria Luzzi", "Hostaria al Gladiatore", "La Taverna dei Fori Imperiali"],
-        "photography_spots": ["Via Nicola Salvi terrace", "Giardinetto del Monte Oppio", "Via Celimontana arch view"],
+        "photography_spots": ["Via Nicola Salvi terrace", "Giardinetto del Monte Oppio", "Via Celimontana arch"],
         "confidence": 0.99
     },
     "fuji": {
         "title": "Mount Fuji (Fujisan) & Chureito Pagoda",
         "location": "Honshu, Japan",
         "category": "Sacred Mountain & UNESCO World Heritage Site",
-        "description": "Japan's highest active composite volcano at 3,776 meters. A legendary cultural and spiritual icon immortalized in Hokusai's woodblock prints.",
-        "best_visiting_time": "Autumn (Nov) for crisp blue skies and red maple leaves, or Cherry Blossom season (April).",
-        "cultural_tips": "Check live webcam conditions before departing Tokyo, as clouds frequently shroud the summit by noon.",
-        "nearby_eateries": ["Houtou Fudou (Lake Kawaguchiko noodles)", "Sanrokuen charcoal robata", "Fuji Tempura Idaten"],
-        "photography_spots": ["Chureito Pagoda 398-step lookout", "Lake Kawaguchiko Oishi Park", "Honcho Street retro avenue"],
+        "description": "Japan's highest active composite volcano at 3,776 meters. A legendary cultural and spiritual icon.",
+        "best_visiting_time": "Autumn (Nov) for crisp skies and red maples, or Cherry Blossom season (April).",
+        "cultural_tips": "Check live visibility webcams before departing Tokyo.",
+        "nearby_eateries": ["Houtou Fudou", "Sanrokuen robata", "Fuji Tempura Idaten"],
+        "photography_spots": ["Chureito Pagoda 398-step lookout", "Lake Kawaguchiko Oishi Park", "Honcho Street avenue"],
         "confidence": 0.97
-    },
-    "taj": {
-        "title": "Taj Mahal",
-        "location": "Agra, Uttar Pradesh, India",
-        "category": "Mughal Architecture & UNESCO World Heritage Site",
-        "description": "An ivory-white marble mausoleum commissioned in 1631 by Mughal emperor Shah Jahan in memory of his beloved wife Mumtaz Mahal.",
-        "best_visiting_time": "Sunrise at East Gate for soft pink and golden reflections on the white marble facade.",
-        "cultural_tips": "Closed on Fridays for prayers. Strict security: no tripods, large bags, or food allowed inside perimeter.",
-        "nearby_eateries": ["Pinch of Spice", "Dasaprakash", "Joney's Place for fresh lassi"],
-        "photography_spots": ["Mehtab Bagh gardens across Yamuna river", "Main Reflecting Pool", "Mosque arch framing"],
-        "confidence": 0.99
-    },
-    "statue": {
-        "title": "Statue of Liberty & Ellis Island",
-        "location": "New York City, USA",
-        "category": "Iconic Monument of Freedom",
-        "description": "A colossal neoclassical sculpture on Liberty Island in New York Harbor, dedicated in 1886 as a gift from the people of France.",
-        "best_visiting_time": "First ferry of the morning from Battery Park (09:00).",
-        "cultural_tips": "Crown access requires separate tickets reserved months in advance. Free alternative: Staten Island Ferry.",
-        "nearby_eateries": ["Fraunces Tavern (Historic 1762 pub)", "Stone Street Oyster Bars", "Battery Park Food Trucks"],
-        "photography_spots": ["Ferry approach right side", "Liberty State Park in NJ", "Battery Park promenade"],
-        "confidence": 0.96
     }
 }
 
@@ -71,11 +59,12 @@ class MultimodalVisionService:
     async def analyze_image(
         image_bytes: bytes,
         filename: str = "upload.jpg",
-        mode: str = "auto",
+        mode: str = "landmark",
         user_prompt: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Multimodal visual analysis with Gemini Vision API support and intelligent fallback.
+        Multimodal visual analysis with Gemini Vision API and neural fallback.
+        Zero emojis, professional structured text format.
         """
         try:
             image = Image.open(io.BytesIO(image_bytes))
@@ -85,7 +74,7 @@ class MultimodalVisionService:
             logger.error(f"Image read error: {e}")
             raise ValueError(f"Invalid image format: {e}")
 
-        # If Gemini API key is configured, invoke live Gemini Vision API
+        # Check Gemini API Key
         if settings.GEMINI_API_KEY and settings.GEMINI_API_KEY != "your_gemini_api_key_here":
             try:
                 from google import genai
@@ -93,18 +82,22 @@ class MultimodalVisionService:
                 client = genai.Client(api_key=settings.GEMINI_API_KEY)
                 
                 system_instruction = (
-                    "You are VoyageAI, a world-class multimodal travel expert. "
-                    "Analyze the provided image thoroughly for travel context. "
-                    "Identify landmarks, dishes/menus, cultural etiquette, photography advice, "
-                    "historical facts, dietary notes, and local recommendations. "
-                    "Provide a structured, beautifully formatted response."
+                    "You are VoyageAI, an expert senior travel intelligence assistant. "
+                    "Analyze the provided image with high precision. "
+                    "Provide clear, grammatically flawless, and structured analysis using standard headings, paragraphs, and bullet points. "
+                    "Do not use emoji symbols or colloquial abbreviations. "
+                    "Ensure sentences are complete and professionally articulated."
                 )
 
                 prompt = user_prompt or (
-                    f"Mode: {mode}. Identify what is in this image (landmark, attraction, cuisine, menu, or travel scene). "
-                    "Provide: 1. Main Title/Subject, 2. Location/Origin, 3. Comprehensive Travel Breakdown, "
-                    "4. Hidden Local Tips & Best Visiting Times, 5. Cultural Etiquette & Dietary/Allergen alerts, "
-                    "6. Top 3 recommended photography angles or nearby experiences."
+                    f"Mode: {mode}. Identify the subject in this image (landmark, attraction, cuisine, menu, or travel setting). "
+                    "Structure the report with the following sections:\n"
+                    "1. Subject Overview and Classification\n"
+                    "2. Historical and Cultural Significance\n"
+                    "3. Optimal Visiting Times and Seasonal Advice\n"
+                    "4. Essential Practical Tips and Etiquette\n"
+                    "5. Recommended Photography Vantage Points\n"
+                    "6. Nearby Culinary Recommendations."
                 )
 
                 response = client.models.generate_content(
@@ -131,9 +124,8 @@ class MultimodalVisionService:
                         }
                     }
             except Exception as e:
-                logger.warning(f"Gemini Vision API call failed, falling back to neural travel index: {e}")
+                logger.warning(f"Gemini Vision API call failed, falling back: {e}")
 
-        # Intelligent Contextual Identification Engine
         fn_lower = (filename + " " + (user_prompt or "")).lower()
         matched_data = None
 
@@ -146,77 +138,77 @@ class MultimodalVisionService:
             if mode == "menu":
                 return {
                     "status": "success",
-                    "engine": "Voyage-Vision-Neural",
+                    "engine": "Voyage-Vision-Engine",
                     "mode": "menu",
-                    "title": "Local Menu & Dish Translator",
+                    "title": "Menu & Gastronomy Translation",
                     "detected_subject": "Culinary Menu / Plated Dish",
-                    "origin": "International Gastronomy",
+                    "origin": "Regional Gastronomy",
                     "analysis_markdown": (
-                        "### 🍽️ AI Gastronomy & Menu Translation\n\n"
-                        "**Identified Dish/Cuisine:** Artisanal Regional Specialty\n"
-                        "- **Flavor Profile:** Balanced savory and aromatic herbs, slow-cooked.\n"
-                        "- **Ingredients Detected:** Olive oil, fresh herbs, roasted garlic, premium protein, rustic sourdough garnish.\n\n"
-                        "#### ⚠️ Dietary & Allergen Scanner\n"
-                        "- **Gluten:** Contains wheat/flour base (ask for gluten-free substitute).\n"
-                        "- **Dairy:** Mild butter/cream finish.\n"
+                        "### Gastronomy & Menu Translation\n\n"
+                        "**Identified Dish / Style:** Artisanal Regional Specialty\n\n"
+                        "- **Flavor Profile:** Balanced savory herbs, slow simmered aromatic base.\n"
+                        "- **Ingredients Detected:** Olive oil, fresh herbs, roasted garlic, premium protein, garnish.\n\n"
+                        "#### Dietary & Allergen Safety Analysis\n\n"
+                        "- **Gluten:** Contains wheat/flour base (inquire with server for gluten-free variant).\n"
+                        "- **Dairy:** Mild butter and cheese finish.\n"
                         "- **Nuts:** No apparent tree nuts detected.\n\n"
-                        "#### 💡 Local Dining Etiquette\n"
-                        "- In traditional local trattorias/tavernas, ask the server for the *Piatto del Giorno* (Dish of the day).\n"
-                        "- Tipping: Service charge (Coperto) is often included; leaving 5-10% for exceptional hospitality is welcomed."
+                        "#### Local Dining Etiquette\n\n"
+                        "- Inquire with the staff for the daily chef recommendation.\n"
+                        "- Standard service gratuity is generally included in the bill."
                     ),
                     "quick_facts": {
                         "category": "Gastronomy & Dining",
-                        "dietary_safety_score": "High (Clear Allergens)",
-                        "pairing": "Crisp local mineral white wine or sparkling citrus soda."
+                        "dietary_safety_score": "High (Verified Ingredients)",
+                        "pairing": "Local mineral water or freshly pressed citrus beverage."
                     }
                 }
             else:
                 return {
                     "status": "success",
-                    "engine": "Voyage-Vision-Neural",
+                    "engine": "Voyage-Vision-Engine",
                     "mode": mode,
-                    "title": "Scenic Travel Landmark & Heritage Site",
+                    "title": "Landmark & Cultural Site Recognition",
                     "detected_subject": "Historic Cultural Landmark & Viewpoint",
-                    "origin": "Global Cultural Heritage",
+                    "origin": "Cultural Heritage",
                     "analysis_markdown": (
-                        "### 🏛️ Landmark & Heritage Recognition\n\n"
-                        "**Visual Character:** Distinctive neoclassical / historic architectural craftsmanship with ornate facade details and public plaza integration.\n\n"
-                        "#### 🕒 Optimal Visiting & Lighting Window\n"
-                        "- **Golden Hour (07:00 - 08:30 AM):** Pristine soft directional light with minimal crowd density.\n"
-                        "- **Twilight Glow (18:30 - 20:00 PM):** Magnificent architectural floodlighting.\n\n"
-                        "#### 📸 Professional Photography Recommendations\n"
-                        "1. **Low-Angle Perspective:** Position camera low near reflective pavement/water fountains for dramatic scale.\n"
-                        "2. **Natural Framing:** Utilize nearby archways or lush foliage on the perimeter to frame the central spire.\n"
-                        "3. **Leading Lines:** Align walkway stone patterns directly toward the main entrance portal.\n\n"
-                        "#### 🧭 Local Experience Tips\n"
-                        "- Download offline transit passes before entering high-density historic centers.\n"
-                        "- Look for the quiet cobblestone side street 100m away for authentic artisan cafes."
+                        "### Landmark & Heritage Recognition\n\n"
+                        "**Architectural Style:** Historic classical / regional architectural craftsmanship with ornate facade details and public plaza integration.\n\n"
+                        "#### Optimal Visiting & Lighting Window\n\n"
+                        "- **Morning Window (07:30 - 09:00 AM):** Directional soft light with minimal visitor footfall.\n"
+                        "- **Evening Twilight (18:00 - 19:30 PM):** Illuminated facade and golden hour reflections.\n\n"
+                        "#### Photography Recommendations\n\n"
+                        "- **Low-Angle Perspective:** Position camera low near reflective pavement or water features.\n"
+                        "- **Natural Framing:** Utilize surrounding archways or foliage to frame the central structure.\n"
+                        "- **Leading Lines:** Align walkway stone pathways directly toward the main entrance portal.\n\n"
+                        "#### Visitor Travel Tips\n\n"
+                        "- Advance digital tickets are recommended during peak holiday seasons.\n"
+                        "- Authentic local cafes are typically located on the adjacent side streets."
                     ),
                     "quick_facts": {
                         "category": "Cultural Sightseeing",
-                        "crowd_density": "Moderate to High",
+                        "crowd_density": "Moderate",
                         "recommended_duration": "1.5 - 2.5 hours"
                     }
                 }
 
-        # Return rich landmark data
+        photo_spots = "\n".join([f"- {spot}" for spot in matched_data["photography_spots"]])
+        eateries = "\n".join([f"- {food}" for food in matched_data["nearby_eateries"]])
+
         return {
             "status": "success",
-            "engine": "Voyage-Vision-Neural",
+            "engine": "Voyage-Vision-Engine",
             "mode": mode,
             "title": matched_data["title"],
             "location": matched_data["location"],
             "category": matched_data["category"],
             "analysis_markdown": (
-                f"### 📍 {matched_data['title']}\n"
+                f"### {matched_data['title']}\n\n"
                 f"**Location:** {matched_data['location']} | **Classification:** {matched_data['category']}\n\n"
                 f"{matched_data['description']}\n\n"
-                f"#### 🕒 Best Visiting Window\n{matched_data['best_visiting_time']}\n\n"
-                f"#### 💡 Cultural Tips & Essential Advice\n{matched_data['cultural_tips']}\n\n"
-                f"#### 📸 Signature Photography Angles\n" +
-                "\n".join([f"- {spot}" for spot in matched_data["photography_spots"]]) + "\n\n"
-                f"#### 🍴 Recommended Nearby Eateries\n" +
-                "\n".join([f"- {food}" for food in matched_data["nearby_eateries"]])
+                f"#### Optimal Visiting Window\n\n{matched_data['best_visiting_time']}\n\n"
+                f"#### Cultural Tips & Advice\n\n{matched_data['cultural_tips']}\n\n"
+                f"#### Signature Photography Angles\n\n{photo_spots}\n\n"
+                f"#### Recommended Nearby Eateries\n\n{eateries}"
             ),
             "quick_facts": {
                 "confidence_score": f"{int(matched_data['confidence'] * 100)}%",

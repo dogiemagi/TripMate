@@ -69,7 +69,6 @@ body {
   background: #334155;
 }
 
-/* Container */
 .app-container {
   display: flex;
   flex-direction: column;
@@ -142,11 +141,13 @@ body {
 .nav-search {
   flex: 0 1 420px;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .nav-search input {
   width: 100%;
-  padding: 0.65rem 1rem 0.65rem 2.75rem;
+  padding: 0.65rem 3rem 0.65rem 2.75rem;
   background: rgba(17, 24, 39, 0.8);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
@@ -162,7 +163,7 @@ body {
   box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
 }
 
-.nav-search i {
+.nav-search i.nav-search-icon, .nav-search #global-search-icon {
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -170,12 +171,75 @@ body {
   color: var(--text-muted);
   width: 18px;
   height: 18px;
+  pointer-events: auto;
+}
+
+.nav-search-btn {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-search-btn:hover {
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+}
+
+.nav-search-btn i {
+  width: 15px;
+  height: 15px;
 }
 
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
+}
+
+/* Global Currency Picker in Navbar */
+.currency-picker-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(17, 24, 39, 0.85);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  border-radius: var(--radius-xl);
+  padding: 0.2rem 0.6rem;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+}
+
+.currency-picker-icon {
+  color: var(--accent-cyan);
+  width: 16px;
+  height: 16px;
+  margin-right: 0.35rem;
+}
+
+.currency-select-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.currency-select-input option {
+  background: #111827;
+  color: #fff;
 }
 
 .status-badge {
@@ -286,7 +350,6 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Section Header */
 .section-header {
   margin-bottom: 2rem;
   display: flex;
@@ -317,7 +380,12 @@ body {
   font-size: 0.95rem;
 }
 
-/* Cards & Glass Containers */
+.currency-highlight {
+  color: var(--accent-cyan);
+  font-weight: 700;
+}
+
+/* Cards */
 .glass-card {
   background: var(--bg-card);
   backdrop-filter: blur(16px);
@@ -352,7 +420,7 @@ body {
   opacity: 1;
 }
 
-/* Form Elements */
+/* Form Controls */
 .form-group {
   margin-bottom: 1.25rem;
 }
@@ -428,10 +496,25 @@ body {
   background: rgba(255, 255, 255, 0.14);
 }
 
-.btn-accent {
-  background: linear-gradient(135deg, var(--accent-purple), var(--accent-rose));
+/* Filter label */
+.filter-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+.filter-label:hover {
   color: #fff;
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.filter-label i {
+  width: 16px;
+  height: 16px;
+  color: var(--accent-cyan);
 }
 
 /* Grid Layouts */
@@ -520,6 +603,9 @@ body {
 }
 
 .sample-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.78rem;
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-xl);
@@ -530,13 +616,18 @@ body {
   transition: var(--transition);
 }
 
+.sample-chip i {
+  width: 14px;
+  height: 14px;
+  color: var(--accent-cyan);
+}
+
 .sample-chip:hover {
   background: rgba(6, 182, 212, 0.2);
   color: #fff;
   border-color: var(--accent-cyan);
 }
 
-/* Vision Results Box */
 .vision-results-content {
   background: rgba(15, 23, 42, 0.6);
   border-radius: var(--radius-md);
@@ -626,8 +717,32 @@ body {
 }
 
 /* ==========================================================================
-   Itinerary Timeline & Map
+   Itinerary Timeline & Leaflet Map Container
    ========================================================================== */
+.map-card-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+}
+
+.map-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  background: rgba(15, 23, 42, 0.8);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+#itinerary-map {
+  height: 440px;
+  width: 100%;
+  z-index: 10;
+}
+
 .timeline-item {
   position: relative;
   padding-left: 2rem;
@@ -674,13 +789,6 @@ body {
   color: #c084fc;
   border: 1px solid rgba(139, 92, 246, 0.3);
   text-transform: uppercase;
-}
-
-#itinerary-map {
-  height: 480px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
-  z-index: 10;
 }
 
 /* ==========================================================================
@@ -783,6 +891,160 @@ body {
   cursor: pointer;
 }
 
+.date-preset-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 500;
+  padding: 0.28rem 0.65rem;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: var(--transition);
+  outline: none;
+}
+
+.date-preset-chip:hover {
+  background: rgba(6, 182, 212, 0.15);
+  color: #fff;
+  border-color: var(--accent-cyan);
+}
+
+.date-preset-chip.active {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.35);
+}
+
+/* Custom Leaflet Map Pin */
+.custom-map-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.82rem;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.7), 0 4px 8px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.custom-map-pin:hover {
+  transform: scale(1.2);
+}
+
+.timeline-card {
+  cursor: pointer;
+}
+
+.timeline-card.focused-act {
+  border-color: var(--accent-cyan) !important;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+}
+
+/* ==========================================================================
+   Interactive Calendar Modal & Range Grid
+   ========================================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(5, 8, 15, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: calFadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid var(--glass-border-glow);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(6, 182, 212, 0.2);
+  animation: calSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes calFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes calSlideUp {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.calendar-grid-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.calendar-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.cal-day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  position: relative;
+}
+
+.cal-day-cell.empty {
+  cursor: default;
+  visibility: hidden;
+}
+
+.cal-day-cell:hover:not(.empty):not(.disabled) {
+  background: rgba(6, 182, 212, 0.25);
+  color: #fff;
+}
+
+.cal-day-cell.disabled {
+  color: #475569;
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.cal-day-cell.range-start,
+.cal-day-cell.range-end {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue)) !important;
+  color: #fff !important;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+}
+
+.cal-day-cell.range-between {
+  background: rgba(6, 182, 212, 0.18);
+  color: var(--accent-cyan);
+  border-radius: 0;
+}
+
 /* ==========================================================================
    Footer
    ========================================================================== */
@@ -801,7 +1063,6 @@ body {
   text-decoration: none;
 }
 
-/* Spinner */
 .spinner {
   width: 24px;
   height: 24px;
@@ -816,7 +1077,6 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
   .grid-split {
     grid-template-columns: 1fr;
@@ -848,3 +1108,132 @@ body {
     gap: 1.5rem;
   }
 }
+
+/* ==========================================================================
+   Vision Results Content Markdown Typography
+   ========================================================================== */
+.vision-results-content {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.68;
+}
+
+.vision-results-content h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 1rem;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.vision-results-content h4 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  margin-top: 1.2rem;
+  margin-bottom: 0.45rem;
+}
+
+.vision-results-content h5,
+.vision-results-content h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 0.85rem;
+  margin-bottom: 0.35rem;
+}
+
+.vision-results-content p {
+  margin-bottom: 0.85rem;
+  color: #cbd5e1;
+}
+
+.vision-results-content strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.vision-results-content em {
+  color: #38bdf8;
+  font-style: italic;
+}
+
+.vision-results-content ul,
+.vision-results-content ol {
+  margin-top: 0.35rem;
+  margin-bottom: 1rem;
+  padding-left: 1.4rem;
+}
+
+.vision-results-content li {
+  margin-bottom: 0.4rem;
+  color: #cbd5e1;
+}
+
+.vision-results-content li::marker {
+  color: var(--accent-cyan);
+}
+
+/* ==========================================================================
+   Toast Notification System
+   ========================================================================== */
+.voyage-toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  pointer-events: none;
+}
+
+.voyage-toast {
+  pointer-events: auto;
+  min-width: 280px;
+  max-width: 420px;
+  padding: 0.85rem 1.2rem;
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-cyan-glow);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  opacity: 0;
+  transform: translateY(-12px) scale(0.96);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.voyage-toast.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.voyage-toast-success {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #ecfdf5;
+}
+
+.voyage-toast-success i {
+  color: var(--accent-emerald);
+}
+
+.voyage-toast-info {
+  border-color: rgba(6, 182, 212, 0.4);
+  color: #ecfeff;
+}
+
+.voyage-toast-info i {
+  color: var(--accent-cyan);
+}
+
+
+

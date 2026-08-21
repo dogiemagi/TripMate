@@ -4,8 +4,12 @@
 const API = {
   baseUrl: window.location.origin,
 
-  async getWeather(city = 'Tokyo', days = 7) {
-    const res = await fetch(`${this.baseUrl}/api/v1/weather?city=${encodeURIComponent(city)}&days=${days}`);
+  async getWeather(city = 'Delhi', startDate = null, endDate = null, days = 7) {
+    let url = `${this.baseUrl}/api/v1/weather?city=${encodeURIComponent(city)}&days=${days}`;
+    if (startDate) url += `&start_date=${encodeURIComponent(startDate)}`;
+    if (endDate) url += `&end_date=${encodeURIComponent(endDate)}`;
+
+    const res = await fetch(url);
     if (!res.ok) throw new Error('Weather API request failed');
     return await res.json();
   },
@@ -34,7 +38,7 @@ const API = {
     return await res.json();
   },
 
-  async getFood(city = 'Rome', dietaryPreferences = []) {
+  async getFood(city = 'Delhi', dietaryPreferences = []) {
     const res = await fetch(`${this.baseUrl}/api/v1/food/explore`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -54,7 +58,7 @@ const API = {
     return await res.json();
   },
 
-  async getBudgetEstimate(city = 'Tokyo', days = 5, style = 'midrange') {
+  async getBudgetEstimate(city = 'Delhi', days = 5, style = 'midrange') {
     const res = await fetch(`${this.baseUrl}/api/v1/budget/estimate?city=${encodeURIComponent(city)}&days=${days}&style=${style}`);
     if (!res.ok) throw new Error('Budget estimation failed');
     return await res.json();
@@ -70,7 +74,7 @@ const API = {
     return await res.json();
   },
 
-  async getPhrases(language = 'Japanese', category = 'All') {
+  async getPhrases(language = 'Hindi', category = 'All') {
     const res = await fetch(`${this.baseUrl}/api/v1/phrasebook/phrases`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

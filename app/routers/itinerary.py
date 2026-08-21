@@ -7,6 +7,6 @@ router = APIRouter(prefix="/api/v1/itinerary", tags=["Smart Itinerary Planner"])
 @router.post("/generate")
 async def generate_itinerary(request: ItineraryRequest):
     """
-    Generate an interactive day-by-day travel plan with geo-coordinates, activities, costs, and timeline.
+    Generate an interactive day-by-day travel plan with geocoded coordinates, activities, costs in INR, and timeline.
     """
-    return ItineraryService.generate_itinerary(request)
+    return await ItineraryService.generate_itinerary(request)
