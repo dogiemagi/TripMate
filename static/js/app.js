@@ -1428,6 +1428,11 @@ function initVoiceInput() {
     const genBtn = document.getElementById('packing-generate-btn');
     if (genBtn) genBtn.click();
   });
+
+  setupMicButton('budget-mic-btn', 'budget-city', () => {
+    const calcBtn = document.getElementById('budget-estimate-btn');
+    if (calcBtn) calcBtn.click();
+  });
 }
 
 // ---------------------------------------------------------

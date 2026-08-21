@@ -139,7 +139,7 @@ body {
 }
 
 .nav-search {
-  flex: 0 1 420px;
+  flex: 0 1 440px;
   position: relative;
   display: flex;
   align-items: center;
@@ -147,8 +147,8 @@ body {
 
 .nav-search input {
   width: 100%;
-  padding: 0.65rem 3rem 0.65rem 2.75rem;
-  background: rgba(17, 24, 39, 0.8);
+  padding: 0.65rem 5rem 0.65rem 2.75rem;
+  background: rgba(17, 24, 39, 0.85);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-xl);
   color: var(--text-primary);
@@ -160,7 +160,7 @@ body {
 .nav-search input:focus {
   outline: none;
   border-color: var(--accent-cyan);
-  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25);
 }
 
 .nav-search i.nav-search-icon, .nav-search #global-search-icon {
@@ -172,32 +172,61 @@ body {
   width: 18px;
   height: 18px;
   pointer-events: auto;
+  z-index: 2;
 }
 
-.nav-search-btn {
+.nav-mic-btn {
   position: absolute;
-  right: 5px;
+  right: 42px;
   top: 50%;
   transform: translateY(-50%);
-  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
-  border: none;
-  color: #fff;
-  width: 32px;
-  height: 32px;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  color: var(--accent-cyan);
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: var(--transition);
+  outline: none;
+  z-index: 3;
+}
+
+.nav-mic-btn:hover {
+  background: var(--accent-cyan);
+  color: #05080f;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+}
+
+.nav-search-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  border: none;
+  color: #fff;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 3;
 }
 
 .nav-search-btn:hover {
   transform: translateY(-50%) scale(1.08);
-  box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.6);
 }
 
-.nav-search-btn i {
+.nav-search-btn i, .nav-mic-btn i {
   width: 15px;
   height: 15px;
 }
