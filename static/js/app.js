@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initPackingAssistant();
   initPhrasebook();
   initGlobalCitySearch();
+  initVoiceInput();
 
   // Set default weather dates (today to +6 days)
   const today = new Date();
@@ -992,10 +993,12 @@ function initCurrencyBudget() {
 }
 
 // ---------------------------------------------------------
-// Smart Packing Checklist
+// Smart Packing Checklist with Live Completion Progress
 // ---------------------------------------------------------
 function initPackingAssistant() {
   const generateBtn = document.getElementById('packing-generate-btn');
+  if (!generateBtn) return;
+
   generateBtn.addEventListener('click', async () => {
     const dest = document.getElementById('packing-dest').value || 'Goa';
     const days = parseInt(document.getElementById('packing-days').value, 10) || 5;
@@ -1016,10 +1019,10 @@ function initPackingAssistant() {
       let itemsHtml = '';
       (data.checklist || []).forEach((item, idx) => {
         itemsHtml += `
-          <div class="checklist-item" onclick="toggleCheckItem(this)">
-            <input type="checkbox" class="checklist-checkbox" id="chk-${idx}" />
+          <div class="checklist-item" onclick="toggleCheckItem(this, event)">
+            <input type="checkbox" class="checklist-checkbox" id="chk-${idx}" onchange="updateChecklistProgress()" />
             <div style="flex: 1;">
-              <span style="font-size: 0.92rem; color: #fff;">${item.item}</span>
+              <span class="item-title" style="font-size: 0.92rem; color: #fff;">${item.item}</span>
               <span style="font-size: 0.72rem; color: var(--accent-cyan); margin-left: 0.5rem; text-transform: uppercase;">[${item.category}]</span>
             </div>
             ${item.essential ? '<span class="dish-diet-pill" style="color:var(--accent-rose); border-color:rgba(244,63,94,0.3); background:rgba(244,63,94,0.15);">Essential</span>' : ''}
@@ -1028,14 +1031,45 @@ function initPackingAssistant() {
       });
 
       container.innerHTML = `
-        <div class="glass-card" style="margin-bottom: 1rem;">
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">${data.destination} (${data.season}) - ${data.trip_duration_days} Days</h3>
-          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; display:flex; align-items:center; gap:0.4rem;">
-            <i data-lucide="briefcase"></i> ${data.luggage_advice}
-          </p>
+        <div class="checklist-progress-card">
+          <div class="checklist-progress-header">
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">${data.destination} (${data.season}) - ${data.trip_duration_days} Days</h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; display:flex; align-items:center; gap:0.4rem;">
+                <i data-lucide="briefcase"></i> ${data.luggage_advice}
+              </p>
+            </div>
+            <div style="text-align: right;">
+              <span id="checklist-pct-badge" class="checklist-pct-badge">0%</span>
+              <div id="checklist-count-badge" style="font-size: 0.75rem; color: var(--text-muted);">0 of ${(data.checklist || []).length} items packed</div>
+            </div>
+          </div>
+
+          <div class="checklist-progress-track">
+            <div id="checklist-progress-fill" class="checklist-progress-fill" style="width: 0%;"></div>
+          </div>
+
+          <div class="checklist-actions">
+            <span>Luggage Readiness Meter</span>
+            <div style="display: flex; gap: 0.5rem;">
+              <button type="button" class="checklist-action-btn" onclick="selectAllChecklist(true)">
+                <i data-lucide="check-check" style="width:13px; height:13px; display:inline-block; vertical-align:middle;"></i> Check All
+              </button>
+              <button type="button" class="checklist-action-btn" onclick="selectAllChecklist(false)">
+                <i data-lucide="rotate-ccw" style="width:13px; height:13px; display:inline-block; vertical-align:middle;"></i> Clear All
+              </button>
+            </div>
+          </div>
+
+          <div id="checklist-complete-badge" class="checklist-complete-badge" style="display: none;">
+            <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
+            <span>100% Ready for Departure! Everything is packed and ready.</span>
+          </div>
         </div>
-        <div>${itemsHtml}</div>
+        <div id="checklist-items-list">${itemsHtml}</div>
       `;
+
+      updateChecklistProgress();
     } catch (err) {
       container.innerHTML = `<div class="glass-card" style="color: var(--accent-rose);"><i data-lucide="alert-circle"></i> Failed to generate checklist.</div>`;
     } finally {
@@ -1046,16 +1080,61 @@ function initPackingAssistant() {
   });
 }
 
-function toggleCheckItem(el) {
+function updateChecklistProgress() {
+  const checkboxes = document.querySelectorAll('.checklist-checkbox');
+  const total = checkboxes.length;
+  if (total === 0) return;
+
+  let checkedCount = 0;
+  checkboxes.forEach(cb => {
+    if (cb.checked) checkedCount++;
+    const parent = cb.closest('.checklist-item');
+    if (parent) parent.classList.toggle('checked', cb.checked);
+  });
+
+  const pct = Math.round((checkedCount / total) * 100);
+
+  const pctBadge = document.getElementById('checklist-pct-badge');
+  if (pctBadge) pctBadge.innerText = `${pct}%`;
+
+  const countBadge = document.getElementById('checklist-count-badge');
+  if (countBadge) countBadge.innerText = `${checkedCount} of ${total} items packed`;
+
+  const fillBar = document.getElementById('checklist-progress-fill');
+  if (fillBar) fillBar.style.width = `${pct}%`;
+
+  const completeBadge = document.getElementById('checklist-complete-badge');
+  if (completeBadge) {
+    completeBadge.style.display = pct === 100 ? 'flex' : 'none';
+  }
+}
+
+function toggleCheckItem(el, event) {
   const cb = el.querySelector('input[type="checkbox"]');
-  cb.checked = !cb.checked;
-  el.classList.toggle('checked', cb.checked);
+  if (!cb) return;
+  if (event && event.target === cb) {
+    el.classList.toggle('checked', cb.checked);
+  } else {
+    cb.checked = !cb.checked;
+    el.classList.toggle('checked', cb.checked);
+  }
+  updateChecklistProgress();
+}
+
+function selectAllChecklist(checkAll = true) {
+  const checkboxes = document.querySelectorAll('.checklist-checkbox');
+  checkboxes.forEach(cb => {
+    cb.checked = checkAll;
+  });
+  updateChecklistProgress();
+  initLucideIcons();
 }
 
 // ---------------------------------------------------------
-// Multilingual Audio Phrasebook & Web Speech TTS
+// Multilingual Audio Phrasebook & Dual-Engine TTS Audio
 // ---------------------------------------------------------
 let speechVoices = [];
+let currentAudioPlayer = null;
 
 function populateSpeechVoices() {
   if ('speechSynthesis' in window) {
@@ -1109,7 +1188,7 @@ async function loadPhrases(language = 'Hindi', category = 'All') {
             </div>
             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Meaning: "${p.english}"</div>
           </div>
-          <button class="audio-play-btn" onclick="playSpeech('${encNative}', '${encRomanized}', '${langCode}', this)" title="Click to listen out loud">
+          <button type="button" class="audio-play-btn" onclick="playSpeech('${encNative}', '${encRomanized}', '${langCode}', this)" title="Click to listen out loud">
             <i data-lucide="volume-2"></i>
           </button>
         </div>
@@ -1129,25 +1208,68 @@ async function loadPhrases(language = 'Hindi', category = 'All') {
 }
 
 function playSpeech(encNative, encRomanized, langCode = 'hi-IN', btn = null) {
+  const nativeText = decodeURIComponent(encNative || '');
+  const romanizedText = decodeURIComponent(encRomanized || '');
+  const langClean = (langCode || 'hi-IN').split('-')[0].toLowerCase();
+
+  // Stop any active audio instance
+  if (currentAudioPlayer) {
+    currentAudioPlayer.pause();
+    currentAudioPlayer.currentTime = 0;
+    currentAudioPlayer = null;
+  }
+
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+
+  document.querySelectorAll('.audio-play-btn.audio-playing').forEach(b => b.classList.remove('audio-playing'));
+
+  if (btn) {
+    btn.classList.add('audio-playing');
+  }
+
+  const cleanup = () => {
+    if (btn) btn.classList.remove('audio-playing');
+    currentAudioPlayer = null;
+  };
+
+  // Primary: Native Neural Audio stream from server TTS endpoint
+  const audioUrl = `/api/v1/phrasebook/audio?text=${encodeURIComponent(nativeText || romanizedText)}&lang=${langClean}`;
+  const audio = new Audio(audioUrl);
+  currentAudioPlayer = audio;
+
+  audio.onended = cleanup;
+  audio.onerror = (e) => {
+    console.warn('Backend audio stream failed, falling back to Web Speech Synthesis:', e);
+    playSpeechSynthesisFallback(nativeText, romanizedText, langCode, btn, cleanup);
+  };
+
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.catch(err => {
+      console.warn('Audio play failed or autoplay restricted, falling back to Web Speech Synthesis:', err);
+      playSpeechSynthesisFallback(nativeText, romanizedText, langCode, btn, cleanup);
+    });
+  }
+}
+
+function playSpeechSynthesisFallback(nativeText, romanizedText, langCode, btn, cleanup) {
   if (!('speechSynthesis' in window)) {
-    alert('Web Speech Synthesis is not supported in this browser.');
+    cleanup();
+    showNotificationToast('Speech synthesis not supported in this browser.', 'info');
     return;
   }
 
-  const nativeText = decodeURIComponent(encNative || '');
-  const romanizedText = decodeURIComponent(encRomanized || '');
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
 
   if (speechVoices.length === 0) {
     populateSpeechVoices();
   }
 
-  // Cancel any ongoing speech & resume engine to avoid Chrome freeze
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.resume();
-
   const langPrefix = (langCode || 'hi-IN').split('-')[0].toLowerCase();
 
-  // 1. Search for native voice matching language code or name
   let matchedVoice = speechVoices.find(v => {
     const vLang = v.lang.toLowerCase();
     const vName = v.name.toLowerCase();
@@ -1164,8 +1286,6 @@ function playSpeech(encNative, encRomanized, langCode = 'hi-IN', btn = null) {
     textToSpeak = nativeText;
     targetLang = matchedVoice.lang;
   } else {
-    // If no native voice installed on client OS (e.g. Tamil/Telugu/Marathi on default Windows),
-    // fall back to Indian English or English voice and speak the phonetic Romanized phrase!
     const fallbackVoice = speechVoices.find(v => {
       const vLang = v.lang.toLowerCase();
       const vName = v.name.toLowerCase();
@@ -1183,50 +1303,131 @@ function playSpeech(encNative, encRomanized, langCode = 'hi-IN', btn = null) {
 
   const utterance = new SpeechSynthesisUtterance(textToSpeak);
   utterance.lang = targetLang;
-  if (matchedVoice) {
-    utterance.voice = matchedVoice;
-  }
+  if (matchedVoice) utterance.voice = matchedVoice;
   utterance.rate = 0.85;
-  utterance.pitch = 1.0;
-  utterance.volume = 1.0;
 
-  if (btn) {
-    btn.classList.add('audio-playing');
-  }
+  window._activeUtterance = utterance;
 
-  const cleanupBtn = () => {
-    if (btn) {
-      btn.classList.remove('audio-playing');
-    }
+  utterance.onend = () => {
+    cleanup();
+    window._activeUtterance = null;
+  };
+  utterance.onerror = () => {
+    cleanup();
+    window._activeUtterance = null;
   };
 
-  utterance.onend = cleanupBtn;
-  utterance.onerror = (e) => {
-    console.warn('SpeechSynthesis error on primary voice:', e);
-    // If primary failed, attempt fallback to romanized text on default voice
-    if (textToSpeak !== romanizedText && romanizedText) {
-      try {
-        const fallbackUtterance = new SpeechSynthesisUtterance(romanizedText);
-        fallbackUtterance.rate = 0.85;
-        fallbackUtterance.volume = 1.0;
-        fallbackUtterance.onend = cleanupBtn;
-        fallbackUtterance.onerror = cleanupBtn;
-        window.speechSynthesis.speak(fallbackUtterance);
-        return;
-      } catch (err) {}
-    }
-    cleanupBtn();
-  };
-
-  // Chromium bug workaround: slight timeout after cancel() before speak()
   setTimeout(() => {
     try {
       window.speechSynthesis.speak(utterance);
     } catch (err) {
-      console.error('Speech speak failed:', err);
-      cleanupBtn();
+      cleanup();
     }
-  }, 40);
+  }, 30);
+}
+
+// ---------------------------------------------------------
+// Speech-to-Text Voice Input Engine (Microphone)
+// ---------------------------------------------------------
+function initVoiceInput() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function setupMicButton(btnId, inputId, onResultCallback = null) {
+    const btn = document.getElementById(btnId);
+    const input = document.getElementById(inputId);
+    if (!btn || !input) return;
+
+    if (!SpeechRecognition) {
+      btn.style.opacity = '0.5';
+      btn.title = 'Voice recognition not supported in this browser';
+      return;
+    }
+
+    let recognition = null;
+    let isListening = false;
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (isListening && recognition) {
+        recognition.stop();
+        return;
+      }
+
+      try {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+          isListening = true;
+          btn.classList.add('mic-listening');
+          showNotificationToast('Listening... Speak now into your microphone.', 'info');
+        };
+
+        recognition.onresult = (event) => {
+          if (event.results && event.results[0] && event.results[0][0]) {
+            const transcript = event.results[0][0].transcript;
+            if (transcript) {
+              input.value = transcript;
+              input.focus();
+              showNotificationToast(`Captured voice: "${transcript}"`, 'success');
+              if (onResultCallback) {
+                onResultCallback(transcript);
+              }
+            }
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.warn('Speech recognition error:', event.error);
+          if (event.error === 'not-allowed') {
+            showNotificationToast('Microphone access was denied in browser permissions.', 'info');
+          }
+        };
+
+        recognition.onend = () => {
+          isListening = false;
+          btn.classList.remove('mic-listening');
+        };
+
+        recognition.start();
+      } catch (err) {
+        console.error('Failed to start voice input:', err);
+        btn.classList.remove('mic-listening');
+      }
+    });
+  }
+
+  // Bind to each input in the platform
+  setupMicButton('global-mic-btn', 'global-city-search', () => {
+    const searchBtn = document.getElementById('global-search-btn');
+    if (searchBtn) searchBtn.click();
+  });
+
+  setupMicButton('vision-mic-btn', 'vision-prompt');
+
+  setupMicButton('weather-mic-btn', 'weather-city-input', () => {
+    const searchBtn = document.getElementById('weather-search-btn');
+    if (searchBtn) searchBtn.click();
+  });
+
+  setupMicButton('itinerary-mic-btn', 'itinerary-dest', () => {
+    const genBtn = document.getElementById('itinerary-generate-btn');
+    if (genBtn) genBtn.click();
+  });
+
+  setupMicButton('food-mic-btn', 'food-city-input', () => {
+    const searchBtn = document.getElementById('food-search-btn');
+    if (searchBtn) searchBtn.click();
+  });
+
+  setupMicButton('packing-mic-btn', 'packing-dest', () => {
+    const genBtn = document.getElementById('packing-generate-btn');
+    if (genBtn) genBtn.click();
+  });
 }
 
 // ---------------------------------------------------------

@@ -39,6 +39,9 @@
       <div class="nav-search">
         <i data-lucide="search" id="global-search-icon" style="color: var(--text-muted); cursor: pointer;"></i>
         <input type="text" id="global-city-search" placeholder="Search any city globally (e.g. Delhi, Chennai, Paris, Tokyo, Goa, New York)..." />
+        <button type="button" id="global-mic-btn" class="nav-mic-btn" title="Speak to Search (Voice Input)">
+          <i data-lucide="mic"></i>
+        </button>
         <button id="global-search-btn" class="nav-search-btn" title="Search Destination">
           <i data-lucide="arrow-right"></i>
         </button>
@@ -157,7 +160,12 @@
 
               <div class="form-group">
                 <label class="form-label">Specific Question / Prompt</label>
-                <input type="text" id="vision-prompt" class="form-control" placeholder="e.g. Is this dish gluten-free? What is the best photography angle?" />
+                <div class="input-with-mic">
+                  <input type="text" id="vision-prompt" class="form-control" placeholder="e.g. Is this dish gluten-free? What is the best photography angle?" />
+                  <button type="button" id="vision-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
+                    <i data-lucide="mic"></i>
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -206,11 +214,16 @@
         <!-- Weather Search & Date Range Toolbar -->
         <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
           <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
-            <div style="flex: 1 1 200px;">
+            <div style="flex: 1 1 220px;">
               <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
                 <i data-lucide="map-pin"></i> Destination City
               </label>
-              <input type="text" id="weather-city-input" class="form-control" placeholder="City name..." value="Delhi" />
+              <div class="input-with-mic">
+                <input type="text" id="weather-city-input" class="form-control" placeholder="City name..." value="Delhi" />
+                <button type="button" id="weather-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
+                  <i data-lucide="mic"></i>
+                </button>
+              </div>
             </div>
 
             <div style="flex: 1 1 160px;">
@@ -322,7 +335,12 @@
               <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
                 <i data-lucide="map-pin"></i> Destination Location
               </label>
-              <input type="text" id="itinerary-dest" class="form-control" value="Delhi, India" placeholder="e.g. Chennai, Paris, Tokyo, Bengaluru, Rome..." />
+              <div class="input-with-mic">
+                <input type="text" id="itinerary-dest" class="form-control" value="Delhi, India" placeholder="e.g. Chennai, Paris, Tokyo, Bengaluru, Rome..." />
+                <button type="button" id="itinerary-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
+                  <i data-lucide="mic"></i>
+                </button>
+              </div>
             </div>
 
             <div class="form-group">
@@ -412,8 +430,13 @@
             <h1><i data-lucide="utensils-crossed"></i> Gastronomy & Dining Guide</h1>
             <p>Signature authentic dishes, pronunciations, curated eateries, and strict dietary filters.</p>
           </div>
-          <div style="display: flex; gap: 0.75rem;">
-            <input type="text" id="food-city-input" class="form-control" style="width: 200px;" placeholder="City..." value="Delhi" />
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <div class="input-with-mic" style="width: 230px;">
+              <input type="text" id="food-city-input" class="form-control" placeholder="City..." value="Delhi" />
+              <button type="button" id="food-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
+                <i data-lucide="mic"></i>
+              </button>
+            </div>
             <button id="food-search-btn" class="btn btn-primary"><i data-lucide="search"></i> Explore</button>
           </div>
         </div>
@@ -560,7 +583,12 @@
             
             <div class="form-group">
               <label class="form-label">Destination</label>
-              <input type="text" id="packing-dest" class="form-control" value="Goa" />
+              <div class="input-with-mic">
+                <input type="text" id="packing-dest" class="form-control" value="Goa" />
+                <button type="button" id="packing-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
+                  <i data-lucide="mic"></i>
+                </button>
+              </div>
             </div>
 
             <div class="form-group">
