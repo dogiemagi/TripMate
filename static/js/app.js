@@ -1055,28 +1055,50 @@ function toggleCheckItem(el) {
 // ---------------------------------------------------------
 // Multilingual Audio Phrasebook & Web Speech TTS
 // ---------------------------------------------------------
+let speechVoices = [];
+
+function populateSpeechVoices() {
+  if ('speechSynthesis' in window) {
+    speechVoices = window.speechSynthesis.getVoices() || [];
+  }
+}
+
+if ('speechSynthesis' in window) {
+  populateSpeechVoices();
+  window.speechSynthesis.onvoiceschanged = populateSpeechVoices;
+}
+
 function initPhrasebook() {
   const langSelect = document.getElementById('phrasebook-lang');
   const catSelect = document.getElementById('phrasebook-cat');
 
-  langSelect.addEventListener('change', () => {
-    loadPhrases(langSelect.value, catSelect.value);
-  });
+  if (langSelect) {
+    langSelect.addEventListener('change', () => {
+      loadPhrases(langSelect.value, catSelect ? catSelect.value : 'All');
+    });
+  }
 
-  catSelect.addEventListener('change', () => {
-    loadPhrases(langSelect.value, catSelect.value);
-  });
+  if (catSelect) {
+    catSelect.addEventListener('change', () => {
+      loadPhrases(langSelect ? langSelect.value : 'Hindi', catSelect.value);
+    });
+  }
 }
 
 async function loadPhrases(language = 'Hindi', category = 'All') {
   const container = document.getElementById('phrasebook-content');
-  container.innerHTML = `<div style="text-align:center; padding: 2rem;"><div class="spinner"></div></div>`;
+  if (!container) return;
+  container.innerHTML = `<div style="text-align:center; padding: 2.5rem;"><div class="spinner"></div><p style="margin-top:0.75rem; color:var(--text-secondary);">Loading audio phrasebook for ${language}...</p></div>`;
 
   try {
     const data = await API.getPhrases(language, category);
     let phrasesHtml = '';
 
     (data.phrases || []).forEach(p => {
+      const encNative = encodeURIComponent(p.audio_text || p.foreign || '');
+      const encRomanized = encodeURIComponent(p.romanized || '');
+      const langCode = data.speech_lang_code || 'hi-IN';
+
       phrasesHtml += `
         <div class="phrase-card">
           <div style="flex: 1;">
@@ -1087,7 +1109,7 @@ async function loadPhrases(language = 'Hindi', category = 'All') {
             </div>
             <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Meaning: "${p.english}"</div>
           </div>
-          <button class="audio-play-btn" onclick="playSpeech('${p.audio_text.replace(/'/g, "\\'")}', '${data.speech_lang_code}')" title="Play Voice Pronunciation">
+          <button class="audio-play-btn" onclick="playSpeech('${encNative}', '${encRomanized}', '${langCode}', this)" title="Click to listen out loud">
             <i data-lucide="volume-2"></i>
           </button>
         </div>
@@ -1101,21 +1123,110 @@ async function loadPhrases(language = 'Hindi', category = 'All') {
     `;
     initLucideIcons();
   } catch (err) {
-    container.innerHTML = `<div class="glass-card" style="color: var(--accent-rose);"><i data-lucide="alert-circle"></i> Failed to load phrases.</div>`;
+    container.innerHTML = `<div class="glass-card" style="color: var(--accent-rose);"><i data-lucide="alert-circle"></i> Failed to load phrases. ${err.message}</div>`;
     initLucideIcons();
   }
 }
 
-function playSpeech(text, langCode = 'hi-IN') {
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = langCode;
-    utterance.rate = 0.85;
-    window.speechSynthesis.speak(utterance);
-  } else {
+function playSpeech(encNative, encRomanized, langCode = 'hi-IN', btn = null) {
+  if (!('speechSynthesis' in window)) {
     alert('Web Speech Synthesis is not supported in this browser.');
+    return;
   }
+
+  const nativeText = decodeURIComponent(encNative || '');
+  const romanizedText = decodeURIComponent(encRomanized || '');
+
+  if (speechVoices.length === 0) {
+    populateSpeechVoices();
+  }
+
+  // Cancel any ongoing speech & resume engine to avoid Chrome freeze
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
+
+  const langPrefix = (langCode || 'hi-IN').split('-')[0].toLowerCase();
+
+  // 1. Search for native voice matching language code or name
+  let matchedVoice = speechVoices.find(v => {
+    const vLang = v.lang.toLowerCase();
+    const vName = v.name.toLowerCase();
+    return vLang === langCode.toLowerCase() ||
+           vLang.startsWith(langPrefix + '-') ||
+           vLang === langPrefix ||
+           vName.includes(langPrefix);
+  });
+
+  let textToSpeak = nativeText;
+  let targetLang = langCode;
+
+  if (matchedVoice) {
+    textToSpeak = nativeText;
+    targetLang = matchedVoice.lang;
+  } else {
+    // If no native voice installed on client OS (e.g. Tamil/Telugu/Marathi on default Windows),
+    // fall back to Indian English or English voice and speak the phonetic Romanized phrase!
+    const fallbackVoice = speechVoices.find(v => {
+      const vLang = v.lang.toLowerCase();
+      const vName = v.name.toLowerCase();
+      return vLang.includes('en-in') || vName.includes('india') || vLang.startsWith('en');
+    });
+
+    if (fallbackVoice) {
+      matchedVoice = fallbackVoice;
+      targetLang = fallbackVoice.lang;
+    } else {
+      targetLang = 'en-US';
+    }
+    textToSpeak = romanizedText || nativeText;
+  }
+
+  const utterance = new SpeechSynthesisUtterance(textToSpeak);
+  utterance.lang = targetLang;
+  if (matchedVoice) {
+    utterance.voice = matchedVoice;
+  }
+  utterance.rate = 0.85;
+  utterance.pitch = 1.0;
+  utterance.volume = 1.0;
+
+  if (btn) {
+    btn.classList.add('audio-playing');
+  }
+
+  const cleanupBtn = () => {
+    if (btn) {
+      btn.classList.remove('audio-playing');
+    }
+  };
+
+  utterance.onend = cleanupBtn;
+  utterance.onerror = (e) => {
+    console.warn('SpeechSynthesis error on primary voice:', e);
+    // If primary failed, attempt fallback to romanized text on default voice
+    if (textToSpeak !== romanizedText && romanizedText) {
+      try {
+        const fallbackUtterance = new SpeechSynthesisUtterance(romanizedText);
+        fallbackUtterance.rate = 0.85;
+        fallbackUtterance.volume = 1.0;
+        fallbackUtterance.onend = cleanupBtn;
+        fallbackUtterance.onerror = cleanupBtn;
+        window.speechSynthesis.speak(fallbackUtterance);
+        return;
+      } catch (err) {}
+    }
+    cleanupBtn();
+  };
+
+  // Chromium bug workaround: slight timeout after cancel() before speak()
+  setTimeout(() => {
+    try {
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.error('Speech speak failed:', err);
+      cleanupBtn();
+    }
+  }, 40);
 }
 
 // ---------------------------------------------------------
