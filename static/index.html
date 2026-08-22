@@ -802,7 +802,7 @@
             <h1><i data-lucide="languages"></i> Multilingual Audio Phrasebook & Voice Translator</h1>
             <p>Speak or type in any language (e.g. Tamil to English, English to Telugu) with speech recognition, neural translation, phonetic guides, and native audio playback.</p>
           </div>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
             <select id="phrasebook-lang" class="form-control" style="width: 180px;">
               <optgroup label="Indian Languages">
                 <option value="Hindi" selected>Hindi (हिन्दी)</option>
@@ -829,11 +829,15 @@
               <option value="Emergency">Emergency</option>
               <option value="Directions">Directions</option>
             </select>
+            <button type="button" id="btn-toggle-translation-studio" class="studio-toggle-btn" title="Open Live Voice & Speech Translation Studio" style="height: 42px; padding: 0 1.25rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(15, 23, 42, 0.75); background-image: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(99, 102, 241, 0.1)); border: 1px solid rgba(6, 182, 212, 0.35); border-radius: var(--radius-md); color: #fff; font-size: 0.88rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);">
+              <i data-lucide="mic" style="color: var(--accent-cyan); width: 16px; height: 16px;"></i>
+              <span>Live Voice &amp; Speech Studio</span>
+            </button>
           </div>
         </div>
 
         <!-- Live Voice & Speech Translation Studio -->
-        <div class="translation-studio-card">
+        <div id="live-voice-translation-studio" class="translation-studio-card" style="display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
             <div>
               <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
@@ -843,7 +847,12 @@
                 Click the microphone to speak in your source language or type any travel phrase to translate.
               </p>
             </div>
-            <span class="brand-badge"><i data-lucide="sparkles" style="width:12px; height:12px; margin-right:4px;"></i> AI Speech Matrix</span>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span class="brand-badge"><i data-lucide="sparkles" style="width:12px; height:12px; margin-right:4px;"></i> AI Speech Matrix</span>
+              <button type="button" id="btn-close-translation-studio" class="studio-close-btn" title="Close Studio & Return to Audio Phrasebook" style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; outline: none; transition: all 0.2s ease;">
+                <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+              </button>
+            </div>
           </div>
 
           <!-- Language Selector Row with Swap Button -->

@@ -1647,6 +1647,38 @@ function initTranslationStudio() {
   const inputTxt = document.getElementById('translator-input-text');
   const resultBox = document.getElementById('translation-result-container');
   const voiceMicBtn = document.getElementById('translator-mic-btn');
+  const studioCard = document.getElementById('live-voice-translation-studio');
+  const toggleStudioBtn = document.getElementById('btn-toggle-translation-studio');
+  const closeStudioBtn = document.getElementById('btn-close-translation-studio');
+
+  // Studio Toggle & Close (Modal/Drawer interaction)
+  if (toggleStudioBtn && studioCard) {
+    toggleStudioBtn.addEventListener('click', () => {
+      const isClosed = studioCard.style.display === 'none' || !studioCard.style.display;
+      if (isClosed) {
+        studioCard.style.display = 'block';
+        toggleStudioBtn.classList.add('active');
+        studioCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        initLucideIcons();
+      } else {
+        studioCard.style.display = 'none';
+        toggleStudioBtn.classList.remove('active');
+      }
+    });
+  }
+
+  if (closeStudioBtn && studioCard) {
+    closeStudioBtn.addEventListener('click', () => {
+      studioCard.style.display = 'none';
+      if (toggleStudioBtn) {
+        toggleStudioBtn.classList.remove('active');
+      }
+      const phrasesSection = document.getElementById('phrasebook-content');
+      if (phrasesSection) {
+        phrasesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
 
   if (!translateBtn || !inputTxt) return;
 
