@@ -34,3 +34,9 @@ class PackingChecklistRequest(BaseModel):
 class PhrasebookQuery(BaseModel):
     language: str = Field(default="Hindi", example="Hindi | Tamil | Telugu | Urdu | Bengali | Marathi | Japanese | French")
     category: Optional[str] = Field(default="All", example="Greetings | Dining | Emergency | Transport | Shopping | All")
+
+class TranslationRequest(BaseModel):
+    text: str = Field(..., example="Where is the train station?")
+    source_language: str = Field(default="auto", example="auto | English | Tamil | Telugu | Hindi | French")
+    target_language: str = Field(default="Tamil", example="Tamil | Telugu | English | Hindi | Japanese | French")
+

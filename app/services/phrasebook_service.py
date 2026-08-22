@@ -1,6 +1,7 @@
 import logging
+import httpx
 from typing import Dict, Any, List
-from app.models.schemas import PhrasebookQuery
+from app.models.schemas import PhrasebookQuery, TranslationRequest
 
 logger = logging.getLogger("voyage.phrasebook")
 
@@ -823,7 +824,25 @@ LANGUAGE_CODES = {
     "french": "fr-FR",
     "spanish": "es-ES",
     "german": "de-DE",
-    "arabic": "ar-SA"
+    "arabic": "ar-SA",
+    "english": "en-US"
+}
+
+LANG_CODE_SHORT = {
+    "hindi": "hi",
+    "tamil": "ta",
+    "telugu": "te",
+    "urdu": "ur",
+    "bengali": "bn",
+    "marathi": "mr",
+    "japanese": "ja",
+    "italian": "it",
+    "french": "fr",
+    "spanish": "es",
+    "german": "de",
+    "arabic": "ar",
+    "english": "en",
+    "auto": "auto"
 }
 
 class PhrasebookService:
@@ -843,3 +862,75 @@ class PhrasebookService:
             "total_phrases": len(phrases),
             "phrases": phrases
         }
+
+    @staticmethod
+    async def translate_phrase(req: TranslationRequest) -> Dict[str, Any]:
+        raw_text = req.text.strip()
+        if not raw_text:
+            return {
+                "status": "error",
+                "message": "Empty text provided"
+            }
+
+        src_input = req.source_language.strip().lower()
+        target_input = req.target_language.strip().lower()
+
+        src_code = LANG_CODE_SHORT.get(src_input, src_input if len(src_input) == 2 else "auto")
+        target_code = LANG_CODE_SHORT.get(target_input, target_input if len(target_input) == 2 else "en")
+
+        translated_text = raw_text
+        detected_source = src_code if src_code != "auto" else "en"
+        romanized = ""
+
+        try:
+            url = "https://translate.googleapis.com/translate_a/single"
+            params = {
+                "client": "gtx",
+                "sl": src_code,
+                "tl": target_code,
+                "dt": ["t", "rm"],
+                "q": raw_text
+            }
+            async with httpx.AsyncClient(timeout=6.0) as client:
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                }
+                resp = await client.get(url, params=params, headers=headers)
+                if resp.status_code == 200:
+                    data = resp.json()
+                    # data[0] contains array of sentence translations [ [trans, orig, ...], ... ]
+                    if data and len(data) > 0 and data[0]:
+                        parts = []
+                        for segment in data[0]:
+                            if segment and len(segment) > 0 and segment[0]:
+                                parts.append(segment[0])
+                            # Romanization is often in segment[3] or data[0][-1][3]
+                            if len(segment) > 3 and segment[3]:
+                                romanized = segment[3]
+                        if parts:
+                            translated_text = "".join(parts)
+                    if len(data) > 2 and data[2]:
+                        detected_source = data[2]
+        except Exception as e:
+            logger.warning(f"Translation API error: {e}")
+
+        # Resolve full speech lang code for audio playback
+        target_lang_full = "en-US"
+        for l_name, s_code in LANG_CODE_SHORT.items():
+            if s_code == target_code:
+                target_lang_full = LANGUAGE_CODES.get(l_name, f"{target_code}-{target_code.upper()}")
+                break
+
+        return {
+            "status": "success",
+            "original_text": raw_text,
+            "translated_text": translated_text,
+            "detected_source_lang": detected_source,
+            "source_language": req.source_language,
+            "target_language": req.target_language,
+            "target_lang_code": target_code,
+            "speech_lang_code": target_lang_full,
+            "romanized": romanized or translated_text,
+            "audio_text": translated_text
+        }
+

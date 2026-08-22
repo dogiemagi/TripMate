@@ -7,6 +7,7 @@ let mapMarkers = [];
 let mapPolyline = null;
 let activeCurrency = 'INR';
 let currentItineraryData = null;
+let activePackingList = [];
 
 const FX_RATES_FROM_INR = {
   INR: 1.0,
@@ -17,7 +18,9 @@ const FX_RATES_FROM_INR = {
   JPY: 1.85,
   SGD: 0.01617,
   AUD: 0.0182,
-  CAD: 0.0164
+  CAD: 0.0164,
+  THB: 0.44,
+  IDR: 194.5
 };
 
 const CURRENCY_SYMBOLS = {
@@ -29,8 +32,146 @@ const CURRENCY_SYMBOLS = {
   JPY: '¥',
   SGD: 'S$',
   AUD: 'A$',
-  CAD: 'C$'
+  CAD: 'C$',
+  THB: '฿',
+  IDR: 'Rp '
 };
+
+// Comprehensive Global City / Country to Local Currency Matrix
+const CITY_CURRENCY_MAP = {
+  tokyo: 'JPY', kyoto: 'JPY', osaka: 'JPY', sapporo: 'JPY', fukuoka: 'JPY', japan: 'JPY',
+  paris: 'EUR', rome: 'EUR', berlin: 'EUR', madrid: 'EUR', barcelona: 'EUR',
+  milan: 'EUR', amsterdam: 'EUR', vienna: 'EUR', athens: 'EUR', venice: 'EUR',
+  florence: 'EUR', dublin: 'EUR', lisbon: 'EUR', brussels: 'EUR', munich: 'EUR',
+  frankfurt: 'EUR', nice: 'EUR', lyon: 'EUR', france: 'EUR', italy: 'EUR',
+  germany: 'EUR', spain: 'EUR', greece: 'EUR', portugal: 'EUR', netherlands: 'EUR',
+  london: 'GBP', manchester: 'GBP', edinburgh: 'GBP', birmingham: 'GBP', uk: 'GBP',
+  england: 'GBP', 'united kingdom': 'GBP', scotland: 'GBP',
+  'new york': 'USD', 'los angeles': 'USD', chicago: 'USD', 'san francisco': 'USD',
+  miami: 'USD', 'las vegas': 'USD', seattle: 'USD', boston: 'USD', washington: 'USD',
+  orlando: 'USD', hawaii: 'USD', usa: 'USD', 'united states': 'USD',
+  dubai: 'AED', 'abu dhabi': 'AED', sharjah: 'AED', uae: 'AED', 'united arab emirates': 'AED',
+  singapore: 'SGD',
+  sydney: 'AUD', melbourne: 'AUD', brisbane: 'AUD', perth: 'AUD', cairns: 'AUD', australia: 'AUD',
+  toronto: 'CAD', vancouver: 'CAD', montreal: 'CAD', calgary: 'CAD', ottawa: 'CAD', canada: 'CAD',
+  bangkok: 'THB', phuket: 'THB', 'chiang mai': 'THB', pattaya: 'THB', krabi: 'THB', thailand: 'THB',
+  bali: 'IDR', jakarta: 'IDR', lombok: 'IDR', yogyakarta: 'IDR', indonesia: 'IDR',
+  delhi: 'INR', 'new delhi': 'INR', mumbai: 'INR', chennai: 'INR', bengaluru: 'INR',
+  bangalore: 'INR', kolkata: 'INR', hyderabad: 'INR', jaipur: 'INR', goa: 'INR',
+  kashmir: 'INR', srinagar: 'INR', ladakh: 'INR', leh: 'INR', kerala: 'INR',
+  kochi: 'INR', agra: 'INR', varanasi: 'INR', pune: 'INR', ahmedabad: 'INR',
+  udaipur: 'INR', amritsar: 'INR', rishikesh: 'INR', shimla: 'INR', manali: 'INR',
+  india: 'INR'
+};
+
+function detectCityCurrency(city) {
+  if (!city) return 'INR';
+  const clean = city.trim().toLowerCase();
+  for (const [key, cur] of Object.entries(CITY_CURRENCY_MAP)) {
+    if (clean === key || clean.includes(key) || key.includes(clean)) {
+      return cur;
+    }
+  }
+  return 'INR';
+}
+
+function updateFromCurrencyForCity(city) {
+  const detected = detectCityCurrency(city);
+  const fromSelect = document.getElementById('currency-from');
+  if (fromSelect) {
+    fromSelect.value = detected;
+    // Auto-trigger currency conversion so user sees live result
+    const convertBtn = document.getElementById('currency-convert-btn');
+    if (convertBtn) {
+      setTimeout(() => convertBtn.click(), 100);
+    }
+  }
+}
+
+// ---------------------------------------------------------
+// Nearest-Neighbor & 2-Opt TSP Route Optimizer
+// ---------------------------------------------------------
+function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function optimizeActivitiesTSP(activities, startCoord = null) {
+  if (!activities || activities.length <= 1) return activities;
+
+  const unvisited = [...activities];
+  const route = [];
+
+  // Start with waypoint closest to reference start coordinates or index 0
+  let currentIdx = 0;
+  if (startCoord && startCoord.lat && startCoord.lon) {
+    let minDist = Infinity;
+    unvisited.forEach((act, idx) => {
+      if (act.lat && act.lon) {
+        const d = calculateHaversineDistance(startCoord.lat, startCoord.lon, act.lat, act.lon);
+        if (d < minDist) {
+          minDist = d;
+          currentIdx = idx;
+        }
+      }
+    });
+  }
+
+  let current = unvisited.splice(currentIdx, 1)[0];
+  route.push(current);
+
+  // Greedily find nearest unvisited spot at each step
+  while (unvisited.length > 0) {
+    let nearestIdx = 0;
+    let nearestDist = Infinity;
+    for (let i = 0; i < unvisited.length; i++) {
+      if (unvisited[i].lat && unvisited[i].lon && current.lat && current.lon) {
+        const dist = calculateHaversineDistance(current.lat, current.lon, unvisited[i].lat, unvisited[i].lon);
+        if (dist < nearestDist) {
+          nearestDist = dist;
+          nearestIdx = i;
+        }
+      }
+    }
+    current = unvisited.splice(nearestIdx, 1)[0];
+    route.push(current);
+  }
+
+  // 2-Opt refinement algorithm to untangle intersecting segments
+  if (route.length >= 4) {
+    let improved = true;
+    let maxIters = 25;
+    while (improved && maxIters-- > 0) {
+      improved = false;
+      for (let i = 0; i < route.length - 2; i++) {
+        for (let j = i + 2; j < route.length; j++) {
+          if (!route[i].lat || !route[i+1].lat || !route[j].lat) continue;
+
+          const d1 = calculateHaversineDistance(route[i].lat, route[i].lon, route[i+1].lat, route[i+1].lon);
+          const d2 = (j + 1 < route.length && route[j+1].lat) ?
+            calculateHaversineDistance(route[j].lat, route[j].lon, route[j+1].lat, route[j+1].lon) : 0;
+          const d3 = calculateHaversineDistance(route[i].lat, route[i].lon, route[j].lat, route[j].lon);
+          const d4 = (j + 1 < route.length && route[j+1].lat) ?
+            calculateHaversineDistance(route[i+1].lat, route[i+1].lon, route[j+1].lat, route[j+1].lon) : 0;
+
+          if (d3 + d4 < d1 + d2 - 0.0001) {
+            const sub = route.slice(i + 1, j + 1).reverse();
+            route.splice(i + 1, sub.length, ...sub);
+            improved = true;
+          }
+        }
+      }
+    }
+  }
+
+  return route;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   initLucideIcons();
@@ -39,10 +180,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initMultimodalVision();
   initWeatherDashboard();
   initItineraryPlanner();
+  initCustomSpotBuilder();
   initFoodExplorer();
   initCurrencyBudget();
   initPackingAssistant();
+  initCustomPackingBuilder();
   initPhrasebook();
+  initTranslationStudio();
   initGlobalCitySearch();
   initVoiceInput();
 
@@ -55,6 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const toInput = document.getElementById('weather-to-date');
   if (fromInput) fromInput.value = today.toISOString().split('T')[0];
   if (toInput) toInput.value = nextWeek.toISOString().split('T')[0];
+
+  // Set initial currency based on default city
+  updateFromCurrencyForCity('Delhi');
 
   // Initial Data Loads
   loadWeatherData('Delhi', fromInput ? fromInput.value : null, toInput ? toInput.value : null);
@@ -107,12 +254,13 @@ function formatCostFromINR(inrAmount) {
   const converted = inrAmount * rate;
   const sym = CURRENCY_SYMBOLS[activeCurrency] || '₹';
   
-  if (activeCurrency === 'INR' || activeCurrency === 'JPY') {
+  if (activeCurrency === 'INR' || activeCurrency === 'JPY' || activeCurrency === 'IDR') {
     return `${sym}${Math.round(converted).toLocaleString()}`;
   } else {
     return `${sym}${converted.toFixed(2)}`;
   }
 }
+
 
 // ---------------------------------------------------------
 // Navigation Tabs Controller
@@ -605,7 +753,7 @@ async function loadWeatherData(city, startDate = null, endDate = null) {
 }
 
 // ---------------------------------------------------------
-// Smart Itinerary Planner & Dynamic Map Routing
+// Smart Itinerary Planner, TSP Map Routing & Visited Tracker
 // ---------------------------------------------------------
 function initItineraryPlanner() {
   initLeafletMap();
@@ -625,13 +773,119 @@ function initItineraryPlanner() {
       }
     });
   }
+
+  // Mark all / Reset visited actions
+  const markAllBtn = document.getElementById('mark-all-visited-btn');
+  if (markAllBtn) {
+    markAllBtn.addEventListener('click', () => {
+      if (!currentItineraryData || !currentItineraryData.days) return;
+      currentItineraryData.days.forEach(day => {
+        (day.activities || []).forEach(act => { act.visited = true; });
+      });
+      renderItinerary(currentItineraryData);
+      showNotificationToast('All visiting spots marked as visited! 🎉', 'success');
+    });
+  }
+
+  const resetVisitedBtn = document.getElementById('reset-visited-btn');
+  if (resetVisitedBtn) {
+    resetVisitedBtn.addEventListener('click', () => {
+      if (!currentItineraryData || !currentItineraryData.days) return;
+      currentItineraryData.days.forEach(day => {
+        (day.activities || []).forEach(act => { act.visited = false; });
+      });
+      renderItinerary(currentItineraryData);
+      showNotificationToast('Exploration progress reset to 0%.', 'info');
+    });
+  }
 }
 
-function focusMapActivity(lat, lon, title, cost) {
-  if (mapInstance) {
-    mapInstance.flyTo([lat, lon], 14, { duration: 0.8 });
+function initCustomSpotBuilder() {
+  const addBtn = document.getElementById('add-custom-spot-btn');
+  const nameInput = document.getElementById('custom-spot-name');
+  const catSelect = document.getElementById('custom-spot-cat');
+  const daySelect = document.getElementById('custom-spot-day');
+  const durInput = document.getElementById('custom-spot-duration');
+  const costInput = document.getElementById('custom-spot-cost');
+
+  if (!addBtn) return;
+
+  addBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    if (!name) {
+      nameInput.focus();
+      showNotificationToast('Please enter a place or landmark name.', 'info');
+      return;
+    }
+
+    if (!currentItineraryData || !currentItineraryData.days || currentItineraryData.days.length === 0) {
+      showNotificationToast('Please generate an itinerary first before adding custom spots.', 'info');
+      return;
+    }
+
+    const dayNum = parseInt(daySelect.value, 10) || 1;
+    const targetDayIndex = Math.min(dayNum - 1, currentItineraryData.days.length - 1);
+    const targetDay = currentItineraryData.days[targetDayIndex];
+
+    const centerLat = (currentItineraryData.center_coordinates && currentItineraryData.center_coordinates.lat) || 28.6139;
+    const centerLon = (currentItineraryData.center_coordinates && currentItineraryData.center_coordinates.lon) || 77.2090;
+
+    // Realistic small coordinate displacement based on existing activity count
+    const count = (targetDay.activities || []).length;
+    const angle = (count * 1.25) + 0.5;
+    const radius = 0.008 + (count * 0.003);
+    const newLat = roundCoord(centerLat + radius * Math.cos(angle));
+    const newLon = roundCoord(centerLon + radius * Math.sin(angle));
+
+    const costNum = parseFloat(costInput.value) || 0;
+    const newActivity = {
+      time: targetDay.activities.length > 0 ? "Flexible Time" : "10:00 AM",
+      title: name,
+      category: catSelect.value,
+      duration: durInput.value.trim() || "1.5 hrs",
+      cost_inr: costNum,
+      cost_display: costNum > 0 ? `INR ${costNum.toLocaleString()}` : "Free",
+      lat: newLat,
+      lon: newLon,
+      desc: `Custom user-added spot: ${name} in ${currentItineraryData.city || 'destination'}. Sequenced via AI TSP routing.`,
+      visited: false,
+      is_custom: true
+    };
+
+    targetDay.activities.push(newActivity);
+
+    // Re-run Traveling Salesperson route optimizer over this day's waypoints
+    targetDay.activities = optimizeActivitiesTSP(targetDay.activities, currentItineraryData.center_coordinates);
+
+    // Update total costs
+    currentItineraryData.estimated_total_cost_inr += costNum;
+
+    // Reset input
+    nameInput.value = '';
     
-    // Find matching marker and open popup
+    // Re-render Itinerary with updated TSP path, pins, and circular progress
+    renderItinerary(currentItineraryData);
+    showNotificationToast(`Added "${name}"! Route re-optimized for shortest travel distance.`, 'success');
+  });
+}
+
+function roundCoord(num) {
+  return Math.round(num * 100000) / 100000;
+}
+
+function focusMapActivity(lat, lon, title, cost, pinNum = null) {
+  // 1. Smoothly scroll viewport up to the map so user can see the marker
+  const mapElem = document.getElementById('itinerary-map');
+  if (mapElem) {
+    mapElem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // 2. Pan & zoom map to place coordinates and open popup
+  if (mapInstance) {
+    mapInstance.invalidateSize();
+    mapInstance.flyTo([lat, lon], 15, { duration: 0.9 });
+    
+    // Find matching marker and open its popup
     const targetMarker = mapMarkers.find(m => {
       const pos = m.getLatLng();
       return Math.abs(pos.lat - lat) < 0.0001 && Math.abs(pos.lng - lon) < 0.0001;
@@ -641,6 +895,75 @@ function focusMapActivity(lat, lon, title, cost) {
       setTimeout(() => {
         targetMarker.openPopup();
       }, 850);
+    }
+  }
+}
+
+function toggleVisitedActivity(dayIdx, actIdx, event) {
+  if (event) {
+    event.stopPropagation();
+  }
+
+  if (!currentItineraryData || !currentItineraryData.days) return;
+  const day = currentItineraryData.days[dayIdx];
+  if (!day || !day.activities || !day.activities[actIdx]) return;
+
+  const act = day.activities[actIdx];
+  act.visited = !act.visited;
+
+  renderItinerary(currentItineraryData);
+
+  if (act.visited) {
+    showNotificationToast(`Visited: "${act.title}"! Progress updated.`, 'success');
+  }
+}
+
+function updateVisitedProgress() {
+  if (!currentItineraryData || !currentItineraryData.days) return;
+
+  let totalSpots = 0;
+  let visitedSpots = 0;
+
+  currentItineraryData.days.forEach(day => {
+    (day.activities || []).forEach(act => {
+      totalSpots++;
+      if (act.visited) {
+        visitedSpots++;
+      }
+    });
+  });
+
+  const pct = totalSpots > 0 ? Math.round((visitedSpots / totalSpots) * 100) : 0;
+
+  // Update SVG Circular Progress Bar
+  const circleBar = document.getElementById('itinerary-circle-bar');
+  if (circleBar) {
+    const circumference = 251.2; // 2 * PI * 40
+    const offset = circumference - (circumference * pct / 100);
+    circleBar.style.strokeDashoffset = offset;
+  }
+
+  const pctText = document.getElementById('itinerary-circle-pct');
+  if (pctText) {
+    pctText.textContent = `${pct}%`;
+  }
+
+  const subtitleText = document.getElementById('itinerary-circle-subtitle');
+  if (subtitleText) {
+    subtitleText.textContent = `${visitedSpots} of ${totalSpots} visiting spots covered`;
+  }
+
+  const statusBadge = document.getElementById('itinerary-circle-status');
+  if (statusBadge) {
+    if (pct === 0) {
+      statusBadge.textContent = 'Ready for Departure';
+      statusBadge.style.color = 'var(--accent-cyan)';
+    } else if (pct < 100) {
+      statusBadge.textContent = `In Progress (${pct}%)`;
+      statusBadge.style.color = 'var(--accent-amber)';
+    } else {
+      statusBadge.textContent = 'Trip Completed! 🎉';
+      statusBadge.style.color = 'var(--accent-emerald)';
     }
   }
 }
@@ -656,9 +979,21 @@ async function generateTripPlan() {
   const btn = document.getElementById('itinerary-generate-btn');
   const container = document.getElementById('itinerary-results');
 
+  // Auto-sync From Currency based on searched city
+  updateFromCurrencyForCity(dest);
+
+  // Update Custom Day dropdown options based on selected days
+  const customDaySelect = document.getElementById('custom-spot-day');
+  if (customDaySelect) {
+    customDaySelect.innerHTML = '';
+    for (let d = 1; d <= days; d++) {
+      customDaySelect.innerHTML += `<option value="${d}">Day ${d}</option>`;
+    }
+  }
+
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = `<div class="spinner"></div> Synthesizing Day-by-Day Route...`;
+    btn.innerHTML = `<div class="spinner"></div> Synthesizing & Optimizing TSP Route...`;
   }
 
   try {
@@ -669,6 +1004,11 @@ async function generateTripPlan() {
       pace: pace,
       budget_level: budget,
       interests: ["Sightseeing", "Food", "Culture", "Photography"]
+    });
+
+    // Optimize waypoints per day with Nearest-Neighbor / 2-Opt TSP
+    (data.days || []).forEach(day => {
+      day.activities = optimizeActivitiesTSP(day.activities, data.center_coordinates);
     });
 
     currentItineraryData = data;
@@ -691,6 +1031,7 @@ function renderItinerary(data) {
   let daysHtml = '';
   const mapCoords = [];
   let globalPointIdx = 0;
+  let totalDistanceKm = 0;
 
   // Clear previous markers & route lines
   if (mapInstance) {
@@ -705,22 +1046,31 @@ function renderItinerary(data) {
   // Update map status badge with resolved location
   const statusBadge = document.getElementById('map-status-badge');
   if (statusBadge) {
-    statusBadge.textContent = `${data.city || 'Destination'} Mapped`;
+    statusBadge.textContent = `${data.city || 'Destination'} (Optimal TSP Mapped)`;
   }
 
-  (data.days || []).forEach(day => {
+  (data.days || []).forEach((day, dayIdx) => {
     let actHtml = '';
     (day.activities || []).forEach((act, actIdx) => {
       globalPointIdx++;
       const pointNum = globalPointIdx;
       const formattedActCost = act.cost_inr > 0 ? formatCostFromINR(act.cost_inr) : "Free";
+      const isVisited = !!act.visited;
 
       if (act.lat && act.lon && mapInstance) {
+        // Calculate cumulative route distance
+        if (mapCoords.length > 0) {
+          const prev = mapCoords[mapCoords.length - 1];
+          totalDistanceKm += calculateHaversineDistance(prev[0], prev[1], act.lat, act.lon);
+        }
         mapCoords.push([act.lat, act.lon]);
+
+        const pinClass = isVisited ? 'custom-map-pin visited-pin' : 'custom-map-pin';
+        const pinContent = isVisited ? `✓` : `${pointNum}`;
 
         const customPinIcon = L.divIcon({
           className: 'custom-map-pin-container',
-          html: `<div class="custom-map-pin" title="${act.title}">${pointNum}</div>`,
+          html: `<div class="${pinClass}" title="${act.title}">${pinContent}</div>`,
           iconSize: [32, 32],
           iconAnchor: [16, 16],
           popupAnchor: [0, -18]
@@ -729,9 +1079,12 @@ function renderItinerary(data) {
         const marker = L.marker([act.lat, act.lon], { icon: customPinIcon })
           .addTo(mapInstance)
           .bindPopup(`
-            <div style="font-family:'Outfit',sans-serif; padding:4px; min-width:180px;">
+            <div style="font-family:'Outfit',sans-serif; padding:6px; min-width:190px;">
               <strong style="color:#0284c7; font-size:0.95rem;">#${pointNum} Day ${day.day}: ${sanitizeAndConvertEmojis(act.title)}</strong><br/>
               <span style="color:#64748b; font-size:0.82rem;">Time: ${act.time} | Cost: ${formattedActCost}</span><br/>
+              <span style="display:inline-block; margin-top:2px; font-size:0.75rem; color:${isVisited ? '#10b981' : '#f59e0b'}; font-weight:700;">
+                ${isVisited ? '✓ Completed / Visited' : '⏳ Scheduled to Visit'}
+              </span>
               <p style="font-size:0.8rem; margin-top:4px; color:#334155;">${sanitizeAndConvertEmojis(act.desc)}</p>
             </div>
           `);
@@ -741,20 +1094,28 @@ function renderItinerary(data) {
       const escapedTitle = act.title.replace(/'/g, "\\'");
       actHtml += `
         <div class="timeline-item">
-          <div class="timeline-dot"></div>
-          <div class="timeline-card" onclick="focusMapActivity(${act.lat}, ${act.lon}, '${escapedTitle}', '${formattedActCost}')" title="Click to view on interactive map">
+          <div class="timeline-dot" style="${isVisited ? 'background:var(--accent-emerald); border-color:rgba(16,185,129,0.5);' : ''}"></div>
+          <div class="timeline-card ${isVisited ? 'is-visited' : ''}" onclick="focusMapActivity(${act.lat}, ${act.lon}, '${escapedTitle}', '${formattedActCost}', ${pointNum})" title="Click to view on interactive map">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
               <span style="font-weight: 700; color: var(--accent-cyan); font-size: 0.85rem; display:flex; align-items:center; gap:0.35rem;">
                 <i data-lucide="clock" style="width:14px; height:14px;"></i> ${act.time}
               </span>
-              <span class="activity-badge"><i data-lucide="map-pin" style="width:11px; height:11px; margin-right:3px;"></i> Pin #${pointNum} | ${act.category}</span>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <button type="button" class="visited-toggle-btn ${isVisited ? 'is-visited' : ''}" onclick="toggleVisitedActivity(${dayIdx}, ${actIdx}, event)" title="Toggle visited state">
+                  <i data-lucide="${isVisited ? 'check-circle-2' : 'circle'}" style="width:13px; height:13px;"></i>
+                  <span>${isVisited ? 'Visited' : 'Mark Visited'}</span>
+                </button>
+                <span class="activity-badge"><i data-lucide="map-pin" style="width:11px; height:11px; margin-right:3px;"></i> Spot #${pointNum} | ${act.category}</span>
+              </div>
             </div>
             <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem;">${sanitizeAndConvertEmojis(act.title)}</h4>
             <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 0.5rem;">${sanitizeAndConvertEmojis(act.desc)}</p>
-            <div style="display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--text-muted);">
+            <div style="display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--text-muted); align-items:center;">
               <span style="display:flex; align-items:center; gap:0.25rem;"><i data-lucide="hourglass" style="width:12px; height:12px;"></i> ${act.duration}</span>
               <span style="display:flex; align-items:center; gap:0.25rem; color:var(--accent-emerald); font-weight:600;"><i data-lucide="banknote" style="width:12px; height:12px;"></i> ${formattedActCost}</span>
-              <span style="display:flex; align-items:center; gap:0.25rem; color:var(--accent-cyan); margin-left:auto;"><i data-lucide="crosshair" style="width:12px; height:12px;"></i> View on Map</span>
+              <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.25rem 0.65rem; margin-left:auto; color:var(--accent-cyan); display:flex; align-items:center; gap:0.25rem;" onclick="focusMapActivity(${act.lat}, ${act.lon}, '${escapedTitle}', '${formattedActCost}', ${pointNum})">
+                <i data-lucide="crosshair" style="width:12px; height:12px;"></i> View on Map
+              </button>
             </div>
           </div>
         </div>
@@ -781,6 +1142,7 @@ function renderItinerary(data) {
 
   const formattedTotalTrip = formatCostFromINR(data.estimated_total_cost_inr);
   const formattedDailyRate = formatCostFromINR(data.estimated_daily_cost_inr);
+  const formattedRouteDist = `${Math.round(totalDistanceKm * 10) / 10} km`;
 
   container.innerHTML = `
     <div class="glass-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));">
@@ -791,7 +1153,12 @@ function renderItinerary(data) {
             Style: ${data.travel_style} | Pace: ${data.pace} | Est. Total: <strong style="color:var(--accent-emerald); font-size:1.05rem;">${formattedTotalTrip}</strong> (${formattedDailyRate}/day)
           </p>
         </div>
-        <span class="brand-badge"><i data-lucide="train" style="width:12px; height:12px; margin-right:4px;"></i> ${data.summary.recommended_transit_pass}</span>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <span class="brand-badge" style="background:rgba(16,185,129,0.15); color:var(--accent-emerald); border-color:rgba(16,185,129,0.3);">
+            <i data-lucide="route" style="width:12px; height:12px; margin-right:4px;"></i> TSP Route: ${formattedRouteDist}
+          </span>
+          <span class="brand-badge"><i data-lucide="train" style="width:12px; height:12px; margin-right:4px;"></i> ${data.summary.recommended_transit_pass}</span>
+        </div>
       </div>
       <p style="color: #94a3b8; font-size: 0.88rem; margin-top: 0.75rem; display:flex; align-items:center; gap:0.4rem;">
         <i data-lucide="lightbulb" style="color:var(--accent-amber); width:16px; height:16px;"></i> ${sanitizeAndConvertEmojis(data.summary.smart_tip)}
@@ -818,6 +1185,8 @@ function renderItinerary(data) {
     setTimeout(() => { mapInstance.invalidateSize(); }, 200);
   }
 
+  // Update Circular Exploration Progress
+  updateVisitedProgress();
   initLucideIcons();
 }
 
@@ -993,7 +1362,7 @@ function initCurrencyBudget() {
 }
 
 // ---------------------------------------------------------
-// Smart Packing Checklist with Live Completion Progress
+// Smart Packing Checklist with Custom Items & Live Progress
 // ---------------------------------------------------------
 function initPackingAssistant() {
   const generateBtn = document.getElementById('packing-generate-btn');
@@ -1003,7 +1372,9 @@ function initPackingAssistant() {
     const dest = document.getElementById('packing-dest').value || 'Goa';
     const days = parseInt(document.getElementById('packing-days').value, 10) || 5;
     const season = document.getElementById('packing-season').value;
-    const container = document.getElementById('packing-checklist-container');
+
+    // Sync From Currency as well
+    updateFromCurrencyForCity(dest);
 
     generateBtn.disabled = true;
     generateBtn.innerHTML = `<div class="spinner"></div> Generating Checklist...`;
@@ -1016,62 +1387,21 @@ function initPackingAssistant() {
         activities: ["Sightseeing", "Dining", "Photography", "Walking"]
       });
 
-      let itemsHtml = '';
-      (data.checklist || []).forEach((item, idx) => {
-        itemsHtml += `
-          <div class="checklist-item" onclick="toggleCheckItem(this, event)">
-            <input type="checkbox" class="checklist-checkbox" id="chk-${idx}" onchange="updateChecklistProgress()" />
-            <div style="flex: 1;">
-              <span class="item-title" style="font-size: 0.92rem; color: #fff;">${item.item}</span>
-              <span style="font-size: 0.72rem; color: var(--accent-cyan); margin-left: 0.5rem; text-transform: uppercase;">[${item.category}]</span>
-            </div>
-            ${item.essential ? '<span class="dish-diet-pill" style="color:var(--accent-rose); border-color:rgba(244,63,94,0.3); background:rgba(244,63,94,0.15);">Essential</span>' : ''}
-          </div>
-        `;
-      });
+      // Store in memory
+      activePackingList = (data.checklist || []).map(item => ({
+        item: item.item,
+        category: item.category,
+        essential: !!item.essential,
+        checked: false,
+        is_custom: false
+      }));
 
-      container.innerHTML = `
-        <div class="checklist-progress-card">
-          <div class="checklist-progress-header">
-            <div>
-              <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">${data.destination} (${data.season}) - ${data.trip_duration_days} Days</h3>
-              <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; display:flex; align-items:center; gap:0.4rem;">
-                <i data-lucide="briefcase"></i> ${data.luggage_advice}
-              </p>
-            </div>
-            <div style="text-align: right;">
-              <span id="checklist-pct-badge" class="checklist-pct-badge">0%</span>
-              <div id="checklist-count-badge" style="font-size: 0.75rem; color: var(--text-muted);">0 of ${(data.checklist || []).length} items packed</div>
-            </div>
-          </div>
-
-          <div class="checklist-progress-track">
-            <div id="checklist-progress-fill" class="checklist-progress-fill" style="width: 0%;"></div>
-          </div>
-
-          <div class="checklist-actions">
-            <span>Luggage Readiness Meter</span>
-            <div style="display: flex; gap: 0.5rem;">
-              <button type="button" class="checklist-action-btn" onclick="selectAllChecklist(true)">
-                <i data-lucide="check-check" style="width:13px; height:13px; display:inline-block; vertical-align:middle;"></i> Check All
-              </button>
-              <button type="button" class="checklist-action-btn" onclick="selectAllChecklist(false)">
-                <i data-lucide="rotate-ccw" style="width:13px; height:13px; display:inline-block; vertical-align:middle;"></i> Clear All
-              </button>
-            </div>
-          </div>
-
-          <div id="checklist-complete-badge" class="checklist-complete-badge" style="display: none;">
-            <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
-            <span>100% Ready for Departure! Everything is packed and ready.</span>
-          </div>
-        </div>
-        <div id="checklist-items-list">${itemsHtml}</div>
-      `;
-
-      updateChecklistProgress();
+      renderPackingChecklist(data.destination, data.season, data.trip_duration_days, data.luggage_advice);
     } catch (err) {
-      container.innerHTML = `<div class="glass-card" style="color: var(--accent-rose);"><i data-lucide="alert-circle"></i> Failed to generate checklist.</div>`;
+      const container = document.getElementById('packing-checklist-container');
+      if (container) {
+        container.innerHTML = `<div class="glass-card" style="color: var(--accent-rose);"><i data-lucide="alert-circle"></i> Failed to generate checklist.</div>`;
+      }
     } finally {
       generateBtn.disabled = false;
       generateBtn.innerHTML = `<i data-lucide="check-square"></i> Generate Packing Checklist`;
@@ -1080,16 +1410,138 @@ function initPackingAssistant() {
   });
 }
 
+function initCustomPackingBuilder() {
+  const addBtn = document.getElementById('add-custom-packing-btn');
+  const nameInput = document.getElementById('custom-packing-item-name');
+  const catSelect = document.getElementById('custom-packing-cat');
+
+  if (!addBtn || !nameInput) return;
+
+  addBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    if (!name) {
+      nameInput.focus();
+      showNotificationToast('Please enter an item name.', 'info');
+      return;
+    }
+
+    if (activePackingList.length === 0) {
+      // Create empty list container if not generated yet
+      const dest = document.getElementById('packing-dest').value || 'Trip';
+      activePackingList = [];
+    }
+
+    const newItem = {
+      item: name,
+      category: catSelect.value,
+      essential: catSelect.value === 'Essentials',
+      checked: false,
+      is_custom: true
+    };
+
+    activePackingList.unshift(newItem);
+    nameInput.value = '';
+
+    const dest = document.getElementById('packing-dest').value || 'Trip';
+    const season = document.getElementById('packing-season').value || 'Summer';
+    const days = document.getElementById('packing-days').value || '5';
+
+    renderPackingChecklist(dest, season, days, "Custom items incorporated into luggage checklist.");
+    showNotificationToast(`Added "${name}" to your packing checklist!`, 'success');
+  });
+
+  nameInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      addBtn.click();
+    }
+  });
+}
+
+function removeCustomPackingItem(index, event) {
+  if (event) event.stopPropagation();
+  if (index >= 0 && index < activePackingList.length) {
+    const removed = activePackingList.splice(index, 1);
+    const dest = document.getElementById('packing-dest').value || 'Trip';
+    const season = document.getElementById('packing-season').value || 'Summer';
+    const days = document.getElementById('packing-days').value || '5';
+    renderPackingChecklist(dest, season, days, "Luggage checklist updated.");
+    showNotificationToast(`Removed "${removed[0].item}".`, 'info');
+  }
+}
+
+function renderPackingChecklist(destination = 'Trip', season = 'Summer', days = 5, luggageAdvice = '') {
+  const container = document.getElementById('packing-checklist-container');
+  if (!container) return;
+
+  let itemsHtml = '';
+  activePackingList.forEach((item, idx) => {
+    const isChecked = !!item.checked;
+    const isCustom = !!item.is_custom;
+
+    itemsHtml += `
+      <div class="checklist-item ${isChecked ? 'checked' : ''}" onclick="toggleCheckItem(${idx}, this, event)">
+        <input type="checkbox" class="checklist-checkbox" id="chk-${idx}" ${isChecked ? 'checked' : ''} onchange="toggleCheckItem(${idx}, this.closest('.checklist-item'), event)" />
+        <div style="flex: 1;">
+          <span class="item-title" style="font-size: 0.92rem; color: #fff;">${sanitizeAndConvertEmojis(item.item)}</span>
+          <span style="font-size: 0.72rem; color: var(--accent-cyan); margin-left: 0.5rem; text-transform: uppercase;">[${item.category}]</span>
+          ${isCustom ? '<span style="font-size: 0.68rem; color: var(--accent-amber); margin-left: 0.35rem;">(Custom)</span>' : ''}
+        </div>
+        ${item.essential ? '<span class="dish-diet-pill" style="color:var(--accent-rose); border-color:rgba(244,63,94,0.3); background:rgba(244,63,94,0.15);">Essential</span>' : ''}
+        ${isCustom ? `<button type="button" class="checklist-delete-btn" onclick="removeCustomPackingItem(${idx}, event)" title="Delete custom item"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>` : ''}
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <div class="checklist-progress-card">
+      <div class="checklist-progress-header">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">${destination} (${season}) - ${days} Days</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; display:flex; align-items:center; gap:0.4rem;">
+            <i data-lucide="briefcase"></i> ${luggageAdvice || 'Luggage & Outfit Index'}
+          </p>
+        </div>
+        <div style="text-align: right;">
+          <span id="checklist-pct-badge" class="checklist-pct-badge">0%</span>
+          <div id="checklist-count-badge" style="font-size: 0.75rem; color: var(--text-muted);">0 of ${activePackingList.length} items packed</div>
+        </div>
+      </div>
+
+      <div class="checklist-progress-track">
+        <div id="checklist-progress-fill" class="checklist-progress-fill" style="width: 0%;"></div>
+      </div>
+
+      <div class="checklist-actions">
+        <span>Luggage Readiness Meter</span>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="checklist-action-btn" onclick="selectAllChecklist(true)">
+            <i data-lucide="check-check" style="width:13px; height:13px; display:inline-block; vertical-align:middle;"></i> Check All
+          </button>
+          <button type="button" class="checklist-action-btn" onclick="selectAllChecklist(false)">
+            <i data-lucide="rotate-ccw" style="width:13px; height:13px; display:inline-block; vertical-align:middle;"></i> Clear All
+          </button>
+        </div>
+      </div>
+
+      <div id="checklist-complete-badge" class="checklist-complete-badge" style="display: none;">
+        <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i>
+        <span>100% Ready for Departure! Everything is packed and ready.</span>
+      </div>
+    </div>
+    <div id="checklist-items-list">${itemsHtml}</div>
+  `;
+
+  updateChecklistProgress();
+  initLucideIcons();
+}
+
 function updateChecklistProgress() {
-  const checkboxes = document.querySelectorAll('.checklist-checkbox');
-  const total = checkboxes.length;
+  const total = activePackingList.length;
   if (total === 0) return;
 
   let checkedCount = 0;
-  checkboxes.forEach(cb => {
-    if (cb.checked) checkedCount++;
-    const parent = cb.closest('.checklist-item');
-    if (parent) parent.classList.toggle('checked', cb.checked);
+  activePackingList.forEach(item => {
+    if (item.checked) checkedCount++;
   });
 
   const pct = Math.round((checkedCount / total) * 100);
@@ -1109,29 +1561,37 @@ function updateChecklistProgress() {
   }
 }
 
-function toggleCheckItem(el, event) {
-  const cb = el.querySelector('input[type="checkbox"]');
-  if (!cb) return;
-  if (event && event.target === cb) {
-    el.classList.toggle('checked', cb.checked);
-  } else {
-    cb.checked = !cb.checked;
-    el.classList.toggle('checked', cb.checked);
+function toggleCheckItem(idx, el, event) {
+  if (event && event.target && event.target.tagName === 'BUTTON') return;
+  if (idx >= 0 && idx < activePackingList.length) {
+    const cb = el ? el.querySelector('input[type="checkbox"]') : null;
+    if (event && event.target === cb) {
+      activePackingList[idx].checked = cb.checked;
+    } else {
+      activePackingList[idx].checked = !activePackingList[idx].checked;
+      if (cb) cb.checked = activePackingList[idx].checked;
+    }
+    if (el) el.classList.toggle('checked', activePackingList[idx].checked);
+    updateChecklistProgress();
   }
-  updateChecklistProgress();
 }
 
 function selectAllChecklist(checkAll = true) {
+  activePackingList.forEach(item => {
+    item.checked = checkAll;
+  });
   const checkboxes = document.querySelectorAll('.checklist-checkbox');
   checkboxes.forEach(cb => {
     cb.checked = checkAll;
+    const parent = cb.closest('.checklist-item');
+    if (parent) parent.classList.toggle('checked', checkAll);
   });
   updateChecklistProgress();
   initLucideIcons();
 }
 
 // ---------------------------------------------------------
-// Multilingual Audio Phrasebook & Dual-Engine TTS Audio
+// Multilingual Audio Phrasebook & Voice Translation Studio
 // ---------------------------------------------------------
 let speechVoices = [];
 let currentAudioPlayer = null;
@@ -1147,6 +1607,21 @@ if ('speechSynthesis' in window) {
   window.speechSynthesis.onvoiceschanged = populateSpeechVoices;
 }
 
+const SPEECH_RECOGNITION_LANG_MAP = {
+  English: 'en-US',
+  Tamil: 'ta-IN',
+  Telugu: 'te-IN',
+  Hindi: 'hi-IN',
+  French: 'fr-FR',
+  Spanish: 'es-ES',
+  Japanese: 'ja-JP',
+  German: 'de-DE',
+  Urdu: 'ur-IN',
+  Bengali: 'bn-IN',
+  Marathi: 'mr-IN',
+  auto: 'en-US'
+};
+
 function initPhrasebook() {
   const langSelect = document.getElementById('phrasebook-lang');
   const catSelect = document.getElementById('phrasebook-cat');
@@ -1160,6 +1635,179 @@ function initPhrasebook() {
   if (catSelect) {
     catSelect.addEventListener('change', () => {
       loadPhrases(langSelect ? langSelect.value : 'Hindi', catSelect.value);
+    });
+  }
+}
+
+function initTranslationStudio() {
+  const srcSelect = document.getElementById('translator-source-lang');
+  const tgtSelect = document.getElementById('translator-target-lang');
+  const swapBtn = document.getElementById('translator-swap-btn');
+  const translateBtn = document.getElementById('translate-action-btn');
+  const inputTxt = document.getElementById('translator-input-text');
+  const resultBox = document.getElementById('translation-result-container');
+  const voiceMicBtn = document.getElementById('translator-mic-btn');
+
+  if (!translateBtn || !inputTxt) return;
+
+  // Language Swap
+  if (swapBtn) {
+    swapBtn.addEventListener('click', () => {
+      const srcVal = srcSelect.value === 'auto' ? 'English' : srcSelect.value;
+      const tgtVal = tgtSelect.value;
+      srcSelect.value = tgtVal;
+      tgtSelect.value = srcVal;
+
+      // Swap contents if existing translation
+      if (inputTxt.value.trim() && resultBox && resultBox.dataset.translatedText) {
+        inputTxt.value = resultBox.dataset.translatedText;
+      }
+      showNotificationToast(`Swapped: ${tgtVal} → ${srcVal}`, 'info');
+    });
+  }
+
+  // Preset chips
+  document.querySelectorAll('.translation-quick-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const src = chip.getAttribute('data-src');
+      const tgt = chip.getAttribute('data-tgt');
+      const sample = chip.getAttribute('data-sample');
+
+      if (srcSelect) srcSelect.value = src;
+      if (tgtSelect) tgtSelect.value = tgt;
+      if (inputTxt) inputTxt.value = sample;
+
+      executeTranslation();
+    });
+  });
+
+  // Voice speech recognition for translation
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (voiceMicBtn && SpeechRecognition) {
+    let recognition = null;
+    let isListening = false;
+
+    voiceMicBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (isListening && recognition) {
+        recognition.stop();
+        return;
+      }
+
+      try {
+        const srcLang = srcSelect.value || 'English';
+        const recLangCode = SPEECH_RECOGNITION_LANG_MAP[srcLang] || 'en-US';
+
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = recLangCode;
+
+        recognition.onstart = () => {
+          isListening = true;
+          voiceMicBtn.classList.add('recording');
+          showNotificationToast(`Listening in ${srcLang} (${recLangCode}). Speak now...`, 'info');
+        };
+
+        recognition.onresult = (event) => {
+          if (event.results && event.results[0] && event.results[0][0]) {
+            const transcript = event.results[0][0].transcript;
+            if (transcript) {
+              inputTxt.value = transcript;
+              showNotificationToast(`Captured: "${transcript}"`, 'success');
+              executeTranslation();
+            }
+          }
+        };
+
+        recognition.onerror = (event) => {
+          console.warn('Voice translation speech recognition error:', event.error);
+          voiceMicBtn.classList.remove('recording');
+        };
+
+        recognition.onend = () => {
+          isListening = false;
+          voiceMicBtn.classList.remove('recording');
+        };
+
+        recognition.start();
+      } catch (err) {
+        console.error('Speech recognition error:', err);
+        voiceMicBtn.classList.remove('recording');
+      }
+    });
+  }
+
+  async function executeTranslation() {
+    const text = inputTxt.value.trim();
+    if (!text) {
+      inputTxt.focus();
+      showNotificationToast('Please type or speak a phrase to translate.', 'info');
+      return;
+    }
+
+    const src = srcSelect.value;
+    const tgt = tgtSelect.value;
+
+    translateBtn.disabled = true;
+    translateBtn.innerHTML = `<div class="spinner"></div> Translating...`;
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `<div style="text-align:center; padding: 1.5rem;"><div class="spinner"></div><p style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.85rem;">Translating to ${tgt} with speech synthesis...</p></div>`;
+
+    try {
+      const data = await API.translatePhrase(text, src, tgt);
+      resultBox.dataset.translatedText = data.translated_text;
+
+      const encNative = encodeURIComponent(data.translated_text);
+      const encRomanized = encodeURIComponent(data.romanized || '');
+      const langCode = data.speech_lang_code || 'en-US';
+
+      resultBox.innerHTML = `
+        <div class="translation-result-card">
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span class="activity-badge" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan); border-color:rgba(6,182,212,0.3);">
+                ${data.source_language} → ${data.target_language}
+              </span>
+              <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.2rem 0.6rem;" onclick="copyTranslationText('${encNative}')">
+                <i data-lucide="copy" style="width:12px; height:12px;"></i> Copy
+              </button>
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Original: "${sanitizeAndConvertEmojis(data.original_text)}"</div>
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff; line-height: 1.3; margin: 0.35rem 0;">${data.translated_text}</h3>
+            
+            ${data.romanized && data.romanized !== data.translated_text ? `
+              <div style="font-size: 0.95rem; color: var(--accent-cyan); display:flex; align-items:center; gap:0.35rem; margin-top: 0.35rem;">
+                <i data-lucide="mic" style="width:14px; height:14px;"></i> Pronunciation: <i>${data.romanized}</i>
+              </div>
+            ` : ''}
+          </div>
+
+          <button type="button" class="audio-play-btn" onclick="playSpeech('${encNative}', '${encRomanized}', '${langCode}', this)" title="Listen to Native Pronunciation" style="margin-top:0.25rem;">
+            <i data-lucide="volume-2" style="width:20px; height:20px;"></i>
+          </button>
+        </div>
+      `;
+      initLucideIcons();
+      showNotificationToast('Translation ready! Click the speaker icon to listen.', 'success');
+    } catch (err) {
+      resultBox.innerHTML = `<div class="glass-card" style="color: var(--accent-rose);"><i data-lucide="alert-circle"></i> Translation failed. ${err.message}</div>`;
+      initLucideIcons();
+    } finally {
+      translateBtn.disabled = false;
+      translateBtn.innerHTML = `<i data-lucide="sparkles"></i> Translate & Listen`;
+    }
+  }
+
+  translateBtn.addEventListener('click', executeTranslation);
+}
+
+function copyTranslationText(encText) {
+  const text = decodeURIComponent(encText || '');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      showNotificationToast('Translated text copied to clipboard!', 'success');
     });
   }
 }
@@ -1402,7 +2050,7 @@ function initVoiceInput() {
   }
 
   // Bind to each input in the platform
-  setupMicButton('global-mic-btn', 'global-city-search', () => {
+  setupMicButton('global-mic-btn', 'global-city-search', (val) => {
     const searchBtn = document.getElementById('global-search-btn');
     if (searchBtn) searchBtn.click();
   });
@@ -1414,22 +2062,30 @@ function initVoiceInput() {
     if (searchBtn) searchBtn.click();
   });
 
-  setupMicButton('itinerary-mic-btn', 'itinerary-dest', () => {
+  setupMicButton('itinerary-mic-btn', 'itinerary-dest', (val) => {
+    updateFromCurrencyForCity(val);
     const genBtn = document.getElementById('itinerary-generate-btn');
     if (genBtn) genBtn.click();
   });
 
-  setupMicButton('food-mic-btn', 'food-city-input', () => {
+  setupMicButton('custom-spot-mic-btn', 'custom-spot-name');
+
+  setupMicButton('food-mic-btn', 'food-city-input', (val) => {
+    updateFromCurrencyForCity(val);
     const searchBtn = document.getElementById('food-search-btn');
     if (searchBtn) searchBtn.click();
   });
 
-  setupMicButton('packing-mic-btn', 'packing-dest', () => {
+  setupMicButton('packing-mic-btn', 'packing-dest', (val) => {
+    updateFromCurrencyForCity(val);
     const genBtn = document.getElementById('packing-generate-btn');
     if (genBtn) genBtn.click();
   });
 
-  setupMicButton('budget-mic-btn', 'budget-city', () => {
+  setupMicButton('custom-packing-mic-btn', 'custom-packing-item-name');
+
+  setupMicButton('budget-mic-btn', 'budget-city', (val) => {
+    updateFromCurrencyForCity(val);
     const calcBtn = document.getElementById('budget-estimate-btn');
     if (calcBtn) calcBtn.click();
   });
@@ -1464,6 +2120,9 @@ function initGlobalCitySearch() {
     if (budgetInput) budgetInput.value = city;
     if (packingInput) packingInput.value = city;
 
+    // Automatically set From Currency to this city's currency
+    updateFromCurrencyForCity(city);
+
     // Refresh weather & food
     const fromDate = document.getElementById('weather-from-date') ? document.getElementById('weather-from-date').value : null;
     const toDate = document.getElementById('weather-to-date') ? document.getElementById('weather-to-date').value : null;
@@ -1478,7 +2137,7 @@ function initGlobalCitySearch() {
     }
 
     const formattedCity = city.charAt(0).toUpperCase() + city.slice(1);
-    showNotificationToast(`Destination set to ${formattedCity}. Synced across all travel modules!`, 'success');
+    showNotificationToast(`Destination set to ${formattedCity}. Synced across all travel modules with local currency!`, 'success');
   }
 
   if (globalInput) {

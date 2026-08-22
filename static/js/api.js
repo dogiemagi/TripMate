@@ -82,5 +82,20 @@ const API = {
     });
     if (!res.ok) throw new Error('Phrasebook request failed');
     return await res.json();
+  },
+
+  async translatePhrase(text, sourceLanguage = 'auto', targetLanguage = 'Tamil') {
+    const res = await fetch(`${this.baseUrl}/api/v1/phrasebook/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text,
+        source_language: sourceLanguage,
+        target_language: targetLanguage
+      })
+    });
+    if (!res.ok) throw new Error('Translation request failed');
+    return await res.json();
   }
 };
+

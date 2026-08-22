@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Response
-from app.models.schemas import PhrasebookQuery
+from app.models.schemas import PhrasebookQuery, TranslationRequest
 from app.services.phrasebook_service import PhrasebookService
 import httpx
 import logging
@@ -13,6 +13,14 @@ async def get_phrases(query: PhrasebookQuery):
     Multilingual travel phrases with phonetic romanization and speech synthesis config.
     """
     return PhrasebookService.get_phrases(query)
+
+@router.post("/translate")
+async def translate_text(req: TranslationRequest):
+    """
+    Live voice & text translation with phonetic romanization and pronunciation synthesis.
+    """
+    return await PhrasebookService.translate_phrase(req)
+
 
 @router.get("/audio")
 async def get_phrase_audio(text: str, lang: str = "hi"):

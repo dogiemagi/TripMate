@@ -1,16 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VoyageAI - Multimodal AI Travel Intelligence Platform</title>
-  <meta name="description" content="Production-ready multimodal travel intelligence platform with AI vision, real-time weather radar, smart itinerary builder, gastronomy guide, and currency budgeting." />
+  <meta name="description"
+    content="Production-ready multimodal travel intelligence platform with AI vision, real-time weather radar, smart itinerary builder, gastronomy guide, and currency budgeting." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
@@ -21,6 +24,7 @@
   <!-- Application Stylesheet -->
   <link rel="stylesheet" href="/static/css/styles.css" />
 </head>
+
 <body>
   <div class="app-container">
 
@@ -38,7 +42,7 @@
 
       <div class="nav-search">
         <i data-lucide="search" id="global-search-icon" style="color: var(--text-muted); cursor: pointer;"></i>
-        <input type="text" id="global-city-search" placeholder="Search any city globally (e.g. Delhi, Chennai, Paris, Tokyo, Goa, New York)..." />
+        <input type="text" id="global-city-search" placeholder="Search any city globally" />
         <button type="button" id="global-mic-btn" class="nav-mic-btn" title="Speak to Search (Voice Input)">
           <i data-lucide="mic"></i>
         </button>
@@ -125,7 +129,8 @@
         <div class="section-header">
           <div class="section-header-left">
             <h1><i data-lucide="camera"></i> Multimodal Visual Intelligence</h1>
-            <p>Upload a landmark photo, restaurant menu, or scenic view for instant AI analysis, history, and translations.</p>
+            <p>Upload a landmark photo, restaurant menu, or scenic view for instant AI analysis, history, and
+              translations.</p>
           </div>
         </div>
 
@@ -133,7 +138,7 @@
           <!-- Upload & Controls -->
           <div class="glass-card">
             <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">Visual Input</h3>
-            
+
             <div class="dropzone" id="vision-dropzone">
               <input type="file" id="vision-file-input" accept="image/*" style="display: none;" />
               <div class="dropzone-icon">
@@ -161,7 +166,8 @@
               <div class="form-group">
                 <label class="form-label">Specific Question / Prompt</label>
                 <div class="input-with-mic">
-                  <input type="text" id="vision-prompt" class="form-control" placeholder="e.g. Is this dish gluten-free? What is the best photography angle?" />
+                  <input type="text" id="vision-prompt" class="form-control"
+                    placeholder="e.g. Is this dish gluten-free? What is the best photography angle?" />
                   <button type="button" id="vision-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
                     <i data-lucide="mic"></i>
                   </button>
@@ -172,10 +178,13 @@
                 <label class="form-label" style="font-size: 0.75rem;">Quick Sample Testing</label>
                 <div class="sample-chips">
                   <span class="sample-chip" data-sample="Taj Mahal Agra"><i data-lucide="landmark"></i> Taj Mahal</span>
-                  <span class="sample-chip" data-sample="Eiffel Tower Paris"><i data-lucide="landmark"></i> Eiffel Tower</span>
+                  <span class="sample-chip" data-sample="Eiffel Tower Paris"><i data-lucide="landmark"></i> Eiffel
+                    Tower</span>
                   <span class="sample-chip" data-sample="Colosseum Rome"><i data-lucide="landmark"></i> Colosseum</span>
-                  <span class="sample-chip" data-sample="Mount Fuji Japan"><i data-lucide="mountain"></i> Mount Fuji</span>
-                  <span class="sample-chip" data-sample="Italian Trattoria Menu"><i data-lucide="file-text"></i> Trattoria Menu</span>
+                  <span class="sample-chip" data-sample="Mount Fuji Japan"><i data-lucide="mountain"></i> Mount
+                    Fuji</span>
+                  <span class="sample-chip" data-sample="Italian Trattoria Menu"><i data-lucide="file-text"></i>
+                    Trattoria Menu</span>
                 </div>
               </div>
 
@@ -188,12 +197,14 @@
           <!-- Vision Results Display -->
           <div id="vision-results">
             <div class="glass-card" style="text-align: center; padding: 4rem 2rem;">
-              <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+              <div
+                style="width: 64px; height: 64px; border-radius: 50%; background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
                 <i data-lucide="scan" style="width: 32px; height: 32px;"></i>
               </div>
               <h3 style="font-size: 1.25rem; color: #fff; font-weight: 700;">Awaiting Visual Input</h3>
               <p style="color: var(--text-secondary); max-width: 420px; margin: 0.5rem auto 0; font-size: 0.9rem;">
-                Upload an image or select a sample landmark to trigger real-time AI recognition, cultural guides, and culinary translations.
+                Upload an image or select a sample landmark to trigger real-time AI recognition, cultural guides, and
+                culinary translations.
               </p>
             </div>
           </div>
@@ -219,7 +230,8 @@
                 <i data-lucide="map-pin"></i> Destination City
               </label>
               <div class="input-with-mic">
-                <input type="text" id="weather-city-input" class="form-control" placeholder="City name..." value="Delhi" />
+                <input type="text" id="weather-city-input" class="form-control" placeholder="City name..."
+                  value="Delhi" />
                 <button type="button" id="weather-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
                   <i data-lucide="mic"></i>
                 </button>
@@ -247,7 +259,8 @@
 
           <!-- Quick Date Range Presets -->
           <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <span style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display:flex; align-items:center; gap:0.3rem;">
+            <span
+              style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display:flex; align-items:center; gap:0.3rem;">
               <i data-lucide="clock" style="width:13px; height:13px;"></i> Quick Date Ranges:
             </span>
             <button type="button" class="date-preset-chip" data-preset="today">Today</button>
@@ -255,7 +268,8 @@
             <button type="button" class="date-preset-chip active" data-preset="7days">Next 7 Days</button>
             <button type="button" class="date-preset-chip" data-preset="14days">Next 14 Days</button>
             <button type="button" class="date-preset-chip" data-preset="weekend">This Weekend</button>
-            <button type="button" id="open-calendar-modal-btn" class="date-preset-chip" style="color:var(--accent-cyan); border-color:rgba(6,182,212,0.4); display:inline-flex; align-items:center; gap:0.35rem;">
+            <button type="button" id="open-calendar-modal-btn" class="date-preset-chip"
+              style="color:var(--accent-cyan); border-color:rgba(6,182,212,0.4); display:inline-flex; align-items:center; gap:0.35rem;">
               <i data-lucide="calendar"></i> Choose from Calendar
             </button>
           </div>
@@ -263,23 +277,30 @@
 
         <!-- Interactive Calendar Range Picker Modal -->
         <div id="calendar-range-modal" class="modal-overlay" style="display: none;">
-          <div class="glass-card modal-content" style="max-width: 440px; width: 92%; padding: 1.5rem; position: relative;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem;">
-              <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+          <div class="glass-card modal-content"
+            style="max-width: 440px; width: 92%; padding: 1.5rem; position: relative;">
+            <div
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem;">
+              <h3
+                style="font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
                 <i data-lucide="calendar" style="color: var(--accent-cyan);"></i> Select Travel Date Range
               </h3>
-              <button id="close-calendar-modal" class="btn btn-secondary" style="padding: 0.2rem 0.5rem; font-size: 0.8rem; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
+              <button id="close-calendar-modal" class="btn btn-secondary"
+                style="padding: 0.2rem 0.5rem; font-size: 0.8rem; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
                 <i data-lucide="x" style="width: 14px; height: 14px;"></i>
               </button>
             </div>
 
             <!-- Calendar Month Header & Navigation -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <button id="cal-prev-month" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+              <button id="cal-prev-month" class="btn btn-secondary"
+                style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
                 <i data-lucide="chevron-left"></i>
               </button>
-              <span id="cal-month-year-label" style="font-weight: 700; font-size: 1.05rem; color: #fff;">August 2026</span>
-              <button id="cal-next-month" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
+              <span id="cal-month-year-label" style="font-weight: 700; font-size: 1.05rem; color: #fff;">August
+                2026</span>
+              <button id="cal-next-month" class="btn btn-secondary"
+                style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
                 <i data-lucide="chevron-right"></i>
               </button>
             </div>
@@ -293,15 +314,18 @@
             </div>
 
             <!-- Selected Range Summary & Actions -->
-            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div
+              style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
               <div>
                 <div style="font-size: 0.75rem; color: var(--text-muted);">Selected Window:</div>
-                <div id="cal-selected-range-text" style="font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan);">
+                <div id="cal-selected-range-text"
+                  style="font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan);">
                   Click start & end dates
                 </div>
               </div>
               <div style="display: flex; gap: 0.5rem;">
-                <button id="cal-reset-btn" class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">Reset</button>
+                <button id="cal-reset-btn" class="btn btn-secondary"
+                  style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">Reset</button>
                 <button id="cal-apply-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.9rem;">
                   <i data-lucide="check"></i> Apply Range
                 </button>
@@ -319,93 +343,195 @@
       <!-- TAB 3: SMART ITINERARY PLANNER & MAP                              -->
       <!-- ================================================================= -->
       <section id="tab-itinerary" class="tab-pane">
+        <!-- SVG Gradient for Circular Progress -->
+        <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#06b6d4" />
+              <stop offset="50%" stop-color="#3b82f6" />
+              <stop offset="100%" stop-color="#10b981" />
+            </linearGradient>
+          </defs>
+        </svg>
+
         <div class="section-header">
           <div class="section-header-left">
             <h1><i data-lucide="map"></i> AI Smart Itinerary & Interactive Map</h1>
-            <p>Multi-day custom travel plans dynamically geocoded to your exact location query, with cost breakdown in <span class="currency-highlight">INR (₹)</span>.</p>
+            <p>Multi-day custom travel plans dynamically geocoded to your exact location query, optimized with Nearest-Neighbor TSP routing and visited place tracking.</p>
+          </div>
+        </div>
+
+        <!-- Visited Places Circular Progress Banner -->
+        <div id="itinerary-progress-banner" class="circular-progress-card">
+          <div style="display: flex; align-items: center; gap: 1.25rem;">
+            <div class="circular-progress-wrapper">
+              <svg class="circle-progress-svg" viewBox="0 0 100 100">
+                <circle class="circle-progress-bg" cx="50" cy="50" r="40" />
+                <circle id="itinerary-circle-bar" class="circle-progress-bar" cx="50" cy="50" r="40" />
+              </svg>
+              <div class="circle-progress-text">
+                <span id="itinerary-circle-pct">0%</span>
+                <small>Visited</small>
+              </div>
+            </div>
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.25rem;">Trip Exploration Progress</h3>
+              <p id="itinerary-circle-subtitle" style="font-size: 0.88rem; color: var(--text-secondary);">0 of 0 visiting spots covered</p>
+              <span id="itinerary-circle-status" class="brand-badge" style="margin-top: 0.4rem; display: inline-block;">Ready for Departure</span>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <button type="button" id="mark-all-visited-btn" class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.75rem; margin-right: 0.5rem;">
+              <i data-lucide="check-check"></i> Mark All Visited
+            </button>
+            <button type="button" id="reset-visited-btn" class="btn btn-secondary" style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
+              <i data-lucide="rotate-ccw"></i> Reset
+            </button>
           </div>
         </div>
 
         <div class="grid-split">
-          <!-- Itinerary Controls -->
-          <div class="glass-card">
-            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff;">Trip Parameters</h3>
-            
-            <div class="form-group">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="map-pin"></i> Destination Location
-              </label>
-              <div class="input-with-mic">
-                <input type="text" id="itinerary-dest" class="form-control" value="Delhi, India" placeholder="e.g. Chennai, Paris, Tokyo, Bengaluru, Rome..." />
-                <button type="button" id="itinerary-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
-                  <i data-lucide="mic"></i>
-                </button>
+          <!-- Itinerary Controls & Custom Place Addition -->
+          <div>
+            <div class="glass-card" style="margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff;">Trip Parameters</h3>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                  <i data-lucide="map-pin"></i> Destination Location
+                </label>
+                <div class="input-with-mic">
+                  <input type="text" id="itinerary-dest" class="form-control" value="Delhi, India"
+                    placeholder="e.g. Chennai, Paris, Tokyo, Bengaluru, Rome..." />
+                  <button type="button" id="itinerary-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
+                    <i data-lucide="mic"></i>
+                  </button>
+                </div>
               </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                  <i data-lucide="clock"></i> Duration (Days)
+                </label>
+                <select id="itinerary-days" class="form-control">
+                  <option value="1">1 Day Express</option>
+                  <option value="2" selected>2 Days Weekend</option>
+                  <option value="3">3 Days Classic</option>
+                  <option value="5">5 Days In-Depth</option>
+                  <option value="7">7 Days Grand Tour</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                  <i data-lucide="compass"></i> Travel Style
+                </label>
+                <select id="itinerary-style" class="form-control">
+                  <option value="Balanced" selected>Balanced (Sights & Food)</option>
+                  <option value="Cultural">Cultural & Historical</option>
+                  <option value="Adventure">Active & Adventure</option>
+                  <option value="Foodie">Culinary & Gastronomy</option>
+                  <option value="Luxury">Luxury & Relaxation</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                  <i data-lucide="activity"></i> Pace
+                </label>
+                <select id="itinerary-pace" class="form-control">
+                  <option value="Relaxed">Relaxed</option>
+                  <option value="Moderate" selected>Moderate</option>
+                  <option value="Fast-Paced">Fast-Paced</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
+                  <i data-lucide="wallet"></i> Budget Tier
+                </label>
+                <select id="itinerary-budget" class="form-control">
+                  <option value="Backpacker">Backpacker (Budget)</option>
+                  <option value="Moderate" selected>Moderate (Standard)</option>
+                  <option value="Premium">Premium (Comfort)</option>
+                  <option value="Luxury">Luxury (Five-Star)</option>
+                </select>
+              </div>
+
+              <button id="itinerary-generate-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                <i data-lucide="sparkles"></i> Generate AI Itinerary
+              </button>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="clock"></i> Duration (Days)
-              </label>
-              <select id="itinerary-days" class="form-control">
-                <option value="1">1 Day Express</option>
-                <option value="2" selected>2 Days Weekend</option>
-                <option value="3">3 Days Classic</option>
-                <option value="5">5 Days In-Depth</option>
-                <option value="7">7 Days Grand Tour</option>
-              </select>
-            </div>
+            <!-- Custom Visiting Spot Addition Form -->
+            <div class="glass-card custom-spot-box">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.45rem;">
+                <i data-lucide="map-pin-plus" style="color: var(--accent-cyan);"></i> Add Your Own Visiting Spot
+              </h3>
+              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                Add any landmark or personal favorite. The AI route optimizer will re-sequence all stops in the shortest, optimal path order.
+              </p>
 
-            <div class="form-group">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="compass"></i> Travel Style
-              </label>
-              <select id="itinerary-style" class="form-control">
-                <option value="Balanced" selected>Balanced (Sights & Food)</option>
-                <option value="Cultural">Cultural & Historical</option>
-                <option value="Adventure">Active & Adventure</option>
-                <option value="Foodie">Culinary & Gastronomy</option>
-                <option value="Luxury">Luxury & Relaxation</option>
-              </select>
-            </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem;">Place / Landmark Name</label>
+                <div class="input-with-mic">
+                  <input type="text" id="custom-spot-name" class="form-control" placeholder="e.g. Qutub Minar or Coffee Roastery..." />
+                  <button type="button" id="custom-spot-mic-btn" class="input-mic-btn" title="Voice Input">
+                    <i data-lucide="mic"></i>
+                  </button>
+                </div>
+              </div>
 
-            <div class="form-group">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="activity"></i> Pace
-              </label>
-              <select id="itinerary-pace" class="form-control">
-                <option value="Relaxed">Relaxed</option>
-                <option value="Moderate" selected>Moderate</option>
-                <option value="Fast-Paced">Fast-Paced</option>
-              </select>
-            </div>
+              <div class="grid-2" style="gap: 0.5rem;">
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Category</label>
+                  <select id="custom-spot-cat" class="form-control" style="padding: 0.45rem 0.75rem; font-size: 0.85rem;">
+                    <option value="Heritage" selected>Heritage & Monument</option>
+                    <option value="Food">Food & Café</option>
+                    <option value="Culture">Culture & Art</option>
+                    <option value="Nature">Nature & Viewpoint</option>
+                    <option value="Shopping">Shopping & Market</option>
+                    <option value="Custom">Personal Spot</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Assigned Day</label>
+                  <select id="custom-spot-day" class="form-control" style="padding: 0.45rem 0.75rem; font-size: 0.85rem;">
+                    <option value="1">Day 1</option>
+                    <option value="2">Day 2</option>
+                    <option value="3">Day 3</option>
+                  </select>
+                </div>
+              </div>
 
-            <div class="form-group">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="wallet"></i> Budget Tier
-              </label>
-              <select id="itinerary-budget" class="form-control">
-                <option value="Backpacker">Backpacker (Budget)</option>
-                <option value="Moderate" selected>Moderate (Standard)</option>
-                <option value="Premium">Premium (Comfort)</option>
-                <option value="Luxury">Luxury (Five-Star)</option>
-              </select>
-            </div>
+              <div class="grid-2" style="gap: 0.5rem;">
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Duration</label>
+                  <input type="text" id="custom-spot-duration" class="form-control" value="1.5 hrs" style="padding: 0.45rem 0.75rem; font-size: 0.85rem;" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" style="font-size: 0.8rem;">Est. Cost (INR)</label>
+                  <input type="number" id="custom-spot-cost" class="form-control" value="0" style="padding: 0.45rem 0.75rem; font-size: 0.85rem;" />
+                </div>
+              </div>
 
-            <button id="itinerary-generate-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
-              <i data-lucide="sparkles"></i> Generate AI Itinerary
-            </button>
+              <button type="button" id="add-custom-spot-btn" class="btn btn-secondary" style="width: 100%; border-color: rgba(6,182,212,0.4); color: var(--accent-cyan);">
+                <i data-lucide="plus-circle"></i> Add Spot & Optimize Path
+              </button>
+            </div>
           </div>
 
           <!-- Itinerary Results & Interactive Map -->
           <div>
             <div class="map-card-wrapper">
               <div class="map-header">
-                <span style="font-weight: 700; font-size: 0.92rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
-                  <i data-lucide="navigation" style="color: var(--accent-cyan);"></i> Live Geo-Routing Radar
+                <span
+                  style="font-weight: 700; font-size: 0.92rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                  <i data-lucide="navigation" style="color: var(--accent-cyan);"></i> Live Geo-Routing Radar (TSP Optimal Route)
                 </span>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <button id="recenter-map-btn" class="btn btn-secondary" style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+                  <button id="recenter-map-btn" class="btn btn-secondary"
+                    style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
                     <i data-lucide="crosshair"></i> Recenter
                   </button>
                   <span id="map-status-badge" class="brand-badge">Map Active</span>
@@ -451,10 +577,12 @@
               <input type="checkbox" class="diet-filter-cb" value="Vegan" /> <i data-lucide="sprout"></i> Vegan
             </label>
             <label class="filter-label">
-              <input type="checkbox" class="diet-filter-cb" value="Gluten-Free" /> <i data-lucide="wheat"></i> Gluten-Free
+              <input type="checkbox" class="diet-filter-cb" value="Gluten-Free" /> <i data-lucide="wheat"></i>
+              Gluten-Free
             </label>
             <label class="filter-label">
-              <input type="checkbox" class="diet-filter-cb" value="Halal" /> <i data-lucide="shield-check"></i> Halal Friendly
+              <input type="checkbox" class="diet-filter-cb" value="Halal" /> <i data-lucide="shield-check"></i> Halal
+              Friendly
             </label>
           </div>
         </div>
@@ -471,15 +599,17 @@
         <div class="section-header">
           <div class="section-header-left">
             <h1><i data-lucide="coins"></i> Currency FX & Travel Budgeter</h1>
-            <p>Live foreign exchange conversions and realistic daily travel expense estimators in INR (₹) and global currencies.</p>
+            <p>Live foreign exchange conversions and realistic daily travel expense estimators in INR (₹) and global
+              currencies.</p>
           </div>
         </div>
 
         <div class="grid-2">
           <!-- FX Converter -->
           <div class="glass-card">
-            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Live Currency Converter</h3>
-            
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Live Currency
+              Converter</h3>
+
             <div class="form-group">
               <label class="form-label">Amount</label>
               <input type="number" id="currency-amount" class="form-control" value="1000" />
@@ -523,17 +653,21 @@
               <i data-lucide="repeat"></i> Convert Currency
             </button>
 
-            <div id="currency-result-box" style="margin-top: 1.5rem; text-align: center; padding: 1.5rem; background: rgba(15, 23, 42, 0.6); border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
+            <div id="currency-result-box"
+              style="margin-top: 1.5rem; text-align: center; padding: 1.5rem; background: rgba(15, 23, 42, 0.6); border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
               <div style="font-size: 0.88rem; color: var(--text-muted);">1,000 INR =</div>
-              <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-cyan); line-height: 1.1; margin: 0.35rem 0;">$11.98 <span style="font-size: 1rem; color: #fff;">USD</span></div>
+              <div
+                style="font-size: 2.2rem; font-weight: 800; color: var(--accent-cyan); line-height: 1.1; margin: 0.35rem 0;">
+                $11.98 <span style="font-size: 1rem; color: #fff;">USD</span></div>
               <div style="font-size: 0.78rem; color: var(--text-secondary);">1 INR = 0.01198 USD</div>
             </div>
           </div>
 
           <!-- Trip Expense Breakdown Calculator -->
           <div class="glass-card">
-            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Trip Expense Estimator</h3>
-            
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Trip Expense
+              Estimator</h3>
+
             <div class="grid-3" style="gap: 0.75rem;">
               <div class="form-group">
                 <label class="form-label">Destination</label>
@@ -578,47 +712,81 @@
         <div class="section-header">
           <div class="section-header-left">
             <h1><i data-lucide="backpack"></i> Smart Packing Assistant</h1>
-            <p>Generate an interactive luggage checklist tailored to your destination climate, season, and activities.</p>
+            <p>Generate an interactive luggage checklist tailored to your destination climate, season, and activities, with custom item additions.
+            </p>
           </div>
         </div>
 
         <div class="grid-split">
-          <div class="glass-card">
-            <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Luggage Planner</h3>
-            
-            <div class="form-group">
-              <label class="form-label">Destination</label>
-              <div class="input-with-mic">
-                <input type="text" id="packing-dest" class="form-control" value="Goa" />
-                <button type="button" id="packing-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
-                  <i data-lucide="mic"></i>
-                </button>
+          <div>
+            <div class="glass-card" style="margin-bottom: 1.25rem;">
+              <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Luggage Planner</h3>
+
+              <div class="form-group">
+                <label class="form-label">Destination</label>
+                <div class="input-with-mic">
+                  <input type="text" id="packing-dest" class="form-control" value="Goa" />
+                  <button type="button" id="packing-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
+                    <i data-lucide="mic"></i>
+                  </button>
+                </div>
               </div>
+
+              <div class="form-group">
+                <label class="form-label">Trip Length (Days)</label>
+                <input type="number" id="packing-days" class="form-control" value="5" min="1" max="30" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Season</label>
+                <select id="packing-season" class="form-control">
+                  <option value="Spring">Spring (Mild & Breezy)</option>
+                  <option value="Summer" selected>Summer (Warm & Sunny)</option>
+                  <option value="Autumn">Autumn (Crisp & Cool)</option>
+                  <option value="Winter">Winter (Cold & Dry)</option>
+                </select>
+              </div>
+
+              <button id="packing-generate-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
+                <i data-lucide="check-square"></i> Generate Packing Checklist
+              </button>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Trip Length (Days)</label>
-              <input type="number" id="packing-days" class="form-control" value="5" min="1" max="30" />
+            <!-- Add Custom Checklist Item Box -->
+            <div class="glass-card custom-spot-box">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.45rem;">
+                <i data-lucide="plus-circle" style="color: var(--accent-cyan);"></i> Add Your Custom Luggage Item
+              </h3>
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem;">Item Name</label>
+                <div class="input-with-mic">
+                  <input type="text" id="custom-packing-item-name" class="form-control" placeholder="e.g. Scuba Goggles, Noise-Cancelling Headphones..." />
+                  <button type="button" id="custom-packing-mic-btn" class="input-mic-btn" title="Voice Input">
+                    <i data-lucide="mic"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" style="font-size: 0.8rem;">Category</label>
+                <select id="custom-packing-cat" class="form-control">
+                  <option value="Essentials" selected>Essentials</option>
+                  <option value="Clothing">Clothing & Apparel</option>
+                  <option value="Electronics">Electronics & Gadgets</option>
+                  <option value="Toiletries">Toiletries & Health</option>
+                  <option value="Documents">Travel Documents</option>
+                  <option value="Custom">Custom / Gear</option>
+                </select>
+              </div>
+              <button type="button" id="add-custom-packing-btn" class="btn btn-secondary" style="width: 100%; border-color: rgba(6,182,212,0.4); color: var(--accent-cyan);">
+                <i data-lucide="plus"></i> Add Item to Checklist
+              </button>
             </div>
-
-            <div class="form-group">
-              <label class="form-label">Season</label>
-              <select id="packing-season" class="form-control">
-                <option value="Spring">Spring (Mild & Breezy)</option>
-                <option value="Summer" selected>Summer (Warm & Sunny)</option>
-                <option value="Autumn">Autumn (Crisp & Cool)</option>
-                <option value="Winter">Winter (Cold & Dry)</option>
-              </select>
-            </div>
-
-            <button id="packing-generate-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
-              <i data-lucide="check-square"></i> Generate Packing Checklist
-            </button>
           </div>
 
           <div id="packing-checklist-container">
             <div class="glass-card" style="text-align: center; padding: 3rem;">
-              <i data-lucide="briefcase" style="width: 48px; height: 48px; color: var(--accent-cyan); margin-bottom: 1rem;"></i>
+              <i data-lucide="briefcase"
+                style="width: 48px; height: 48px; color: var(--accent-cyan); margin-bottom: 1rem;"></i>
               <h3 style="font-size: 1.2rem; color: #fff;">Click 'Generate' to build your dynamic checklist.</h3>
             </div>
           </div>
@@ -626,13 +794,13 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- TAB 7: AUDIO PHRASEBOOK                                           -->
+      <!-- TAB 7: AUDIO PHRASEBOOK & VOICE TRANSLATION STUDIO                -->
       <!-- ================================================================= -->
       <section id="tab-phrasebook" class="tab-pane">
         <div class="section-header">
           <div class="section-header-left">
-            <h1><i data-lucide="languages"></i> Multilingual Audio Phrasebook</h1>
-            <p>Essential local survival phrases with pronunciation guides and built-in speech synthesis playback for Indian and International languages.</p>
+            <h1><i data-lucide="languages"></i> Multilingual Audio Phrasebook & Voice Translator</h1>
+            <p>Speak or type in any language (e.g. Tamil to English, English to Telugu) with speech recognition, neural translation, phonetic guides, and native audio playback.</p>
           </div>
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
             <select id="phrasebook-lang" class="form-control" style="width: 180px;">
@@ -664,6 +832,96 @@
           </div>
         </div>
 
+        <!-- Live Voice & Speech Translation Studio -->
+        <div class="translation-studio-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+            <div>
+              <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="mic" style="color: var(--accent-cyan);"></i> Live Voice & Speech Translation Studio
+              </h3>
+              <p style="font-size: 0.85rem; color: var(--text-secondary);">
+                Click the microphone to speak in your source language or type any travel phrase to translate.
+              </p>
+            </div>
+            <span class="brand-badge"><i data-lucide="sparkles" style="width:12px; height:12px; margin-right:4px;"></i> AI Speech Matrix</span>
+          </div>
+
+          <!-- Language Selector Row with Swap Button -->
+          <div class="translation-controls-row">
+            <div style="flex: 1 1 200px;">
+              <label class="form-label" style="font-size: 0.78rem; margin-bottom: 0.35rem;">From (Spoken / Source Language)</label>
+              <select id="translator-source-lang" class="form-control">
+                <option value="auto">Auto-Detect / Speech Input</option>
+                <option value="English" selected>English</option>
+                <option value="Tamil">Tamil (தமிழ்)</option>
+                <option value="Telugu">Telugu (తెలుగు)</option>
+                <option value="Hindi">Hindi (हिन्दी)</option>
+                <option value="French">French (Français)</option>
+                <option value="Spanish">Spanish (Español)</option>
+                <option value="Japanese">Japanese (日本語)</option>
+                <option value="German">German (Deutsch)</option>
+                <option value="Urdu">Urdu (اردو)</option>
+                <option value="Bengali">Bengali (বাংলা)</option>
+                <option value="Marathi">Marathi (मराठी)</option>
+              </select>
+            </div>
+
+            <button type="button" id="translator-swap-btn" class="translation-swap-btn" title="Swap Source & Target Languages">
+              <i data-lucide="arrow-left-right"></i>
+            </button>
+
+            <div style="flex: 1 1 200px;">
+              <label class="form-label" style="font-size: 0.78rem; margin-bottom: 0.35rem;">To (Target Translation Language)</label>
+              <select id="translator-target-lang" class="form-control">
+                <option value="Tamil" selected>Tamil (தமிழ்)</option>
+                <option value="Telugu">Telugu (తెలుగు)</option>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi (हिन्दी)</option>
+                <option value="French">French (Français)</option>
+                <option value="Spanish">Spanish (Español)</option>
+                <option value="Japanese">Japanese (日本語)</option>
+                <option value="German">German (Deutsch)</option>
+                <option value="Urdu">Urdu (اردو)</option>
+                <option value="Bengali">Bengali (বাংলা)</option>
+                <option value="Marathi">Marathi (मराठी)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Input Text Area with Speech Recognition Button -->
+          <div class="translation-input-box">
+            <textarea id="translator-input-text" placeholder="Speak or type a sentence here (e.g. 'Where is the central railway station?' or 'வணக்கம் எனக்கு உதவி வேண்டும்')..."></textarea>
+            <button type="button" id="translator-mic-btn" class="translation-voice-btn" title="Speak to Translate (Voice Input)">
+              <i data-lucide="mic"></i>
+            </button>
+          </div>
+
+          <!-- Action Buttons & Quick Conversion Presets -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Quick Presets:</span>
+              <button type="button" class="translation-quick-chip" data-src="English" data-tgt="Tamil" data-sample="Where is the train station?">English → Tamil</button>
+              <button type="button" class="translation-quick-chip" data-src="Tamil" data-tgt="English" data-sample="சாப்பாடு மிகவும் சுவையாக இருக்கிறது">Tamil → English</button>
+              <button type="button" class="translation-quick-chip" data-src="English" data-tgt="Telugu" data-sample="How much does this cost?">English → Telugu</button>
+              <button type="button" class="translation-quick-chip" data-src="Telugu" data-tgt="English" data-sample="రైల్వే స్టేషన్ ఎక్కడ ఉంది?">Telugu → English</button>
+              <button type="button" class="translation-quick-chip" data-src="English" data-tgt="Hindi" data-sample="Can you help me find a doctor?">English → Hindi</button>
+            </div>
+
+            <button type="button" id="translate-action-btn" class="btn btn-primary" style="padding: 0.55rem 1.25rem;">
+              <i data-lucide="sparkles"></i> Translate & Listen
+            </button>
+          </div>
+
+          <!-- Translation Output Display -->
+          <div id="translation-result-container" style="display: none;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem;">
+          <i data-lucide="book-open" style="color: var(--accent-cyan);"></i> Curated Essential Travel Phrases
+        </h3>
+
         <div id="phrasebook-content">
           <!-- Injected via JS -->
         </div>
@@ -673,7 +931,8 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <p>VoyageAI Platform &copy; 2026. Built with FastAPI & Modern Multimodal Web Engineering. Ready for <a href="https://render.com" target="_blank">Render</a> Cloud.</p>
+      <p>VoyageAI Platform &copy; 2026. Built with FastAPI & Modern Multimodal Web Engineering. Ready for <a
+          href="https://render.com" target="_blank">Render</a> Cloud.</p>
     </footer>
 
   </div>
@@ -682,4 +941,5 @@
   <script src="/static/js/api.js"></script>
   <script src="/static/js/app.js"></script>
 </body>
+
 </html>

@@ -1531,5 +1531,311 @@ body {
   border-radius: 4px;
 }
 
+.checklist-delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checklist-delete-btn:hover {
+  color: var(--accent-rose);
+  background: rgba(244, 63, 94, 0.15);
+}
+
+/* ==========================================================================
+   Circular Progress Tracker & Visited Places Meter
+   ========================================================================== */
+.circular-progress-card {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.85), rgba(30, 41, 59, 0.75));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.circular-progress-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.circular-progress-wrapper {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circle-progress-svg {
+  transform: rotate(-90deg);
+  width: 90px;
+  height: 90px;
+}
+
+.circle-progress-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 8;
+}
+
+.circle-progress-bar {
+  fill: none;
+  stroke: url(#progressGradient);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 251.2;
+  stroke-dashoffset: 251.2;
+  transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.circle-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  text-align: center;
+}
+
+.circle-progress-text small {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.visited-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  color: var(--text-secondary);
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: var(--transition);
+}
+
+.visited-toggle-btn:hover {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #fff;
+}
+
+.visited-toggle-btn.is-visited {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #10b981;
+  font-weight: 700;
+}
+
+.timeline-card.is-visited {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.timeline-card.is-visited h4 {
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.custom-map-pin.visited-pin {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.7) !important;
+}
+
+/* ==========================================================================
+   Custom Place / Itinerary Addition Form
+   ========================================================================== */
+.custom-spot-box {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px dashed rgba(6, 182, 212, 0.35);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  transition: var(--transition);
+}
+
+.custom-spot-box:hover {
+  border-color: var(--accent-cyan);
+  background: rgba(15, 23, 42, 0.85);
+}
+
+/* ==========================================================================
+   Voice Translation Studio & Multilingual Audio Hub
+   ========================================================================== */
+.translation-studio-card {
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.9), rgba(30, 41, 59, 0.8));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-subtle);
+}
+
+.translation-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.translation-swap-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--glass-border);
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.translation-swap-btn:hover {
+  background: var(--accent-cyan);
+  color: #fff;
+  transform: rotate(180deg);
+}
+
+.translation-input-box {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.translation-input-box textarea {
+  width: 100%;
+  min-height: 85px;
+  background: rgba(10, 14, 23, 0.85);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 3.2rem 0.85rem 1rem;
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  resize: vertical;
+  line-height: 1.5;
+  transition: var(--transition);
+}
+
+.translation-input-box textarea:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 15px var(--accent-cyan-glow);
+}
+
+.translation-voice-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(6, 182, 212, 0.15);
+  border: 1px solid rgba(6, 182, 212, 0.35);
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.translation-voice-btn:hover {
+  background: var(--accent-cyan);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.translation-voice-btn.recording {
+  background: var(--accent-rose) !important;
+  color: #fff !important;
+  border-color: #f43f5e !important;
+  animation: pulseRecording 1s infinite alternate;
+}
+
+@keyframes pulseRecording {
+  from {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+    transform: scale(1);
+  }
+  to {
+    box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+    transform: scale(1.12);
+  }
+}
+
+.translation-result-card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  transition: var(--transition);
+}
+
+.translation-result-card:hover {
+  border-color: rgba(6, 182, 212, 0.5);
+  box-shadow: 0 4px 20px -2px rgba(6, 182, 212, 0.2);
+}
+
+.translation-quick-chip {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.translation-quick-chip:hover {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: var(--accent-cyan);
+  color: #fff;
+}
+
+
 
 
