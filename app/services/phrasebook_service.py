@@ -879,6 +879,107 @@ COMMON_PHONETICS = {
     "grazie": "Grazie"
 }
 
+# Lexicon for transliterating Romanized Hindi / Urdu to Devanagari
+HINDI_URDU_ROMAN_MAP = {
+    "idhar": "इधर", "eedhar": "इधर", "yahan": "यहाँ", "yaha": "यहाँ", "udhar": "उधर", "oodhar": "उधर",
+    "wahan": "वहाँ", "waha": "वहाँ", "kahan": "कहाँ", "kaha": "कहाँ", "kidhar": "किधर", "ithar": "इधर",
+    "aa": "आओ", "aaa": "आओ", "aah": "आओ", "aao": "आओ", "aaiye": "आइए", "aaye": "आइए", "aaja": "आजा", "aajao": "आ जाओ",
+    "ja": "जा", "jaa": "जा", "jao": "जाओ", "jaiye": "जाइए", "jaaye": "जाइए",
+    "ja rahe ho": "जा रहे हो", "ja raha hai": "जा रहा है", "ja rahi hai": "जा रही है",
+    "kya": "क्या", "hai": "है", "hain": "हैं", "ho": "हो", "hoon": "हूँ", "hun": "हूँ",
+    "tha": "था", "the": "थे", "thi": "थी", "aap": "आप", "tum": "तुम", "main": "मैं", "hum": "हम",
+    "yeh": "यह", "ye": "यह", "woh": "वह", "wo": "वह", "kaise": "कैसे", "kaisi": "कैसी", "kaisa": "कैसा",
+    "kyun": "क्यों", "kyu": "क्यों", "kab": "कब", "kaun": "कौन", "kon": "कौन",
+    "kitna": "कितना", "kitne": "कितने", "kitni": "कितनी", "kitna hua": "कितना हुआ",
+    "pani": "पानी", "paani": "पानी", "khana": "खाना", "khaana": "खाना", "chai": "चाय",
+    "chahiye": "चाहिए", "dijiye": "दीजिए", "do": "दो", "le": "ले", "lao": "लाओ",
+    "karo": "करो", "kijiye": "कीजिए", "kar": "कर", "rahe": "रहे", "raha": "रहा", "rahi": "रही",
+    "madad": "मदद", "shukriya": "शुक्रिया", "dhanyawad": "धन्यवाद", "dhanyavad": "धन्यवाद",
+    "namaste": "नमस्ते", "alvida": "अलvida", "theek": "ठीक", "achha": "अच्छा", "acha": "अच्छा",
+    "bahut": "बहुत", "kam": "कम", "bhai": "भाई", "dost": "दोस्त", "station": "स्टेशन",
+    "airport": "हवाई अड्डा", "hotel": "होटल", "chalo": "चलो", "ruko": "रुको", "rok": "रोक",
+    "pate": "पते", "jana": "जाना", "kripya": "कृपया", "sunिए": "सुनिए", "suno": "सुनो",
+    "mujhe": "मुझे", "hume": "हमें", "naam": "नाम", "mera": "मेरा", "tera": "तेरा", "apka": "आपका"
+}
+
+ROMAN_INTENT_PATTERNS = [
+    # Come here patterns
+    (r'\b(idhar|eedhar|yahan|yaha|ithar)\s+(aa|aaa|aah|aao|aaye|aaiye|ao|chale\s+aao|aaja|aajao)\b', "Come here", "यहाँ आओ / ادھر آؤ"),
+    (r'\b(idhar\s+aaa|idhar\s+aah|idhar\s+aa|idhar\s+aao|idhar\s+aaiye)\b', "Come here", "यहाँ आओ / ادھر آؤ"),
+    (r'\b(yahan\s+aao|yahan\s+aaiye|yaha\s+aao)\b', "Come here", "यहाँ आओ"),
+    
+    # Go there patterns
+    (r'\b(udhar|oodhar|wahan|waha)\s+(ja|jaa|jao|jaaye|jaaiye|chale\s+jao|jaye)\b', "Go there", "वहाँ जाओ / ادھر جاؤ"),
+    (r'\b(udhar\s+jao|wahan\s+jao|udhar\s+jaiye)\b', "Go there", "वहाँ जाओ"),
+
+    # How are you & Greetings
+    (r'\b(kya\s+haal\s+hai|kaise\s+ho|kaise\s+hain|kaisi\s+ho|kaisa\s+hai|aap\s+kaise\s+hain|tum\s+kaise\s+ho)\b', "How are you?", "आप कैसे हैं? / آپ کیسے ہیں؟"),
+    (r'\b(main\s+theek\s+hoon|theek\s+hoon|main\s+achha\s+hoon|sab\s+theek\s+hai)\b', "I am fine / Everything is good", "मैं ठीक हूँ / میں ٹھیک ہوں"),
+    (r'\b(namaste|namaskar|namaskaram)\b', "Hello / Greetings", "नमस्ते"),
+    (r'\b(vanakkam|vanakam)\b', "Hello / Greetings", "வணக்கம்"),
+    (r'\b(shukriya|shukriyah|dhanyawad|dhanyavaad|dhanyavad|nandri|danyavad)\b', "Thank you very much", "धन्यवाद / شکریہ"),
+    (r'\b(alvida|khuda\s*hafiz|phir\s*milenge)\b', "Goodbye / See you again", "अलविदा / خدا حافظ"),
+    
+    # Help & Emergency
+    (r'\b(madad\s+karo|madad\s+chahiye|madad\s+kijiye|help\s+karo|bachao|bachaiye)\b', "Please help me", "कृपया मदद कीजिए / برائے مہربانی مدد کریں"),
+    (r'\b(police\s+ko\s+bulao|police\s+bulaiye|police\s+chahiye)\b', "Call the police", "पुलिस को बुलाइए / پولیس کو بلائیں"),
+    (r'\b(doctor\s+chahiye|hospital\s+kahan\s+hai|doctor\s+kahan\s+hai)\b', "I need a doctor / Where is the hospital?", "मुझे डॉक्टर चाहिए / مجھے ڈاکٹر چاہیے"),
+    (r'\b(tabiyat\s+kharab\s+hai|bimaar\s+hoon|dard\s+ho\s+raha\s+hai)\b', "I am feeling sick / unwell", "मेरी तबीयत खराब है"),
+
+    # Questions / Where is
+    (r'\b(kahan\s+ja\s+rahe\s+ho|kidhar\s+ja\s+rahe\s+ho)\b', "Where are you going?", "कहाँ जा रहे हो? / کہاں جا رہے ہو؟"),
+    (r'\b(station|railway\s+station)\s+(kahan|kidhar)\s+hai\b', "Where is the railway station?", "रेलवे स्टेशन कहाँ है?"),
+    (r'\b(airport|aerodrome)\s+(kahan|kidhar)\s+hai\b', "Where is the airport?", "हवाई अड्डा कहाँ है?"),
+    (r'\b(hotel|lodge|kamra)\s+(kahan|kidhar)\s+hai\b', "Where is the hotel?", "होटल कहाँ है?"),
+    (r'\b(restroom|washroom|toilet|shauchalay)\s+(kahan|kidhar)\s+hai\b', "Where is the restroom / toilet?", "शौचालय कहाँ है?"),
+    (r'\b(kahan\s+hai|kidhar\s+hai|kaha\s+hai)\b', "Where is it?", "कहाँ है? / کہاں ہے؟"),
+    
+    # Cost & Money
+    (r'\b(kitne\s+ka\s+hai|kitna\s+hua|kitna\s+paisa|kitna\s+lagega|kitna\s+hai)\b', "How much does this cost?", "यह कितने का है? / یہ کتنے کا ہے؟"),
+    (r'\b(kam\s+karo|kam\s+kijiye|discount\s+do|sasta\s+karo)\b', "Can you give a discount / make it cheaper?", "कम कीजिए / कम करें"),
+    (r'\b(bill\s+le\s+aao|bill\s+dijiye|bill\s+lao)\b', "Please bring the bill", "बिल ले आइए / بل لائیں"),
+
+    # Needs & Dining
+    (r'\b(pani\s+chahiye|paani\s+dijiye|pani\s+do|paani\s+chahiye|drinking\s+water)\b', "Please give drinking water", "पीने का पानी दीजिए / پینے کا पानी दें"),
+    (r'\b(khana\s+chahiye|khana\s+do|khana\s+kahan\s+milega)\b', "I want food / Where can I get food?", "खाना चाहिए / खाना चाहिए"),
+    (r'\b(chai\s+chahiye|chai\s+dijiye|ek\s+cup\s+chai)\b', "Can I have one cup of tea?", "एक कप चाय दीजिए / एक कप चाय दें"),
+
+    # Actions / Movements
+    (r'\b(chalo|chalo\s+ab|chalain|chalte\s+hain)\b', "Let's go / Move on", "चलो / چلیں"),
+    (r'\b(ruko|ruk\s+jao|roko|rok\s+dijiye|thehro)\b', "Please stop / Wait here", "यहाँ रोक दीजिए / रोकें"),
+    (r'\b(jaldi\s+karo|jaldi\s+chalo|jaldi\s+aao)\b', "Hurry up / Come quickly", "जल्दी करो / جلदी करें"),
+    (r'\b(aage\s+badho|seedhe\s+jao)\b', "Go straight ahead", "सीधे जाइए / سیدھے جائیں"),
+    (r'\b(left\s+mudo|baayein\s+mudo|bayen\s+mudo)\b', "Turn left", "बाएँ मुड़िए / بائیں مڑیں"),
+    (r'\b(right\s+mudo|daayein\s+mudo|dayen\s+mudo)\b', "Turn right", "दाएँ मुड़िए / دائیں مڑیں"),
+    
+    # Common questions & dialogue
+    (r'\b(kya\s+naam\s+hai|aapka\s+naam\s+kya\s+hai|tumhara\s+naam\s+kya\s+hai)\b', "What is your name?", "आपका नाम क्या है? / آپ کا نام کیا ہے؟"),
+    (r'\b(kya\s+kar\s+rahe\s+ho|kya\s+ho\s+raha\s+hai|kya\s+chal\s+raha\s+hai)\b', "What are you doing? / What's happening?", "क्या कर रहे हो? / کیا کر رہے ہو؟"),
+    (r'\b(kahan\s+se\s+ho|aap\s+kahan\s+ke\s+hain)\b', "Where are you from?", "आप कहाँ से हैं? / آپ کہاں سے ہیں؟"),
+    (r'\b(samajh\s+nahi\s+aaya|samajh\s+gaya|samajh\s+nahi\s+raha)\b', "I didn't understand / I understand", "समझ नहीं आया / समझ नहीं आया"),
+
+    # Tamil Romanized patterns
+    (r'\b(inge\s+vaa|inga\s+vaa|inga\s+vaanga|inge\s+vaanga)\b', "Come here", "இங்கே வாருங்கள்"),
+    (r'\b(ange\s+ponga|anga\s+po|anga\s+ponga)\b', "Go there", "அங்கே போங்கள்"),
+    (r'\b(eppadi\s+irukkeenga|eppadi\s+irukinga|epdi\s+irukeenga)\b', "How are you?", "நீங்கள் எப்படி இருக்கிறீர்கள்?"),
+    (r'\b(nalla\s+irukken|nallaa\s+irukken)\b', "I am fine", "நான் நலமாக இருக்கிறேன்"),
+    (r'\b(ungal\s+peyar\s+enna|unga\s+per\s+enna)\b', "What is your name?", "உங்கள் பெயர் என்ன?"),
+    (r'\b(enna\s+vilai|evvalavu|evlo)\b', "How much does this cost?", "எவ்வளவு விலை?"),
+    (r'\b(thanni\s+kudunga|thanneer\s+kudunga)\b', "Please give water", "தண்ணீர் கொடுங்கள்"),
+    (r'\b(saapaadu\s+venum|unavu\s+venum)\b', "I want food", "உணவு வேண்டும்"),
+    (r'\b(kaapaathunga|udhavi\s+seiyunga)\b', "Please help me", "உதவி செய்யுங்கள்"),
+
+    # Telugu Romanized patterns
+    (r'\b(ikkadiki\s+ra|ikkadiki\s+randi|ikkada\s+ra)\b', "Come here", "ఇక్కడికి రండి"),
+    (r'\b(akkadiki\s+vellu|akkadiki\s+vellandi)\b', "Go there", "అక్కడికి వెళ్ళండి"),
+    (r'\b(ela\s+unnaru|ela\s+unnav)\b', "How are you?", "ఎలా ఉన్నారు?"),
+    (r'\b(baagunnanu|bavunnanu)\b', "I am fine", "బాగున్నాను"),
+    (r'\b(mee\s+peru\s+enti|nee\s+peru\s+enti)\b', "What is your name?", "మీ పేరు ఏమిటి?"),
+    (r'\b(entha\s+avuthundi|dheen\s+kharchu\s+entha|entha)\b', "How much is this?", "ఎంత ఖర్చు అవుతుంది?"),
+    (r'\b(neellu\s+ivvandi|neellu\s+kavali)\b', "Please give drinking water", "మంచి నీళ్ళు ఇవ్వండి"),
+    (r'\b(sahayam\s+cheyandi)\b', "Please help me", "సహాయం చేయండి")
+]
+
 class PhrasebookService:
     @staticmethod
     def get_phrases(query: PhrasebookQuery) -> Dict[str, Any]:
@@ -941,9 +1042,43 @@ class PhrasebookService:
         return None
 
     @classmethod
+    def _transliterate_romanized_text(cls, text: str) -> str:
+        """Converts Romanized Hinglish/Roman Urdu words into native Devanagari script for accurate translation."""
+        text_clean = text.strip().lower()
+        words = text_clean.split()
+        translated_words = []
+        
+        i = 0
+        while i < len(words):
+            matched = False
+            if i + 2 < len(words):
+                triplet = f"{words[i]} {words[i+1]} {words[i+2]}"
+                if triplet in HINDI_URDU_ROMAN_MAP:
+                    translated_words.append(HINDI_URDU_ROMAN_MAP[triplet])
+                    i += 3
+                    matched = True
+            if not matched and i + 1 < len(words):
+                pair = f"{words[i]} {words[i+1]}"
+                if pair in HINDI_URDU_ROMAN_MAP:
+                    translated_words.append(HINDI_URDU_ROMAN_MAP[pair])
+                    i += 2
+                    matched = True
+            if not matched:
+                w = words[i]
+                clean_w = re.sub(r'[^\w\s]', '', w)
+                if clean_w in HINDI_URDU_ROMAN_MAP:
+                    translated_words.append(HINDI_URDU_ROMAN_MAP[clean_w])
+                else:
+                    translated_words.append(w)
+                i += 1
+                
+        return " ".join(translated_words)
+
+    @classmethod
     async def translate_phrase(cls, req: TranslationRequest) -> Dict[str, Any]:
         import html
         import re
+        import os
         from app.config import settings
 
         raw_text = req.text.strip()
@@ -960,13 +1095,36 @@ class PhrasebookService:
         detected_source = src_code if src_code != "auto" else "en"
         romanized = ""
 
-        # 1. Check Gemini AI if configured
-        if settings.GEMINI_API_KEY and settings.GEMINI_API_KEY != "your_gemini_api_key_here":
+        # Check Gemini API Key from settings or environment
+        gemini_key = (
+            getattr(settings, "GEMINI_API_KEY", "") or 
+            os.environ.get("GEMINI_API_KEY", "") or 
+            os.environ.get("GOOGLE_API_KEY", "")
+        )
+
+        # 1. Phonetic & Conversational Pattern Matcher (Handles "idhar aaa", "idhar aah", "yahan aao", etc.)
+        raw_lower = raw_text.lower().strip()
+        for pattern, eng_translation, native_script in ROMAN_INTENT_PATTERNS:
+            if re.search(pattern, raw_lower):
+                if target_code == "en":
+                    translated_text = eng_translation
+                    romanized = eng_translation
+                    break
+                else:
+                    # If target is another language (e.g. Tamil/Hindi/French), use the English meaning to translate into target
+                    raw_text_for_trans = eng_translation
+                    # Will fall through to web/API translation to translate eng_translation into target language
+                    break
+
+        # 2. Check Gemini AI if configured (Handles slang, Hinglish, Roman Urdu, full context)
+        if not translated_text and gemini_key and gemini_key != "your_gemini_api_key_here":
             try:
                 from google import genai
-                client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                client = genai.Client(api_key=gemini_key)
                 prompt = (
-                    f"Translate the following text accurately from {req.source_language} to {req.target_language}.\n"
+                    f"You are an expert polyglot translator. Translate the following text accurately from {req.source_language} into {req.target_language}.\n"
+                    f"Important: The input text might be written in native script OR Romanized/phonetic script (like Hinglish, Roman Urdu, Roman Tamil, etc.).\n"
+                    f"Always translate the true intended conversational meaning accurately.\n"
                     f"Text: \"{raw_text}\"\n"
                     f"Return a strict JSON with: {{\"translated_text\": \"...\", \"romanized\": \"phonetic latin pronunciation\", \"detected_source\": \"en/ta/hi...\"}}"
                 )
@@ -988,30 +1146,45 @@ class PhrasebookService:
             except Exception as e:
                 logger.warning(f"Gemini translation error: {e}")
 
-        # 2. Google Mobile Web Translation Engine (High reliability, bypasses 429)
-        if not translated_text:
+        # 3. Transliterated Google Mobile Web Translation Engine
+        # If text is in Latin characters and source is Indian/Asian language (Urdu, Hindi, etc.),
+        # transliterate to native script first so translation engine doesn't echo back the romanized text.
+        if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
             try:
-                url = "https://translate.google.com/m"
-                params = {
-                    "sl": src_code,
-                    "tl": target_code,
-                    "q": raw_text
-                }
+                candidates_to_try = [raw_text]
+                # If input looks like Romanized South Asian text
+                if re.search(r'[a-zA-Z]', raw_text) and src_code in ["hi", "ur", "auto", "ta", "te", "bn", "mr"]:
+                    transliterated_native = cls._transliterate_romanized_text(raw_text)
+                    if transliterated_native != raw_text.lower():
+                        candidates_to_try.insert(0, transliterated_native)
+
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                 }
-                async with httpx.AsyncClient(timeout=5.0) as client:
-                    resp = await client.get(url, params=params, headers=headers)
-                    if resp.status_code == 200:
-                        match = re.search(r'class="result-container">([^<]+)</div>', resp.text)
-                        if match:
-                            candidate = html.unescape(match.group(1)).strip()
-                            if candidate:
-                                translated_text = candidate
+                async with httpx.AsyncClient(timeout=4.0) as client:
+                    for query_cand in candidates_to_try:
+                        # Try with detected/specified sl, plus fallback to auto/hi
+                        for try_sl in [src_code, "hi" if src_code == "ur" else src_code, "auto"]:
+                            url = "https://translate.google.com/m"
+                            params = {
+                                "sl": try_sl,
+                                "tl": target_code,
+                                "q": query_cand
+                            }
+                            resp = await client.get(url, params=params, headers=headers)
+                            if resp.status_code == 200:
+                                match = re.search(r'class="result-container">([^<]+)</div>', resp.text)
+                                if match:
+                                    res_val = html.unescape(match.group(1)).strip()
+                                    if res_val and res_val.lower() != raw_text.lower():
+                                        translated_text = res_val
+                                        break
+                        if translated_text:
+                            break
             except Exception as e:
                 logger.warning(f"Google Web translation error: {e}")
 
-        # 3. MyMemory Free Translation API
+        # 4. MyMemory Free Translation API
         if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
             try:
                 url = "https://api.mymemory.translated.net/get"
@@ -1020,17 +1193,17 @@ class PhrasebookService:
                     "q": raw_text,
                     "langpair": f"{s_code}|{target_code}"
                 }
-                async with httpx.AsyncClient(timeout=5.0) as client:
+                async with httpx.AsyncClient(timeout=4.0) as client:
                     resp = await client.get(url, params=params)
                     if resp.status_code == 200:
                         data = resp.json()
                         res_text = data.get("responseData", {}).get("translatedText")
-                        if res_text and not str(res_text).startswith("MYMEMORY WARNING:"):
+                        if res_text and not str(res_text).startswith("MYMEMORY WARNING:") and res_text.lower() != raw_text.lower():
                             translated_text = html.unescape(res_text).strip()
             except Exception as e:
                 logger.warning(f"MyMemory translation error: {e}")
 
-        # 4. Phrasebook Dictionary Match Fallback
+        # 5. Phrasebook Dictionary Match Fallback
         if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
             matched = cls._find_phrasebook_match(raw_text, req.target_language)
             if matched and matched.get("foreign"):
@@ -1050,7 +1223,6 @@ class PhrasebookService:
                 romanized = COMMON_PHONETICS[raw_text]
             else:
                 # Check for greeting/common shortcuts
-                lower_trans = translated_text.lower()
                 if "வணக்கம்" in translated_text:
                     romanized = "Vanakkam"
                 elif "நன்றி" in translated_text:
