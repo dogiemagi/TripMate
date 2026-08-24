@@ -1,6 +1,5 @@
 # VoyageAI - Multimodal Travel Intelligence Platform
 
-> **Your Travel Assistant is Here** — A production-ready, multimodal AI travel platform built with **FastAPI** (Python 3.10+), modern cyber-luxury glassmorphism web UI with **Lucide icons**, interactive **Leaflet mapping**, and live voice speech translation.
 
 🌐 **Live Application:** [https://voyage-ai-platform.onrender.com/](https://voyage-ai-platform.onrender.com/)
 
