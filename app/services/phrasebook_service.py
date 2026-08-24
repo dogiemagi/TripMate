@@ -1,6 +1,6 @@
 import logging
 import httpx
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Tuple
 from app.models.schemas import PhrasebookQuery, TranslationRequest
 
 logger = logging.getLogger("voyage.phrasebook")
@@ -845,6 +845,40 @@ LANG_CODE_SHORT = {
     "auto": "auto"
 }
 
+# Common transliterations & pronunciations for standard phrases
+COMMON_PHONETICS = {
+    "வணக்கம்": "Vanakkam",
+    "நன்றி": "Nandri",
+    "ரயில் நிலையம் எங்கே?": "Rayil nilaiyam enge?",
+    "சாப்பாடு மிகவும் சுவையாக இருக்கிறது": "Saappadu migavum suvaiyaaga irukkiradhu",
+    "இது எவ்வளவு?": "Idhu evvalavu?",
+    "காலை வணக்கம்": "Kaalai vanakkam",
+    "மாலை வணக்கம்": "Maalai vanakkam",
+    "நல்வரவு": "Nalvaravu",
+    "नमस्ते": "Namaste",
+    "धन्यवाद": "Dhanyavaad",
+    "आप कैसे हैं?": "Aap kaise hain?",
+    "शुभ प्रभात": "Shubh Prabhaat",
+    "शुभ संध्या": "Shubh Sandhya",
+    "यह कितने का है?": "Yeh kitne ka hai?",
+    "खाना बहुत स्वादिष्ट है": "Khaana bahut swaadisht hai",
+    "नमस्कर": "Namaskar",
+    "నమస్కారం": "Namaskaram",
+    "ధన్యవాదాలు": "Dhanyavaadalu",
+    "రైల్వే స్టేషన్ ఎక్కడ ఉంది?": "Railway station ekkada undi?",
+    "ఇది ఎంత?": "Idi enta?",
+    "మంచి ఉదయం": "Manchi udayam",
+    "రుచికరమైనది": "Ruchikaramainadi",
+    "konnichiwa": "Konnichiwa",
+    "arigatou": "Arigatou gozaimasu",
+    "bonjour": "Bonjour",
+    "merci": "Merci",
+    "hola": "Hola",
+    "gracias": "Gracias",
+    "ciao": "Ciao",
+    "grazie": "Grazie"
+}
+
 class PhrasebookService:
     @staticmethod
     def get_phrases(query: PhrasebookQuery) -> Dict[str, Any]:
@@ -863,8 +897,55 @@ class PhrasebookService:
             "phrases": phrases
         }
 
-    @staticmethod
-    async def translate_phrase(req: TranslationRequest) -> Dict[str, Any]:
+    @classmethod
+    def _resolve_lang_code(cls, lang_input: str, default: str = "en") -> str:
+        if not lang_input:
+            return default
+        clean = lang_input.split("(")[0].strip().lower()
+        if clean in LANG_CODE_SHORT:
+            return LANG_CODE_SHORT[clean]
+        if len(clean) == 2:
+            return clean
+        for k, v in LANG_CODE_SHORT.items():
+            if k in clean or clean in k:
+                return v
+        return default
+
+    @classmethod
+    def _resolve_speech_code(cls, short_code: str, lang_name: str = "") -> str:
+        clean_name = lang_name.split("(")[0].strip().lower()
+        if clean_name in LANGUAGE_CODES:
+            return LANGUAGE_CODES[clean_name]
+        for name, s_code in LANG_CODE_SHORT.items():
+            if s_code == short_code:
+                return LANGUAGE_CODES.get(name, f"{short_code}-{short_code.upper()}")
+        return f"{short_code}-{short_code.upper()}"
+
+    @classmethod
+    def _find_phrasebook_match(cls, text: str, target_lang: str) -> Optional[Dict[str, str]]:
+        clean_target = target_lang.split("(")[0].strip().lower()
+        phrases = PHRASEBOOK_DATA.get(clean_target, [])
+        query = text.strip().lower()
+        
+        for p in phrases:
+            if p.get("english", "").lower() == query or query in p.get("english", "").lower():
+                return {
+                    "foreign": p.get("foreign", ""),
+                    "romanized": p.get("romanized", "")
+                }
+            if p.get("foreign", "").lower() == query:
+                return {
+                    "foreign": p.get("english", ""),
+                    "romanized": p.get("english", "")
+                }
+        return None
+
+    @classmethod
+    async def translate_phrase(cls, req: TranslationRequest) -> Dict[str, Any]:
+        import html
+        import re
+        from app.config import settings
+
         raw_text = req.text.strip()
         if not raw_text:
             return {
@@ -872,54 +953,118 @@ class PhrasebookService:
                 "message": "Empty text provided"
             }
 
-        src_input = req.source_language.strip().lower()
-        target_input = req.target_language.strip().lower()
+        src_code = cls._resolve_lang_code(req.source_language, default="auto")
+        target_code = cls._resolve_lang_code(req.target_language, default="en")
 
-        src_code = LANG_CODE_SHORT.get(src_input, src_input if len(src_input) == 2 else "auto")
-        target_code = LANG_CODE_SHORT.get(target_input, target_input if len(target_input) == 2 else "en")
-
-        translated_text = raw_text
+        translated_text = ""
         detected_source = src_code if src_code != "auto" else "en"
         romanized = ""
 
-        try:
-            url = "https://translate.googleapis.com/translate_a/single"
-            params = {
-                "client": "gtx",
-                "sl": src_code,
-                "tl": target_code,
-                "dt": ["t", "rm"],
-                "q": raw_text
-            }
-            async with httpx.AsyncClient(timeout=6.0) as client:
+        # 1. Check Gemini AI if configured
+        if settings.GEMINI_API_KEY and settings.GEMINI_API_KEY != "your_gemini_api_key_here":
+            try:
+                from google import genai
+                client = genai.Client(api_key=settings.GEMINI_API_KEY)
+                prompt = (
+                    f"Translate the following text accurately from {req.source_language} to {req.target_language}.\n"
+                    f"Text: \"{raw_text}\"\n"
+                    f"Return a strict JSON with: {{\"translated_text\": \"...\", \"romanized\": \"phonetic latin pronunciation\", \"detected_source\": \"en/ta/hi...\"}}"
+                )
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt
+                )
+                if response and response.text:
+                    clean_res = response.text.strip()
+                    json_match = re.search(r'\{.*\}', clean_res, re.DOTALL)
+                    if json_match:
+                        import json
+                        parsed = json.loads(json_match.group(0))
+                        if parsed.get("translated_text"):
+                            translated_text = parsed["translated_text"].strip()
+                            romanized = parsed.get("romanized", "").strip()
+                            if parsed.get("detected_source"):
+                                detected_source = parsed["detected_source"]
+            except Exception as e:
+                logger.warning(f"Gemini translation error: {e}")
+
+        # 2. Google Mobile Web Translation Engine (High reliability, bypasses 429)
+        if not translated_text:
+            try:
+                url = "https://translate.google.com/m"
+                params = {
+                    "sl": src_code,
+                    "tl": target_code,
+                    "q": raw_text
+                }
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                 }
-                resp = await client.get(url, params=params, headers=headers)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    # data[0] contains array of sentence translations [ [trans, orig, ...], ... ]
-                    if data and len(data) > 0 and data[0]:
-                        parts = []
-                        for segment in data[0]:
-                            if segment and len(segment) > 0 and segment[0]:
-                                parts.append(segment[0])
-                            # Romanization is often in segment[3] or data[0][-1][3]
-                            if len(segment) > 3 and segment[3]:
-                                romanized = segment[3]
-                        if parts:
-                            translated_text = "".join(parts)
-                    if len(data) > 2 and data[2]:
-                        detected_source = data[2]
-        except Exception as e:
-            logger.warning(f"Translation API error: {e}")
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    resp = await client.get(url, params=params, headers=headers)
+                    if resp.status_code == 200:
+                        match = re.search(r'class="result-container">([^<]+)</div>', resp.text)
+                        if match:
+                            candidate = html.unescape(match.group(1)).strip()
+                            if candidate:
+                                translated_text = candidate
+            except Exception as e:
+                logger.warning(f"Google Web translation error: {e}")
 
-        # Resolve full speech lang code for audio playback
-        target_lang_full = "en-US"
-        for l_name, s_code in LANG_CODE_SHORT.items():
-            if s_code == target_code:
-                target_lang_full = LANGUAGE_CODES.get(l_name, f"{target_code}-{target_code.upper()}")
-                break
+        # 3. MyMemory Free Translation API
+        if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
+            try:
+                url = "https://api.mymemory.translated.net/get"
+                s_code = "autodetect" if src_code == "auto" else src_code
+                params = {
+                    "q": raw_text,
+                    "langpair": f"{s_code}|{target_code}"
+                }
+                async with httpx.AsyncClient(timeout=5.0) as client:
+                    resp = await client.get(url, params=params)
+                    if resp.status_code == 200:
+                        data = resp.json()
+                        res_text = data.get("responseData", {}).get("translatedText")
+                        if res_text and not str(res_text).startswith("MYMEMORY WARNING:"):
+                            translated_text = html.unescape(res_text).strip()
+            except Exception as e:
+                logger.warning(f"MyMemory translation error: {e}")
+
+        # 4. Phrasebook Dictionary Match Fallback
+        if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
+            matched = cls._find_phrasebook_match(raw_text, req.target_language)
+            if matched and matched.get("foreign"):
+                translated_text = matched["foreign"]
+                if matched.get("romanized"):
+                    romanized = matched["romanized"]
+
+        # Final Fallback if all external networks failed
+        if not translated_text:
+            translated_text = raw_text
+
+        # Phonetic romanization lookup if not yet generated
+        if not romanized:
+            if translated_text in COMMON_PHONETICS:
+                romanized = COMMON_PHONETICS[translated_text]
+            elif raw_text in COMMON_PHONETICS:
+                romanized = COMMON_PHONETICS[raw_text]
+            else:
+                # Check for greeting/common shortcuts
+                lower_trans = translated_text.lower()
+                if "வணக்கம்" in translated_text:
+                    romanized = "Vanakkam"
+                elif "நன்றி" in translated_text:
+                    romanized = "Nandri"
+                elif "नमस्ते" in translated_text:
+                    romanized = "Namaste"
+                elif "धन्यवाद" in translated_text:
+                    romanized = "Dhanyavaad"
+                elif "నమస్కారం" in translated_text:
+                    romanized = "Namaskaram"
+                else:
+                    romanized = translated_text
+
+        speech_lang_code = cls._resolve_speech_code(target_code, req.target_language)
 
         return {
             "status": "success",
@@ -929,8 +1074,9 @@ class PhrasebookService:
             "source_language": req.source_language,
             "target_language": req.target_language,
             "target_lang_code": target_code,
-            "speech_lang_code": target_lang_full,
+            "speech_lang_code": speech_lang_code,
             "romanized": romanized or translated_text,
             "audio_text": translated_text
         }
+
 
