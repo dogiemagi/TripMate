@@ -1,5 +1,9 @@
 import logging
 import httpx
+import re
+import html
+import json
+import os
 from typing import Dict, Any, List, Optional, Tuple
 from app.models.schemas import PhrasebookQuery, TranslationRequest
 
@@ -1072,7 +1076,37 @@ class PhrasebookService:
                     translated_words.append(w)
                 i += 1
                 
-        return " ".join(translated_words)
+    @classmethod
+    async def _transliterate_to_native(cls, text: str, lang_code: str) -> str:
+        """
+        Converts Romanized/phonetic text (e.g. 'Meeru ela unnaaru', 'Eppadi irukkeenga', 'Aap kaise hain')
+        into authentic native script using Google Input Tools API with local fallback.
+        """
+        if not text or not re.search(r'[a-zA-Z]', text):
+            return text
+
+        if lang_code in ["en", "auto"]:
+            return text
+
+        try:
+            url = "https://inputtools.google.com/request"
+            params = {
+                "text": text,
+                "itc": f"{lang_code}-t-i0-und",
+                "num": 1
+            }
+            async with httpx.AsyncClient(timeout=3.5) as client:
+                res = await client.get(url, params=params)
+                if res.status_code == 200:
+                    data = res.json()
+                    if data and len(data) > 1 and data[0] == "SUCCESS" and data[1]:
+                        words = [item[1][0] for item in data[1] if item and len(item) > 1 and item[1]]
+                        if words:
+                            return " ".join(words)
+        except Exception as e:
+            logger.debug(f"Input tools translit: {e}")
+
+        return cls._transliterate_romanized_text(text)
 
     @classmethod
     async def translate_phrase(cls, req: TranslationRequest) -> Dict[str, Any]:
@@ -1102,18 +1136,13 @@ class PhrasebookService:
             os.environ.get("GOOGLE_API_KEY", "")
         )
 
-        # 1. Phonetic & Conversational Pattern Matcher (Handles "idhar aaa", "idhar aah", "yahan aao", etc.)
+        # 1. Phonetic & Conversational Pattern Matcher (Handles common greetings, travel shortcuts)
         raw_lower = raw_text.lower().strip()
         for pattern, eng_translation, native_script in ROMAN_INTENT_PATTERNS:
             if re.search(pattern, raw_lower):
                 if target_code == "en":
                     translated_text = eng_translation
                     romanized = eng_translation
-                    break
-                else:
-                    # If target is another language (e.g. Tamil/Hindi/French), use the English meaning to translate into target
-                    raw_text_for_trans = eng_translation
-                    # Will fall through to web/API translation to translate eng_translation into target language
                     break
 
         # 2. Check Gemini AI if configured (Handles slang, Hinglish, Roman Urdu, full context)
@@ -1123,10 +1152,10 @@ class PhrasebookService:
                 client = genai.Client(api_key=gemini_key)
                 prompt = (
                     f"You are an expert polyglot translator. Translate the following text accurately from {req.source_language} into {req.target_language}.\n"
-                    f"Important: The input text might be written in native script OR Romanized/phonetic script (like Hinglish, Roman Urdu, Roman Tamil, etc.).\n"
-                    f"Always translate the true intended conversational meaning accurately.\n"
+                    f"Important: The input text might be written in native script OR Romanized/phonetic script (e.g. 'Meeru ela unnaaru', 'Eppadi irukkeenga', 'Aap kaise hain', 'Konnichiwa', etc.).\n"
+                    f"Always understand the true intended meaning and provide an accurate natural translation.\n"
                     f"Text: \"{raw_text}\"\n"
-                    f"Return a strict JSON with: {{\"translated_text\": \"...\", \"romanized\": \"phonetic latin pronunciation\", \"detected_source\": \"en/ta/hi...\"}}"
+                    f"Return a strict JSON with: {{\"translated_text\": \"...\", \"romanized\": \"phonetic latin pronunciation\", \"detected_source\": \"en/te/ta/hi...\"}}"
                 )
                 response = client.models.generate_content(
                     model='gemini-2.5-flash',
@@ -1147,24 +1176,22 @@ class PhrasebookService:
                 logger.warning(f"Gemini translation error: {e}")
 
         # 3. Transliterated Google Mobile Web Translation Engine
-        # If text is in Latin characters and source is Indian/Asian language (Urdu, Hindi, etc.),
-        # transliterate to native script first so translation engine doesn't echo back the romanized text.
+        # If text is written in English/Latin letters but source language is non-English (Telugu, Tamil, Hindi, etc.)
+        # transliterate to authentic native script first so the translation engine accurately translates the meaning!
         if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
             try:
                 candidates_to_try = [raw_text]
-                # If input looks like Romanized South Asian text
-                if re.search(r'[a-zA-Z]', raw_text) and src_code in ["hi", "ur", "auto", "ta", "te", "bn", "mr"]:
-                    transliterated_native = cls._transliterate_romanized_text(raw_text)
-                    if transliterated_native != raw_text.lower():
-                        candidates_to_try.insert(0, transliterated_native)
+                if re.search(r'[a-zA-Z]', raw_text) and src_code != "en":
+                    native_translit = await cls._transliterate_to_native(raw_text, src_code)
+                    if native_translit and native_translit.lower() != raw_text.lower():
+                        candidates_to_try.insert(0, native_translit)
 
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                 }
-                async with httpx.AsyncClient(timeout=4.0) as client:
+                async with httpx.AsyncClient(timeout=4.5) as client:
                     for query_cand in candidates_to_try:
-                        # Try with detected/specified sl, plus fallback to auto/hi
-                        for try_sl in [src_code, "hi" if src_code == "ur" else src_code, "auto"]:
+                        for try_sl in [src_code, "auto"]:
                             url = "https://translate.google.com/m"
                             params = {
                                 "sl": try_sl,
@@ -1184,22 +1211,30 @@ class PhrasebookService:
             except Exception as e:
                 logger.warning(f"Google Web translation error: {e}")
 
-        # 4. MyMemory Free Translation API
+        # 4. MyMemory Free Translation API Fallback
         if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
             try:
-                url = "https://api.mymemory.translated.net/get"
-                s_code = "autodetect" if src_code == "auto" else src_code
-                params = {
-                    "q": raw_text,
-                    "langpair": f"{s_code}|{target_code}"
-                }
-                async with httpx.AsyncClient(timeout=4.0) as client:
-                    resp = await client.get(url, params=params)
-                    if resp.status_code == 200:
-                        data = resp.json()
-                        res_text = data.get("responseData", {}).get("translatedText")
-                        if res_text and not str(res_text).startswith("MYMEMORY WARNING:") and res_text.lower() != raw_text.lower():
-                            translated_text = html.unescape(res_text).strip()
+                candidates_to_try = [raw_text]
+                if re.search(r'[a-zA-Z]', raw_text) and src_code != "en":
+                    native_translit = await cls._transliterate_to_native(raw_text, src_code)
+                    if native_translit and native_translit.lower() != raw_text.lower():
+                        candidates_to_try.insert(0, native_translit)
+
+                for query_cand in candidates_to_try:
+                    url = "https://api.mymemory.translated.net/get"
+                    s_code = "autodetect" if src_code == "auto" else src_code
+                    params = {
+                        "q": query_cand,
+                        "langpair": f"{s_code}|{target_code}"
+                    }
+                    async with httpx.AsyncClient(timeout=4.0) as client:
+                        resp = await client.get(url, params=params)
+                        if resp.status_code == 200:
+                            data = resp.json()
+                            res_text = data.get("responseData", {}).get("translatedText")
+                            if res_text and not str(res_text).startswith("MYMEMORY WARNING:") and res_text.lower() != raw_text.lower():
+                                translated_text = html.unescape(res_text).strip()
+                                break
             except Exception as e:
                 logger.warning(f"MyMemory translation error: {e}")
 
