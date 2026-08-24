@@ -96,8 +96,8 @@ function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180;
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
@@ -151,14 +151,14 @@ function optimizeActivitiesTSP(activities, startCoord = null) {
       improved = false;
       for (let i = 0; i < route.length - 2; i++) {
         for (let j = i + 2; j < route.length; j++) {
-          if (!route[i].lat || !route[i+1].lat || !route[j].lat) continue;
+          if (!route[i].lat || !route[i + 1].lat || !route[j].lat) continue;
 
-          const d1 = calculateHaversineDistance(route[i].lat, route[i].lon, route[i+1].lat, route[i+1].lon);
-          const d2 = (j + 1 < route.length && route[j+1].lat) ?
-            calculateHaversineDistance(route[j].lat, route[j].lon, route[j+1].lat, route[j+1].lon) : 0;
+          const d1 = calculateHaversineDistance(route[i].lat, route[i].lon, route[i + 1].lat, route[i + 1].lon);
+          const d2 = (j + 1 < route.length && route[j + 1].lat) ?
+            calculateHaversineDistance(route[j].lat, route[j].lon, route[j + 1].lat, route[j + 1].lon) : 0;
           const d3 = calculateHaversineDistance(route[i].lat, route[i].lon, route[j].lat, route[j].lon);
-          const d4 = (j + 1 < route.length && route[j+1].lat) ?
-            calculateHaversineDistance(route[i+1].lat, route[i+1].lon, route[j+1].lat, route[j+1].lon) : 0;
+          const d4 = (j + 1 < route.length && route[j + 1].lat) ?
+            calculateHaversineDistance(route[i + 1].lat, route[i + 1].lon, route[j + 1].lat, route[j + 1].lon) : 0;
 
           if (d3 + d4 < d1 + d2 - 0.0001) {
             const sub = route.slice(i + 1, j + 1).reverse();
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const today = new Date();
   const nextWeek = new Date();
   nextWeek.setDate(today.getDate() + 6);
-  
+
   const fromInput = document.getElementById('weather-from-date');
   const toInput = document.getElementById('weather-to-date');
   if (fromInput) fromInput.value = today.toISOString().split('T')[0];
@@ -253,7 +253,7 @@ function formatCostFromINR(inrAmount) {
   const rate = FX_RATES_FROM_INR[activeCurrency] || 1.0;
   const converted = inrAmount * rate;
   const sym = CURRENCY_SYMBOLS[activeCurrency] || '₹';
-  
+
   if (activeCurrency === 'INR' || activeCurrency === 'JPY' || activeCurrency === 'IDR') {
     return `${sym}${Math.round(converted).toLocaleString()}`;
   } else {
@@ -371,7 +371,7 @@ function initMultimodalVision() {
     chip.addEventListener('click', () => {
       const sampleName = chip.getAttribute('data-sample');
       document.getElementById('vision-prompt').value = `Analyze: ${sampleName}`;
-      
+
       const canvas = document.createElement('canvas');
       canvas.width = 400; canvas.height = 300;
       const ctx = canvas.getContext('2d');
@@ -862,7 +862,7 @@ function initCustomSpotBuilder() {
 
     // Reset input
     nameInput.value = '';
-    
+
     // Re-render Itinerary with updated TSP path, pins, and circular progress
     renderItinerary(currentItineraryData);
     showNotificationToast(`Added "${name}"! Route re-optimized for shortest travel distance.`, 'success');
@@ -884,7 +884,7 @@ function focusMapActivity(lat, lon, title, cost, pinNum = null) {
   if (mapInstance) {
     mapInstance.invalidateSize();
     mapInstance.flyTo([lat, lon], 15, { duration: 0.9 });
-    
+
     // Find matching marker and open its popup
     const targetMarker = mapMarkers.find(m => {
       const pos = m.getLatLng();
@@ -1075,7 +1075,7 @@ function renderItinerary(data) {
           iconAnchor: [16, 16],
           popupAnchor: [0, -18]
         });
-        
+
         const marker = L.marker([act.lat, act.lon], { icon: customPinIcon })
           .addTo(mapInstance)
           .bindPopup(`
@@ -1228,7 +1228,12 @@ async function loadFoodData(city) {
     let dishesHtml = '';
 
     (data.signature_dishes || []).forEach(d => {
-      const pills = (d.dietary || []).map(tag => `<span class="dish-diet-pill">${tag}</span>`).join(' ');
+      const pills = (d.dietary || []).map(tag => {
+        const isNonVeg = tag.toLowerCase().includes('non-veg') || tag.toLowerCase().includes('poultry') || tag.toLowerCase().includes('meat') || tag.toLowerCase().includes('pork') || tag.toLowerCase().includes('seafood');
+        const cls = isNonVeg ? 'dish-diet-pill non-veg' : 'dish-diet-pill';
+        const icon = isNonVeg ? `<i data-lucide="drumstick" style="width:11px; height:11px; margin-right:3px;"></i>` : '';
+        return `<span class="${cls}">${icon}${tag}</span>`;
+      }).join(' ');
       const priceDisplay = d.price_range_inr || d.price_range || 'INR 300 - INR 600';
 
       dishesHtml += `
@@ -1326,7 +1331,7 @@ function initCurrencyBudget() {
     try {
       const data = await API.getBudgetEstimate(city, days, style);
       const sym = CURRENCY_SYMBOLS[activeCurrency] || '₹';
-      
+
       let itemsHtml = '';
       for (const [key, val] of Object.entries(data.cost_breakdown || {})) {
         itemsHtml += `
@@ -1954,9 +1959,9 @@ function playSpeechSynthesisFallback(nativeText, romanizedText, langCode, btn, c
     const vLang = v.lang.toLowerCase();
     const vName = v.name.toLowerCase();
     return vLang === langCode.toLowerCase() ||
-           vLang.startsWith(langPrefix + '-') ||
-           vLang === langPrefix ||
-           vName.includes(langPrefix);
+      vLang.startsWith(langPrefix + '-') ||
+      vLang === langPrefix ||
+      vName.includes(langPrefix);
   });
 
   let textToSpeak = nativeText;
@@ -2234,7 +2239,7 @@ function showNotificationToast(message, type = 'info') {
 
 function sanitizeAndConvertEmojis(text) {
   if (!text || typeof text !== 'string') return text || '';
-  
+
   return text
     .replace(/[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
     .replace(/\s{2,}/g, ' ')
