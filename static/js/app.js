@@ -1834,6 +1834,7 @@ function initTranslationStudio() {
     } finally {
       translateBtn.disabled = false;
       translateBtn.innerHTML = `<i data-lucide="sparkles"></i> Translate & Listen`;
+      initLucideIcons();
     }
   }
 
