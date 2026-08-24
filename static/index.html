@@ -86,7 +86,7 @@
       <ul class="nav-tabs">
         <li>
           <button class="tab-btn active" data-tab="tab-vision">
-            <i data-lucide="sparkles"></i> AI Vision Hub
+            <i data-lucide="camera"></i> Photo Scanner
           </button>
         </li>
         <li>
@@ -126,14 +126,78 @@
     <main class="main-wrapper">
 
       <!-- ================================================================= -->
-      <!-- TAB 1: MULTIMODAL VISION HUB                                      -->
+      <!-- TAB 1: AI PHOTO SCANNER                                           -->
       <!-- ================================================================= -->
       <section id="tab-vision" class="tab-pane active">
+        <!-- Features Quick Summary Overview Card (Above Photo Scanner) -->
+        <div class="features-summary-card">
+          <div class="features-summary-header">
+            <span class="features-badge"><i data-lucide="sparkles"></i> All-In-One Travel Assistant</span>
+            <span class="features-summary-title">Explore All Built-in Tools & Features:</span>
+          </div>
+          <div class="features-mini-grid">
+            <div class="feature-mini-pill" onclick="switchToTab('tab-vision')" title="Click to view Photo Scanner">
+              <div class="pill-icon" style="color: var(--accent-cyan);"><i data-lucide="camera"></i></div>
+              <div class="pill-body">
+                <strong>Photo & Menu Scanner</strong>
+                <span>Instant landmark recognition, history & menu translator</span>
+              </div>
+            </div>
+
+            <div class="feature-mini-pill" onclick="switchToTab('tab-weather')" title="Click to view Weather & Radar">
+              <div class="pill-icon" style="color: #38bdf8;"><i data-lucide="cloud-sun"></i></div>
+              <div class="pill-body">
+                <strong>Weather & Live Radar</strong>
+                <span>Hourly forecasts, rain radar, UV index & packing advice</span>
+              </div>
+            </div>
+
+            <div class="feature-mini-pill" onclick="switchToTab('tab-itinerary')" title="Click to view Smart Itinerary">
+              <div class="pill-icon" style="color: #a855f7;"><i data-lucide="map"></i></div>
+              <div class="pill-body">
+                <strong>Smart Itinerary & Map</strong>
+                <span>Custom multi-day trip schedules with interactive map pins</span>
+              </div>
+            </div>
+
+            <div class="feature-mini-pill" onclick="switchToTab('tab-food')" title="Click to view Gastronomy & Food">
+              <div class="pill-icon" style="color: #f59e0b;"><i data-lucide="utensils-crossed"></i></div>
+              <div class="pill-body">
+                <strong>Gastronomy & Food</strong>
+                <span>Must-try dishes, vegetarian filters, prices & dietary tips</span>
+              </div>
+            </div>
+
+            <div class="feature-mini-pill" onclick="switchToTab('tab-budget')" title="Click to view Currency & Budget">
+              <div class="pill-icon" style="color: #10b981;"><i data-lucide="coins"></i></div>
+              <div class="pill-body">
+                <strong>Currency & Budget</strong>
+                <span>Live multi-currency converter & travel expense estimator</span>
+              </div>
+            </div>
+
+            <div class="feature-mini-pill" onclick="switchToTab('tab-packing')" title="Click to view Packing Assistant">
+              <div class="pill-icon" style="color: #ec4899;"><i data-lucide="backpack"></i></div>
+              <div class="pill-body">
+                <strong>Smart Packing Assistant</strong>
+                <span>Weather-tailored packing lists with interactive check-offs</span>
+              </div>
+            </div>
+
+            <div class="feature-mini-pill" onclick="switchToTab('tab-phrasebook')" title="Click to view Audio Phrasebook">
+              <div class="pill-icon" style="color: #06b6d4;"><i data-lucide="languages"></i></div>
+              <div class="pill-body">
+                <strong>Audio Phrasebook & Voice</strong>
+                <span>Live speech translation, phonetic guides & native audio</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="section-header">
           <div class="section-header-left">
-            <h1><i data-lucide="camera"></i> Multimodal Visual Intelligence</h1>
-            <p>Upload a landmark photo, restaurant menu, or scenic view for instant AI analysis, history, and
-              translations.</p>
+            <h1><i data-lucide="camera"></i> AI Photo & Landmark Scanner</h1>
+            <p>Upload a landmark photo, restaurant menu, or scenic view for instant AI analysis, history, and translations.</p>
           </div>
         </div>
 
