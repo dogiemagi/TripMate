@@ -1110,9 +1110,14 @@ function renderItinerary(data) {
             </div>
             <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem;">${sanitizeAndConvertEmojis(act.title)}</h4>
             <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 0.5rem;">${sanitizeAndConvertEmojis(act.desc)}</p>
-            <div style="display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--text-muted); align-items:center;">
+            <div style="display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--text-muted); align-items:center; flex-wrap:wrap;">
               <span style="display:flex; align-items:center; gap:0.25rem;"><i data-lucide="hourglass" style="width:12px; height:12px;"></i> ${act.duration}</span>
               <span style="display:flex; align-items:center; gap:0.25rem; color:var(--accent-emerald); font-weight:600;"><i data-lucide="banknote" style="width:12px; height:12px;"></i> ${formattedActCost}</span>
+              ${act.travel_from_prev_min && actIdx > 0 ? `
+                <span style="display:flex; align-items:center; gap:0.25rem; color:var(--accent-cyan); font-weight:600; background:rgba(6,182,212,0.1); padding:0.15rem 0.5rem; border-radius:var(--radius-sm); border:1px solid rgba(6,182,212,0.2);">
+                  <i data-lucide="navigation" style="width:11px; height:11px;"></i> ${act.travel_from_prev_min} min transit (${act.travel_from_prev_km} km)
+                </span>
+              ` : ''}
               <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.25rem 0.65rem; margin-left:auto; color:var(--accent-cyan); display:flex; align-items:center; gap:0.25rem;" onclick="focusMapActivity(${act.lat}, ${act.lon}, '${escapedTitle}', '${formattedActCost}', ${pointNum})">
                 <i data-lucide="crosshair" style="width:12px; height:12px;"></i> View on Map
               </button>

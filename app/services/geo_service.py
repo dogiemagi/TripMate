@@ -17,6 +17,8 @@ POPULAR_DESTINATIONS = {
     "kolkata": (22.5726, 88.3639, "Kolkata", "India", "Kolkata, West Bengal, India"),
     "jaipur": (26.9124, 75.7873, "Jaipur", "India", "Jaipur, Rajasthan, India"),
     "hyderabad": (17.3850, 78.4867, "Hyderabad", "India", "Hyderabad, Telangana, India"),
+    "hydrabad": (17.3850, 78.4867, "Hyderabad", "India", "Hyderabad, Telangana, India"),
+    "hyderabad, india": (17.3850, 78.4867, "Hyderabad", "India", "Hyderabad, Telangana, India"),
     "goa": (15.2993, 74.1240, "Goa", "India", "Goa, India"),
     "goa, india": (15.2993, 74.1240, "Goa", "India", "Goa, India"),
     "kashmir": (34.0837, 74.7973, "Srinagar (Kashmir)", "India", "Srinagar, Kashmir, India"),
