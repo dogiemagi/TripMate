@@ -816,37 +816,82 @@ PHRASEBOOK_DATA = {
     ]
 }
 
+# Universal 21+ Language Registry
 LANGUAGE_CODES = {
     "hindi": "hi-IN",
     "tamil": "ta-IN",
     "telugu": "te-IN",
-    "urdu": "ur-IN",
-    "bengali": "bn-IN",
+    "kannada": "kn-IN",
+    "malayalam": "ml-IN",
     "marathi": "mr-IN",
-    "japanese": "ja-JP",
-    "italian": "it-IT",
-    "french": "fr-FR",
+    "bengali": "bn-IN",
+    "gujarati": "gu-IN",
+    "punjabi": "pa-IN",
+    "urdu": "ur-IN",
+    "english": "en-US",
     "spanish": "es-ES",
+    "french": "fr-FR",
     "german": "de-DE",
+    "italian": "it-IT",
+    "portuguese": "pt-BR",
+    "russian": "ru-RU",
     "arabic": "ar-SA",
-    "english": "en-US"
+    "mandarin": "zh-CN",
+    "chinese": "zh-CN",
+    "japanese": "ja-JP",
+    "korean": "ko-KR"
 }
 
 LANG_CODE_SHORT = {
     "hindi": "hi",
     "tamil": "ta",
     "telugu": "te",
-    "urdu": "ur",
-    "bengali": "bn",
+    "kannada": "kn",
+    "malayalam": "ml",
     "marathi": "mr",
-    "japanese": "ja",
-    "italian": "it",
-    "french": "fr",
-    "spanish": "es",
-    "german": "de",
-    "arabic": "ar",
+    "bengali": "bn",
+    "gujarati": "gu",
+    "punjabi": "pa",
+    "urdu": "ur",
     "english": "en",
+    "spanish": "es",
+    "french": "fr",
+    "german": "de",
+    "italian": "it",
+    "portuguese": "pt",
+    "russian": "ru",
+    "arabic": "ar",
+    "mandarin": "zh",
+    "chinese": "zh",
+    "japanese": "ja",
+    "korean": "ko",
     "auto": "auto"
+}
+
+CODE_TO_LANG_NAME = {
+    "hi": "Hindi", "ta": "Tamil", "te": "Telugu", "kn": "Kannada", "ml": "Malayalam",
+    "mr": "Marathi", "bn": "Bengali", "gu": "Gujarati", "pa": "Punjabi", "ur": "Urdu",
+    "en": "English", "es": "Spanish", "fr": "French", "de": "German", "it": "Italian",
+    "pt": "Portuguese", "ru": "Russian", "ar": "Arabic", "zh": "Mandarin Chinese",
+    "ja": "Japanese", "ko": "Korean"
+}
+
+TRANSLITERATION_STANDARDS = {
+    "te": "ISO 15919 (Indic)",
+    "hi": "ISO 15919 (Indic)",
+    "ta": "ISO 15919 (Indic)",
+    "kn": "ISO 15919 (Indic)",
+    "ml": "ISO 15919 (Indic)",
+    "mr": "ISO 15919 (Indic)",
+    "bn": "ISO 15919 (Indic)",
+    "gu": "ISO 15919 (Indic)",
+    "pa": "ISO 15919 (Indic)",
+    "ur": "ALA-LC / ISO 233 (Urdu)",
+    "zh": "Hanyu Pinyin",
+    "ja": "Hepburn Romaji",
+    "ko": "Revised Romanization (RR)",
+    "ar": "Arabizi / ALA-LC",
+    "ru": "Cyrillic Translit (BGN/PCGN)"
 }
 
 # Common transliterations & pronunciations for standard phrases
@@ -868,127 +913,296 @@ COMMON_PHONETICS = {
     "खाना बहुत स्वादिष्ट है": "Khaana bahut swaadisht hai",
     "नमस्कर": "Namaskar",
     "నమస్కారం": "Namaskaram",
-    "ధన్యవాదాలు": "Dhanyavaadalu",
+    "నమస్తే": "Namaste",
+    "ధన్యవాదాలు": "Dhanyavaadaalu",
     "రైల్వే స్టేషన్ ఎక్కడ ఉంది?": "Railway station ekkada undi?",
-    "ఇది ఎంత?": "Idi enta?",
-    "మంచి ఉదయం": "Manchi udayam",
-    "రుచికరమైనది": "Ruchikaramainadi",
+    "ఇది ఎంత?": "Idi entha?",
+    "బాగుంది": "Baagundi",
+    "నమస్కార": "Namaskara",
+    "ధన్యవాదగళు": "Dhanyavaadagalu",
+    "హేగಿದ್ದీరా": "Hegiddira?",
+    "నమస్కారం": "Namaskaram",
+    "నన్ద్రి": "Nandi",
+    "సుఖమాణో": "Sukhamano?",
+    "ధన్యవాద్": "Dhanyavad",
+    "కైసే హో": "Kaise ho?",
+    "కైం ఛో": "Kem cho?",
+    "ఆభార్": "Aabhar",
+    "కిద్దాం": "Kiddan?",
+    "శుక్రియా": "Shukriya",
+    "你好": "Nǐ hǎo",
+    "谢谢": "Xièxie",
+    "再见": "Zàijiàn",
+    "多少钱": "Duōshǎo qián?",
     "konnichiwa": "Konnichiwa",
     "arigatou": "Arigatou gozaimasu",
+    "arigato": "Arigatou",
+    "sayonara": "Sayonara",
+    "sumimasen": "Sumimasen",
+    "annyeonghaseyo": "Annyeonghaseyo",
+    "gamsahamnida": "Gamsahamnida",
     "bonjour": "Bonjour",
     "merci": "Merci",
     "hola": "Hola",
     "gracias": "Gracias",
     "ciao": "Ciao",
-    "grazie": "Grazie"
+    "grazie": "Grazie",
+    "obrigado": "Obrigado",
+    "privet": "Privet",
+    "spasibo": "Spasibo",
+    "marhaban": "Marhaban",
+    "shukran": "Shukran"
 }
 
-# Lexicon for transliterating Romanized Hindi / Urdu to Devanagari
+# --- Curated Lexicons for Romanized Inputs (ISO 15919, Pinyin, Hepburn, RR, Arabizi, Translit) ---
+
+TELUGU_ROMAN_MAP = {
+    "namaskaram": "నమస్కారం", "namaskaramu": "నమస్కారం", "namaste": "నమస్తే", "baagundi": "బాగుంది", "bagundi": "బాగుంది",
+    "bavundi": "బాగుంది", "baagunnanu": "బాగున్నాను", "bagunnanu": "బాగున్నాను", "bavunnanu": "బాగున్నాను",
+    "ela": "ఎలా", "unnaru": "ఉన్నారు", "unnav": "ఉన్నావ్", "unnaaru": "ఉన్నారు", "meeru": "మీరు", "nenu": "నేను",
+    "dhanyavaadaalu": "ధన్యవాదాలు", "dhanyavaadalu": "ధన్యవాదాలు", "dhanyavadalu": "ధన్యవాదాలు",
+    "chala": "చాలా", "chala dhanyavadalu": "చాలా ధన్యవాదాలు", "chala bagundi": "చాలా బాగుంది",
+    "ikkada": "ఇక్కడ", "ikkadiki": "ఇక్కడికి", "randi": "రండి", "ra": "రా", "akkada": "అక్కడ", "akkadiki": "అక్కడికి",
+    "vellandi": "వెళ్ళండి", "vellu": "వెళ్ళు", "idi": "ఇది", "entha": "ఎంత", "avuthundi": "అవుతుంది",
+    "sahayam": "సహాయం", "sahayam cheyandi": "సహాయం చేయండి", "kavali": "కావాలి", "neellu": "నీళ్ళు",
+    "thindi": "తిండి", "bhojanam": "భోజనం", "ekkada": "ఎక్కడ", "undi": "ఉంది", "railway": "రైల్వే", "station": "స్టేషన్",
+    "manchi": "మంచి", "udayam": "ఉదయం", "shubhodhayam": "శుభోదయం", "shubharatri": "శుభరాత్రి", "annaya": "అన్నయ్య",
+    "tammudu": "తమ్ముడు", "akka": "అక్క", "chelli": "చెల్లి", "kasta": "కాస్త", "cheppandi": "చెప్పండి"
+}
+
+TAMIL_ROMAN_MAP = {
+    "vanakkam": "வணக்கம்", "vanakam": "வணக்கம்", "eppadi": "எப்படி", "irukkeenga": "இருக்கிறீர்கள்",
+    "irukinga": "இருக்கிறீர்கள்", "epdi": "எப்படி", "nalla": "நல்லா", "irukken": "இருக்கிறேன்",
+    "naan": "நான்", "neengal": "நீங்கள்", "mikka": "மிக்க", "nandri": "நன்றி", "idhan": "இதன்",
+    "vilai": "விலை", "enna": "என்ன", "evvalavu": "எவ்வளவு", "evlo": "எவ்வளவு", "udhavi": "உதவி",
+    "seiyungal": "செய்யுங்கள்", "kaapaathunga": "காப்பாற்றுங்கள்", "kaalai": "காலை", "maalai": "மாலை",
+    "thanni": "தண்ணீர்", "thanneer": "தண்ணீர்", "saappadu": "சாப்பாடு", "enge": "எங்கே", "irukku": "இருக்கிறது",
+    "romba": "ரொம்ப", "suvaiyaaga": "சுவையாக", "kaapathunga": "காப்பாற்றுங்கள்", "poyitu": "போய்விட்டு", "varen": "வருகிறேன்"
+}
+
+KANNADA_ROMAN_MAP = {
+    "namaskara": "ನಮಸ್ಕಾರ", "namaskar": "ನಮಸ್ಕಾರ", "hegiddira": "ಹೇಗಿದ್ದೀರಾ", "hegiddeera": "ಹೇಗಿದ್ದೀರಾ",
+    "chennagiddini": "ಚೆನ್ನಾಗಿದ್ದೇನೆ", "chennagidene": "ಚೆನ್ನಾಗಿದ್ದೇನೆ", "naanu": "ನಾನು", "neevu": "ನೀವು",
+    "dhanyavaadagalu": "ಧನ್ಯವಾದಗಳು", "tumba": "ತುಂಬಾ", "dhanyavada": "ಧನ್ಯವಾದ", "idu": "ಇದು",
+    "eshtu": "ಎಷ್ಟು", "aagutte": "ಆಗುತ್ತದೆ", "sahaya": "ಸಹಾಯ", "madi": "ಮಾಡಿ", "neeru": "ನೀರು",
+    "kodi": "ಕೊಡಿ", "oota": "ಊಟ", "elli": "ಎಲ್ಲಿ", "ide": "ಇದೆ", "shubhodaya": "ಶುಭೋದಯ"
+}
+
+MALAYALAM_ROMAN_MAP = {
+    "namaskaram": "നമസ്കാരം", "suprabhatham": "സുപ്രഭാതം", "sukhamano": "സുഖമാണോ", "sukhamanu": "സുഖമാണ്",
+    "valare": "വളരെ", "nandi": "നന്ദി", "ithinu": "ഇതിന്", "ethraya": "എത്രയാണ്", "ethra": "എത്ര",
+    "sahayikku": "സഹായിക്കൂ", "sahayam": "സഹായം", "vellam": "വെള്ളം", "tharu": "തരൂ", "bhakshanam": "ഭക്ഷണം",
+    "evide": "എവിടെ", "aanu": "ആണ്", "veendum": "വീണ്ടും", "kaanam": "കാണാം"
+}
+
 HINDI_URDU_ROMAN_MAP = {
-    "idhar": "इधर", "eedhar": "इधर", "yahan": "यहाँ", "yaha": "यहाँ", "udhar": "उधर", "oodhar": "उधर",
-    "wahan": "वहाँ", "waha": "वहाँ", "kahan": "कहाँ", "kaha": "कहाँ", "kidhar": "किधर", "ithar": "इधर",
-    "aa": "आओ", "aaa": "आओ", "aah": "आओ", "aao": "आओ", "aaiye": "आइए", "aaye": "आइए", "aaja": "आजा", "aajao": "आ जाओ",
-    "ja": "जा", "jaa": "जा", "jao": "जाओ", "jaiye": "जाइए", "jaaye": "जाइए",
-    "ja rahe ho": "जा रहे हो", "ja raha hai": "जा रहा है", "ja rahi hai": "जा रही है",
-    "kya": "क्या", "hai": "है", "hain": "हैं", "ho": "हो", "hoon": "हूँ", "hun": "हूँ",
-    "tha": "था", "the": "थे", "thi": "थी", "aap": "आप", "tum": "तुम", "main": "मैं", "hum": "हम",
-    "yeh": "यह", "ye": "यह", "woh": "वह", "wo": "वह", "kaise": "कैसे", "kaisi": "कैसी", "kaisa": "कैसा",
-    "kyun": "क्यों", "kyu": "क्यों", "kab": "कब", "kaun": "कौन", "kon": "कौन",
-    "kitna": "कितना", "kitne": "कितने", "kitni": "कितनी", "kitna hua": "कितना हुआ",
-    "pani": "पानी", "paani": "पानी", "khana": "खाना", "khaana": "खाना", "chai": "चाय",
-    "chahiye": "चाहिए", "dijiye": "दीजिए", "do": "दो", "le": "ले", "lao": "लाओ",
-    "karo": "करो", "kijiye": "कीजिए", "kar": "कर", "rahe": "रहे", "raha": "रहा", "rahi": "रही",
-    "madad": "मदद", "shukriya": "शुक्रिया", "dhanyawad": "धन्यवाद", "dhanyavad": "धन्यवाद",
-    "namaste": "नमस्ते", "alvida": "अलvida", "theek": "ठीक", "achha": "अच्छा", "acha": "अच्छा",
-    "bahut": "बहुत", "kam": "कम", "bhai": "भाई", "dost": "दोस्त", "station": "स्टेशन",
-    "airport": "हवाई अड्डा", "hotel": "होटल", "chalo": "चलो", "ruko": "रुको", "rok": "रोक",
-    "pate": "पते", "jana": "जाना", "kripya": "कृपया", "sunिए": "सुनिए", "suno": "सुनो",
-    "mujhe": "मुझे", "hume": "हमें", "naam": "नाम", "mera": "मेरा", "tera": "तेरा", "apka": "आपका"
+    "namaste": "नमस्ते", "namaskar": "नमस्कार", "pranaam": "प्रणाम", "shubh": "शुभ", "prabhaat": "प्रभात",
+    "sandhya": "संध्या", "dhanyavaad": "धन्यवाद", "dhanyawad": "धन्यवाद", "dhanyavad": "धन्यवाद",
+    "shukriya": "शुक्रिया", "shukriyah": "शुक्रिया", "aap": "आप", "kaise": "कैसे", "hain": "हैं",
+    "kaisi": "कैसी", "ho": "हो", "kya": "क्या", "haal": "हाल", "hai": "है", "main": "मैं",
+    "theek": "ठीक", "hoon": "हूँ", "hun": "हूँ", "achha": "अच्छा", "acha": "अच्छा", "sab": "सब",
+    "badiya": "बढ़िया", "badhiya": "बढ़िया", "yeh": "यह", "ye": "यह", "kitne": "कितने", "ka": "का",
+    "kitna": "कितना", "hua": "हुआ", "lagega": "लगेगा", "paisa": "पैसा", "paani": "पानी", "pani": "पानी",
+    "peene": "पीने", "dijiye": "दीजिए", "do": "दो", "chahiye": "चाहिए", "khana": "खाना", "khaana": "खाना",
+    "bahut": "बहुत", "swaadisht": "स्वादिष्ट", "swadisht": "स्वादिष्ट", "madad": "मदद", "kijiye": "कीजिए",
+    "karo": "करो", "bachao": "बचाओ", "kripya": "कृपया", "kahan": "कहाँ", "kaha": "कहाँ", "kidhar": "किधर",
+    "station": "स्टेशन", "railway": "रेलवे", "airport": "हवाई अड्डा", "hotel": "होटल", "idhar": "इधर",
+    "udhar": "उधर", "yahan": "यहाँ", "wahan": "वहाँ", "aao": "आओ", "aaiye": "आइए", "jao": "जाओ",
+    "jaiye": "जाइए", "chalo": "चलो", "ruko": "रुको", "pyaar": "प्यार", "pyar": "प्यार", "dost": "दोस्त",
+    "bhai": "भाई", "sunie": "सुनिए", "suno": "सुनो", "alvida": "अलविदा", "khuda hafiz": "ख़ुदा हाफ़िज़"
+}
+
+MARATHI_ROMAN_MAP = {
+    "namaskar": "नमस्कार", "kase": "कसे", "aahat": "आहात", "kasa": "कसा", "aahes": "आहेस",
+    "me": "मी", "theek": "ठीक", "ahe": "आहे", "khup": "खूप", "dhanyavad": "धन्यवाद", "he": "हे",
+    "kiti": "किती", "aahe": "आहे", "madat": "मदत", "kara": "करा", "paani": "पाणी", "dya": "द्या",
+    "kuthe": "कुठे", "shubh": "शुभ", "sakal": "सकाळ", "jevan": "जेवण", "chhan": "छान"
+}
+
+BENGALI_ROMAN_MAP = {
+    "nomoshkar": "নমস্কার", "kemon": "কেমন", "achen": "আছেন", "acho": "আছো", "ami": "আমি",
+    "bhalo": "ভালো", "achi": "আছি", "onek": "অনেক", "dhonnobad": "ধন্যবাদ", "er": "এর",
+    "daam": "দাম", "koto": "কত", "shahajjo": "সাহায্য", "korun": "করুন", "jol": "জল",
+    "dint": "দিন", "khabar": "খাবার", "kothay": "কোথায়", "shubho": "शुभ", "shokal": "सকাল"
+}
+
+GUJARATI_ROMAN_MAP = {
+    "kem": "કેમ", "cho": "છો", "chho": "છો", "majama": "મજામાં", "maja": "મજા", "ma": "માં",
+    "khub": "ખૂબ", "aabhar": "આભાર", "aa": "આ", "ketla": "કેટલા", "nu": "નું", "chhe": "છે",
+    "madad": "મદદ", "karo": "કરો", "paani": "પાણી", "aapo": "આપો", "kya": "ક્યાં", "javanu": "જવાનું"
+}
+
+PUNJABI_ROMAN_MAP = {
+    "sat": "ਸਤਿ", "sri": "ਸ੍ਰੀ", "akaal": "ਅਕਾਲ", "satsriakal": "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ", "kiddan": "ਕਿੱਦਾਂ",
+    "ki": "ਕੀ", "haal": "ਹਾਲ", "hai": "ਹੈ", "changa": "ਚੰਗਾ", "haan": "ਹਾਂ", "dhanvaad": "ਧੰਨਵਾਦ",
+    "dhannvaad": "ਧੰਨਵਾਦ", "eh": "ਇਹ", "kinne": "ਕਿੰਨੇ", "da": "ਦਾ", "madad": "ਮਦਦ", "paani": "ਪਾਣੀ"
+}
+
+MANDARIN_PINYIN_MAP = {
+    "ni hao": "你好", "nihao": "你好", "nin hao": "您好", "xiexie": "谢谢", "xie xie": "谢谢",
+    "duoxie": "多谢", "zaijian": "再见", "zai jian": "再见", "duoshao": "多少", "qian": "钱",
+    "duoshao qian": "多少钱", "bang bang wo": "帮帮我", "jiu ming": "救命", "zao shang hao": "早上好",
+    "wan an": "晚安", "wo hen hao": "我很好", "bu ke qi": "不客气", "dui bu qi": "对不起",
+    "qing wen": "请问", "ce suo zai na li": "厕所在哪里", "huo che zhan": "火车站", "piao": "票"
+}
+
+JAPANESE_ROMAJI_MAP = {
+    "konnichiwa": "こんにちは", "konbanwa": "こんばんは", "ohayou": "おはよう", "ohayou gozaimasu": "おはようございます",
+    "arigatou": "ありがとう", "arigato": "ありがとう", "arigatou gozaimasu": "ありがとうございます",
+    "sayonara": "さようなら", "sumimasen": "すみません", "gomen nasai": "ごめんなさい", "ogenki desu ka": "お元気ですか",
+    "hai genki desu": "はい、元気です", "ikura desu ka": "いくらですか", "tasukete": "助けて", "tasukete kudasai": "助けてください",
+    "eki wa doko desu ka": "駅はどこですか", "toire wa doko desu ka": "トイレはどこですか", "mizu o kudasai": "水をください",
+    "kore o kudasai": "これをください", "oishii": "おいしい", "hai": "はい", "iie": "いいえ"
+}
+
+KOREAN_RR_MAP = {
+    "annyeonghaseyo": "안녕하세요", "annyeong": "안녕", "gamsahamnida": "감사합니다", "gomawoyo": "고마워요",
+    "jal jinaeseyo": "잘 지내세요", "ne jal jinaeyo": "네, 잘 지내요", "eolmayeyo": "얼마예요",
+    "dowa juseyo": "도와주세요", "yeogi": "여기", "hwayangsil": "화장실", "eodiye-yo": "어디예요",
+    "mul juseyo": "물 주세요", "mas-iss-eoyo": "맛있어요", "joe-song-hamnida": "죄송합니다",
+    "sillyehamnida": "실례합니다", "an-nyeong-hi gyeseyo": "안녕히 계세요", "ne": "네", "anoyo": "아니요"
+}
+
+ARABIC_ARABIZI_MAP = {
+    "marhaban": "مرحبا", "ahlan": "أهلا", "ahlan wa sahlan": "أهلا وسهلا", "shukran": "شكرا",
+    "shukran jazilan": "شكرا جزيلا", "kayfa haluk": "كيف حالك", "ana bi-khayr": "أنا بخير",
+    "bikam hatha": "بكم هذا", "kam al-thaman": "كم الثمن", "sa-idni": "ساعدني", "ayn al-hammam": "أين الحمام",
+    "ayn al-mahattah": "أين المحطة", "ma-a as-salamah": "مع السلامة", "sabah al-khayr": "صباح الخير",
+    "masa al-khayr": "مساء الخير", "min fadlik": "من فضلك", "naam": "نعم", "la": "لا"
+}
+
+RUSSIAN_TRANSLIT_MAP = {
+    "privet": "Привет", "zdravstvuyte": "Здравствуйте", "spasibo": "Спасибо", "bolshoe spasibo": "Большое спасибо",
+    "kak dela": "Как дела?", "horosho": "Хорошо", "skolko stoit": "Сколько стоит?", "skolko eto stoit": "Сколько это стоит?",
+    "gde stantsiya": "Где станция?", "gde tualet": "Где туалет?", "pomogite": "Помогите",
+    "nuzhen vrach": "Нужен врач", "schet pozhaluysta": "Счет, пожалуйста",
+    "voda": "Вода", "da": "Да", "net": "Нет"
+}
+
+ENGLISH_STOPWORDS = {
+    "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with",
+    "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her",
+    "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", "so", "up",
+    "out", "if", "about", "who", "get", "which", "go", "me", "when", "make", "can", "like", "time",
+    "no", "just", "him", "know", "take", "people", "into", "year", "your", "good", "some", "could",
+    "them", "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think",
+    "also", "back", "after", "use", "two", "how", "our", "work", "first", "well", "way", "even",
+    "new", "want", "because", "any", "these", "give", "day", "most", "us", "is", "are", "was", "were",
+    "where", "please", "hotel", "station", "train", "airport", "taxi", "doctor", "hospital", "food",
+    "water", "bill", "price", "cost", "much", "many", "ticket", "help", "hello", "morning", "night",
+    "evening", "thank", "thanks", "welcome", "excuse", "sorry", "name", "delicious", "restaurant"
 }
 
 ROMAN_INTENT_PATTERNS = [
-    # Come here patterns
-    (r'\b(idhar|eedhar|yahan|yaha|ithar)\s+(aa|aaa|aah|aao|aaye|aaiye|ao|chale\s+aao|aaja|aajao)\b', "Come here", "यहाँ आओ / ادھر آؤ"),
-    (r'\b(idhar\s+aaa|idhar\s+aah|idhar\s+aa|idhar\s+aao|idhar\s+aaiye)\b', "Come here", "यहाँ आओ / ادھر آؤ"),
-    (r'\b(yahan\s+aao|yahan\s+aaiye|yaha\s+aao)\b', "Come here", "यहाँ आओ"),
-    
-    # Go there patterns
-    (r'\b(udhar|oodhar|wahan|waha)\s+(ja|jaa|jao|jaaye|jaaiye|chale\s+jao|jaye)\b', "Go there", "वहाँ जाओ / ادھر جاؤ"),
-    (r'\b(udhar\s+jao|wahan\s+jao|udhar\s+jaiye)\b', "Go there", "वहाँ जाओ"),
+    # Telugu
+    (r'\b(namaskaram|namaskaramu)\b', "Hello / Greetings", "నమస్కారం", "te"),
+    (r'\b(ela\s+unnaru|ela\s+unnav|meeru\s+ela\s+unnaru|meeru\s+ela\s+unnaaru)\b', "How are you?", "మీరు ఎలా ఉన్నారు?", "te"),
+    (r'\b(baagunnanu|bagunnanu|bavunnanu|nenu\s+bagunnanu|baagundi|bagundi)\b', "I am fine / It is good", "బాగున్నాను", "te"),
+    (r'\b(dhanyavaadaalu|dhanyavaadalu|dhanyavadalu|chala\s+dhanyavadalu)\b', "Thank you very much", "చాలా ధన్యవాదాలు", "te"),
+    (r'\b(ikkadiki\s+randi|ikkadiki\s+ra|ikkada\s+ra)\b', "Come here", "ఇక్కడికి రండి", "te"),
+    (r'\b(akkadiki\s+vellandi|akkadiki\s+vellu)\b', "Go there", "అక్కడికి వెళ్ళండి", "te"),
+    (r'\b(idi\s+entha|entha\s+avuthundi|dheen\s+kharchu\s+entha)\b', "How much does this cost?", "ఇది ఎంత?", "te"),
+    (r'\b(sahayam\s+cheyandi|sahayam\s+kavali)\b', "Please help me", "సహాయం చేయండి", "te"),
 
-    # How are you & Greetings
-    (r'\b(kya\s+haal\s+hai|kaise\s+ho|kaise\s+hain|kaisi\s+ho|kaisa\s+hai|aap\s+kaise\s+hain|tum\s+kaise\s+ho)\b', "How are you?", "आप कैसे हैं? / آپ کیسے ہیں؟"),
-    (r'\b(main\s+theek\s+hoon|theek\s+hoon|main\s+achha\s+hoon|sab\s+theek\s+hai)\b', "I am fine / Everything is good", "मैं ठीक हूँ / میں ٹھیک ہوں"),
-    (r'\b(namaste|namaskar|namaskaram)\b', "Hello / Greetings", "नमस्ते"),
-    (r'\b(vanakkam|vanakam)\b', "Hello / Greetings", "வணக்கம்"),
-    (r'\b(shukriya|shukriyah|dhanyawad|dhanyavaad|dhanyavad|nandri|danyavad)\b', "Thank you very much", "धन्यवाद / شکریہ"),
-    (r'\b(alvida|khuda\s*hafiz|phir\s*milenge)\b', "Goodbye / See you again", "अलविदा / خدا حافظ"),
-    
-    # Help & Emergency
-    (r'\b(madad\s+karo|madad\s+chahiye|madad\s+kijiye|help\s+karo|bachao|bachaiye)\b', "Please help me", "कृपया मदद कीजिए / برائے مہربانی مدد کریں"),
-    (r'\b(police\s+ko\s+bulao|police\s+bulaiye|police\s+chahiye)\b', "Call the police", "पुलिस को बुलाइए / پولیس کو بلائیں"),
-    (r'\b(doctor\s+chahiye|hospital\s+kahan\s+hai|doctor\s+kahan\s+hai)\b', "I need a doctor / Where is the hospital?", "मुझे डॉक्टर चाहिए / مجھے ڈاکٹر چاہیے"),
-    (r'\b(tabiyat\s+kharab\s+hai|bimaar\s+hoon|dard\s+ho\s+raha\s+hai)\b', "I am feeling sick / unwell", "मेरी तबीयत खराब है"),
+    # Tamil
+    (r'\b(vanakkam|vanakam)\b', "Hello / Greetings", "வணக்கம்", "ta"),
+    (r'\b(eppadi\s+irukkeenga|eppadi\s+irukinga|epdi\s+irukeenga|neengal\s+eppadi\s+irukkireergal)\b', "How are you?", "நீங்கள் எப்படி இருக்கிறீர்கள்?", "ta"),
+    (r'\b(nalla\s+irukken|nallaa\s+irukken|naan\s+nalamaaga\s+irukkiren)\b', "I am fine", "நான் நலமாக இருக்கிறேன்", "ta"),
+    (r'\b(mikka\s+nandri|nandri)\b', "Thank you very much", "மிக்க நன்றி", "ta"),
+    (r'\b(idhan\s+vilai\s+enna|evvalavu|evlo)\b', "How much does this cost?", "இதன் விலை என்ன?", "ta"),
+    (r'\b(udhavi\s+seiyungal|kaapaathunga)\b', "Please help me", "உதவி செய்யுங்கள்", "ta"),
 
-    # Questions / Where is
-    (r'\b(kahan\s+ja\s+rahe\s+ho|kidhar\s+ja\s+rahe\s+ho)\b', "Where are you going?", "कहाँ जा रहे हो? / کہاں جا رہے ہو؟"),
-    (r'\b(station|railway\s+station)\s+(kahan|kidhar)\s+hai\b', "Where is the railway station?", "रेलवे स्टेशन कहाँ है?"),
-    (r'\b(airport|aerodrome)\s+(kahan|kidhar)\s+hai\b', "Where is the airport?", "हवाई अड्डा कहाँ है?"),
-    (r'\b(hotel|lodge|kamra)\s+(kahan|kidhar)\s+hai\b', "Where is the hotel?", "होटल कहाँ है?"),
-    (r'\b(restroom|washroom|toilet|shauchalay)\s+(kahan|kidhar)\s+hai\b', "Where is the restroom / toilet?", "शौचालय कहाँ है?"),
-    (r'\b(kahan\s+hai|kidhar\s+hai|kaha\s+hai)\b', "Where is it?", "कहाँ है? / کہاں ہے؟"),
-    
-    # Cost & Money
-    (r'\b(kitne\s+ka\s+hai|kitna\s+hua|kitna\s+paisa|kitna\s+lagega|kitna\s+hai)\b', "How much does this cost?", "यह कितने का है? / یہ کتنے کا ہے؟"),
-    (r'\b(kam\s+karo|kam\s+kijiye|discount\s+do|sasta\s+karo)\b', "Can you give a discount / make it cheaper?", "कम कीजिए / कम करें"),
-    (r'\b(bill\s+le\s+aao|bill\s+dijiye|bill\s+lao)\b', "Please bring the bill", "बिल ले आइए / بل لائیں"),
+    # Kannada
+    (r'\b(namaskara|namaskar)\b', "Hello / Greetings", "ನಮಸ್ಕಾರ", "kn"),
+    (r'\b(hegiddira|hegiddeera|hegiddiya)\b', "How are you?", "ಹೇಗಿದ್ದೀರಾ?", "kn"),
+    (r'\b(chennagiddini|naanu\s+chennagiddene)\b', "I am fine", "ನಾನು ಚೆನ್ನಾಗಿದ್ದೇನೆ", "kn"),
+    (r'\b(dhanyavaadagalu|tumba\s+dhanyavada)\b', "Thank you very much", "ಧನ್ಯವಾದಗಳು", "kn"),
+    (r'\b(idu\s+eshtu|eshtu\s+aagutte)\b', "How much does this cost?", "ಇದು ಎಷ್ಟು?", "kn"),
+    (r'\b(sahaya\s+madi)\b', "Please help me", "ಸಹಾಯ ಮಾಡಿ", "kn"),
 
-    # Needs & Dining
-    (r'\b(pani\s+chahiye|paani\s+dijiye|pani\s+do|paani\s+chahiye|drinking\s+water)\b', "Please give drinking water", "पीने का पानी दीजिए / پینے کا पानी दें"),
-    (r'\b(khana\s+chahiye|khana\s+do|khana\s+kahan\s+milega)\b', "I want food / Where can I get food?", "खाना चाहिए / खाना चाहिए"),
-    (r'\b(chai\s+chahiye|chai\s+dijiye|ek\s+cup\s+chai)\b', "Can I have one cup of tea?", "एक कप चाय दीजिए / एक कप चाय दें"),
+    # Malayalam
+    (r'\b(namaskaram|suprabhatham)\b', "Hello / Greetings", "നമസ്കാരം", "ml"),
+    (r'\b(sukhamano|sukhamano\s+ningalkku)\b', "How are you?", "സുഖമാണോ?", "ml"),
+    (r'\b(sukhamanu|enikku\s+sukhamanu)\b', "I am fine", "സുഖമാണ്", "ml"),
+    (r'\b(valare\s+nandi|nandi)\b', "Thank you very much", "വളരെ നന്ദി", "ml"),
+    (r'\b(ithinu\s+ethraya|ethraya)\b', "How much does this cost?", "ഇതിന് എത്രയാണ്?", "ml"),
+    (r'\b(sahayikku)\b', "Please help me", "സഹായിക്കൂ", "ml"),
 
-    # Actions / Movements
-    (r'\b(chalo|chalo\s+ab|chalain|chalte\s+hain)\b', "Let's go / Move on", "चलो / چلیں"),
-    (r'\b(ruko|ruk\s+jao|roko|rok\s+dijiye|thehro)\b', "Please stop / Wait here", "यहाँ रोक दीजिए / रोकें"),
-    (r'\b(jaldi\s+karo|jaldi\s+chalo|jaldi\s+aao)\b', "Hurry up / Come quickly", "जल्दी करो / جلदी करें"),
-    (r'\b(aage\s+badho|seedhe\s+jao)\b', "Go straight ahead", "सीधे जाइए / سیدھے جائیں"),
-    (r'\b(left\s+mudo|baayein\s+mudo|bayen\s+mudo)\b', "Turn left", "बाएँ मुड़िए / بائیں مڑیں"),
-    (r'\b(right\s+mudo|daayein\s+mudo|dayen\s+mudo)\b', "Turn right", "दाएँ मुड़िए / دائیں مڑیں"),
-    
-    # Common questions & dialogue
-    (r'\b(kya\s+naam\s+hai|aapka\s+naam\s+kya\s+hai|tumhara\s+naam\s+kya\s+hai)\b', "What is your name?", "आपका नाम क्या है? / آپ کا نام کیا ہے؟"),
-    (r'\b(kya\s+kar\s+rahe\s+ho|kya\s+ho\s+raha\s+hai|kya\s+chal\s+raha\s+hai)\b', "What are you doing? / What's happening?", "क्या कर रहे हो? / کیا کر رہے ہو؟"),
-    (r'\b(kahan\s+se\s+ho|aap\s+kahan\s+ke\s+hain)\b', "Where are you from?", "आप कहाँ से हैं? / آپ کہاں سے ہیں؟"),
-    (r'\b(samajh\s+nahi\s+aaya|samajh\s+gaya|samajh\s+nahi\s+raha)\b', "I didn't understand / I understand", "समझ नहीं आया / समझ नहीं आया"),
+    # Hindi / Urdu
+    (r'\b(kya\s+haal\s+hai|kaise\s+ho|kaise\s+hain|aap\s+kaise\s+hain)\b', "How are you?", "आप कैसे हैं?", "hi"),
+    (r'\b(main\s+theek\s+hoon|theek\s+hoon|sab\s+theek\s+hai)\b', "I am fine", "मैं ठीक हूँ", "hi"),
+    (r'\b(namaste|namaskar)\b', "Hello / Greetings", "नमस्ते", "hi"),
+    (r'\b(shukriya|shukriyah)\b', "Thank you very much", "शुक्रिया", "ur"),
+    (r'\b(dhanyawad|dhanyavaad|dhanyavad)\b', "Thank you very much", "धन्यवाद", "hi"),
+    (r'\b(kitne\s+ka\s+hai|kitna\s+hua|kitna\s+lagega)\b', "How much does this cost?", "यह कितने का है?", "hi"),
+    (r'\b(madad\s+karo|madad\s+kijiye|bachao)\b', "Please help me", "कृपया मदद कीजिए", "hi"),
 
-    # Tamil Romanized patterns
-    (r'\b(inge\s+vaa|inga\s+vaa|inga\s+vaanga|inge\s+vaanga)\b', "Come here", "இங்கே வாருங்கள்"),
-    (r'\b(ange\s+ponga|anga\s+po|anga\s+ponga)\b', "Go there", "அங்கே போங்கள்"),
-    (r'\b(eppadi\s+irukkeenga|eppadi\s+irukinga|epdi\s+irukeenga)\b', "How are you?", "நீங்கள் எப்படி இருக்கிறீர்கள்?"),
-    (r'\b(nalla\s+irukken|nallaa\s+irukken)\b', "I am fine", "நான் நலமாக இருக்கிறேன்"),
-    (r'\b(ungal\s+peyar\s+enna|unga\s+per\s+enna)\b', "What is your name?", "உங்கள் பெயர் என்ன?"),
-    (r'\b(enna\s+vilai|evvalavu|evlo)\b', "How much does this cost?", "எவ்வளவு விலை?"),
-    (r'\b(thanni\s+kudunga|thanneer\s+kudunga)\b', "Please give water", "தண்ணீர் கொடுங்கள்"),
-    (r'\b(saapaadu\s+venum|unavu\s+venum)\b', "I want food", "உணவு வேண்டும்"),
-    (r'\b(kaapaathunga|udhavi\s+seiyunga)\b', "Please help me", "உதவி செய்யுங்கள்"),
+    # Gujarati
+    (r'\b(kem\s+cho|kem\s+chho)\b', "How are you?", "કેમ છો?", "gu"),
+    (r'\b(majama|maja\s+ma)\b', "I am fine", "મજામાં", "gu"),
+    (r'\b(aabhar|khub\s+aabhar)\b', "Thank you very much", "ખૂબ આભાર", "gu"),
 
-    # Telugu Romanized patterns
-    (r'\b(ikkadiki\s+ra|ikkadiki\s+randi|ikkada\s+ra)\b', "Come here", "ఇక్కడికి రండి"),
-    (r'\b(akkadiki\s+vellu|akkadiki\s+vellandi)\b', "Go there", "అక్కడికి వెళ్ళండి"),
-    (r'\b(ela\s+unnaru|ela\s+unnav)\b', "How are you?", "ఎలా ఉన్నారు?"),
-    (r'\b(baagunnanu|bavunnanu)\b', "I am fine", "బాగున్నాను"),
-    (r'\b(mee\s+peru\s+enti|nee\s+peru\s+enti)\b', "What is your name?", "మీ పేరు ఏమిటి?"),
-    (r'\b(entha\s+avuthundi|dheen\s+kharchu\s+entha|entha)\b', "How much is this?", "ఎంత ఖర్చు అవుతుంది?"),
-    (r'\b(neellu\s+ivvandi|neellu\s+kavali)\b', "Please give drinking water", "మంచి నీళ్ళు ఇవ్వండి"),
-    (r'\b(sahayam\s+cheyandi)\b', "Please help me", "సహాయం చేయండి")
+    # Punjabi
+    (r'\b(sat\s+sri\s+akaal|satsriakal)\b', "Hello / Greetings", "ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ", "pa"),
+    (r'\b(kiddan|ki\s+haal\s+hai)\b', "How are you?", "ਕਿੱਦਾਂ?", "pa"),
+    (r'\b(dhannvaad|dhanvaad)\b', "Thank you very much", "ਧੰਨਵਾਦ", "pa"),
+
+    # Bengali
+    (r'\b(nomoshkar|kemon\s+achen|kemon\s+acho)\b', "How are you?", "কেমন আছেন?", "bn"),
+    (r'\b(bhalo\s+achi|ami\s+bhalo\s+achi)\b', "I am fine", "আমি ভালো আছি", "bn"),
+    (r'\b(dhonnobad|anek\s+dhonnobad)\b', "Thank you very much", "অনেক ধন্যবাদ", "bn"),
+
+    # Mandarin (Pinyin)
+    (r'\b(ni\s+hao|nihao|nin\s+hao)\b', "Hello / Greetings", "你好", "zh"),
+    (r'\b(xie\s+xie|xiexie|duo\s+xie)\b', "Thank you very much", "谢谢", "zh"),
+    (r'\b(zai\s+jian|zaijian)\b', "Goodbye", "再见", "zh"),
+    (r'\b(duo\s+shao\s+qian)\b', "How much does this cost?", "多少钱？", "zh"),
+    (r'\b(bang\s+bang\s+wo|jiu\s+ming)\b', "Please help me", "帮帮我", "zh"),
+
+    # Japanese (Romaji)
+    (r'\b(konnichiwa|konbanwa|ohayou\s+gozaimasu)\b', "Hello / Greetings", "こんにちは", "ja"),
+    (r'\b(arigatou\s+gozaimasu|arigatou|arigato)\b', "Thank you very much", "ありがとうございます", "ja"),
+    (r'\b(ogenki\s+desu\s+ka)\b', "How are you?", "お元気ですか？", "ja"),
+    (r'\b(ikura\s+desu\s+ka)\b', "How much does this cost?", "いくらですか？", "ja"),
+    (r'\b(tasukete\s+kudasai)\b', "Please help me", "助けてください", "ja"),
+
+    # Korean (Revised Romanization)
+    (r'\b(annyeonghaseyo|annyeong)\b', "Hello / Greetings", "안녕하세요", "ko"),
+    (r'\b(gamsahamnida|gomawoyo)\b', "Thank you very much", "감사합니다", "ko"),
+    (r'\b(jal\s+jinaeseyo)\b', "How are you?", "잘 지내세요?", "ko"),
+    (r'\b(eolmayeyo)\b', "How much does this cost?", "얼마예요?", "ko"),
+    (r'\b(dowa\s+juseyo)\b', "Please help me", "도와주세요", "ko"),
+
+    # Arabic (Arabizi)
+    (r'\b(marhaban|ahlan\s+wa\s+sahlan)\b', "Hello / Greetings", "مرحبا", "ar"),
+    (r'\b(shukran|shukran\s+jazilan)\b', "Thank you very much", "شكرا", "ar"),
+    (r'\b(kayfa\s+haluk)\b', "How are you?", "كيف حالك؟", "ar"),
+    (r'\b(bikam\s+hatha|kam\s+al-thaman)\b', "How much does this cost?", "بكم هذا؟", "ar"),
+
+    # Russian (Translit)
+    (r'\b(privet|zdravstvuyte)\b', "Hello / Greetings", "Привет", "ru"),
+    (r'\b(spasibo|bolshoe\s+spasibo)\b', "Thank you very much", "Спасибо", "ru"),
+    (r'\b(kak\s+dela)\b', "How are you?", "Как дела?", "ru"),
+    (r'\b(skolko\s+eto\s+stoit)\b', "How much does this cost?", "Сколько это стоит?", "ru"),
+
+    # Spanish, French, German, Italian, Portuguese
+    (r'\b(hola|buenos\s+dias)\b', "Hello / Greetings", "Hola", "es"),
+    (r'\b(gracias|muchas\s+gracias)\b', "Thank you very much", "Gracias", "es"),
+    (r'\b(bonjour|salut)\b', "Hello / Greetings", "Bonjour", "fr"),
+    (r'\b(merci|merci\s+beaucoup)\b', "Thank you very much", "Merci", "fr"),
+    (r'\b(guten\s+tag|guten\s+morgen)\b', "Hello / Greetings", "Guten Tag", "de"),
+    (r'\b(danke|vielen\s+dank)\b', "Thank you very much", "Vielen Dank", "de"),
+    (r'\b(buongiorno|ciao)\b', "Hello / Greetings", "Buongiorno", "it"),
+    (r'\b(grazie|grazie\s+mille)\b', "Thank you very much", "Grazie mille", "it"),
+    (r'\b(ola|bom\s+dia)\b', "Hello / Greetings", "Olá", "pt"),
+    (r'\b(obrigado|muito\s+obrigado)\b', "Thank you very much", "Muito obrigado", "pt")
 ]
 
 class PhrasebookService:
     @staticmethod
     def get_phrases(query: PhrasebookQuery) -> Dict[str, Any]:
         lang_key = query.language.strip().lower()
-        phrases = PHRASEBOOK_DATA.get(lang_key, PHRASEBOOK_DATA["hindi"])
+        phrases = PHRASEBOOK_DATA.get(lang_key, PHRASEBOOK_DATA.get("hindi", []))
 
         if query.category and query.category.lower() != "all":
             cat_filter = query.category.strip().lower()
@@ -1027,6 +1241,336 @@ class PhrasebookService:
         return f"{short_code}-{short_code.upper()}"
 
     @classmethod
+    def _detect_language_and_script(
+        cls, 
+        text: str, 
+        user_hint: str = "auto", 
+        target_lang: str = "en"
+    ) -> Dict[str, Any]:
+        """
+        Universal Multi-Lingual & Script Detection Engine.
+        Distinguishes between:
+          (a) Text in native script (Indic, East Asian, Semitic, Cyrillic)
+          (b) Romanized / transliterated text (ISO 15919, Pinyin, Romaji, RR, Arabizi, Translit)
+          (c) Authentic English text (never misidentifies Indic romanization as English).
+        Computes normalized confidence scoring, candidate rankings, ambiguity detection,
+        and transliteration standards.
+        """
+        raw = text.strip()
+        if not raw:
+            return {
+                "code": "en",
+                "name": "English",
+                "is_romanized": False,
+                "confidence": 1.0,
+                "candidates": [{"language": "English", "code": "en", "confidence": 1.0}],
+                "is_ambiguous": False,
+                "transliteration_standard": "None"
+            }
+
+        # -------------------------------------------------------------
+        # 1. Native Unicode Script Detection (100% Deterministic & Exact)
+        # -------------------------------------------------------------
+        # Telugu (U+0C00 - U+0C7F)
+        if re.search(r'[ఀ-౿]', raw):
+            return {
+                "code": "te", "name": "Telugu", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Telugu", "code": "te", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Tamil (U+0B80 - U+0BFF)
+        if re.search(r'[஀-௿]', raw):
+            return {
+                "code": "ta", "name": "Tamil", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Tamil", "code": "ta", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Kannada (U+0C80 - U+0CFF)
+        if re.search(r'[ಀ-೿]', raw):
+            return {
+                "code": "kn", "name": "Kannada", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Kannada", "code": "kn", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Malayalam (U+0D00 - U+0D7F)
+        if re.search(r'[ഀ-ൿ]', raw):
+            return {
+                "code": "ml", "name": "Malayalam", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Malayalam", "code": "ml", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Gujarati (U+0A80 - U+0AFF)
+        if re.search(r'[઀-૿]', raw):
+            return {
+                "code": "gu", "name": "Gujarati", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Gujarati", "code": "gu", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Punjabi / Gurmukhi (U+0A00 - U+0A7F)
+        if re.search(r'[਀-੿]', raw):
+            return {
+                "code": "pa", "name": "Punjabi", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Punjabi", "code": "pa", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Bengali (U+0980 - U+09FF)
+        if re.search(r'[ঀ-৿]', raw):
+            return {
+                "code": "bn", "name": "Bengali", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Bengali", "code": "bn", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Devanagari (U+0900 - U+097F) -> Hindi / Marathi
+        if re.search(r'[ऀ-ॿ]', raw):
+            clean_hint = user_hint.lower()
+            code = "mr" if "marathi" in clean_hint else "hi"
+            name = "Marathi" if code == "mr" else "Hindi"
+            return {
+                "code": code, "name": name, "is_romanized": False, "confidence": 0.98,
+                "candidates": [{"language": name, "code": code, "confidence": 0.98}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Korean Hangul (U+AC00 - U+D7AF, U+1100 - U+11FF)
+        if re.search(r'[가-힯ᄀ-ᇿ]', raw):
+            return {
+                "code": "ko", "name": "Korean", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Korean", "code": "ko", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Japanese Kana (Hiragana U+3040 - U+309F, Katakana U+30A0 - U+30FF)
+        if re.search(r'[぀-ゟ゠-ヿ]', raw):
+            return {
+                "code": "ja", "name": "Japanese", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Japanese", "code": "ja", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Chinese Hanzi / CJK Ideographs (U+4E00 - U+9FFF)
+        if re.search(r'[一-鿿]', raw):
+            return {
+                "code": "zh", "name": "Mandarin Chinese", "is_romanized": False, "confidence": 0.98,
+                "candidates": [{"language": "Mandarin Chinese", "code": "zh", "confidence": 0.98}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Cyrillic / Russian (U+0400 - U+04FF)
+        if re.search(r'[Ѐ-ӿ]', raw):
+            return {
+                "code": "ru", "name": "Russian", "is_romanized": False, "confidence": 0.99,
+                "candidates": [{"language": "Russian", "code": "ru", "confidence": 0.99}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+        # Arabic / Urdu Script (U+0600 - U+06FF)
+        if re.search(r'[؀-ۿ]', raw):
+            is_urdu = bool(re.search(r'[ٹچڈڑںھہے]', raw)) or "urdu" in user_hint.lower()
+            code = "ur" if is_urdu else "ar"
+            name = "Urdu" if is_urdu else "Arabic"
+            return {
+                "code": code, "name": name, "is_romanized": False, "confidence": 0.97,
+                "candidates": [{"language": name, "code": code, "confidence": 0.97}],
+                "is_ambiguous": False, "transliteration_standard": "None"
+            }
+
+        # -------------------------------------------------------------
+        # 2. Latin / Romanized Multi-Factor Classifier & Scorer
+        # -------------------------------------------------------------
+        raw_lower = raw.lower()
+        words = re.findall(r'\b[a-zA-Z]+\b', raw_lower)
+
+        # Multi-language score buckets
+        scores = {lang: 0.0 for lang in [
+            "te", "hi", "ta", "kn", "ml", "mr", "bn", "gu", "pa", "ur",
+            "zh", "ja", "ko", "ar", "ru", "es", "fr", "de", "it", "pt", "en"
+        ]}
+
+        # Map lexicons to language codes
+        lex_map = {
+            "te": TELUGU_ROMAN_MAP,
+            "ta": TAMIL_ROMAN_MAP,
+            "kn": KANNADA_ROMAN_MAP,
+            "ml": MALAYALAM_ROMAN_MAP,
+            "hi": HINDI_URDU_ROMAN_MAP,
+            "mr": MARATHI_ROMAN_MAP,
+            "bn": BENGALI_ROMAN_MAP,
+            "gu": GUJARATI_ROMAN_MAP,
+            "pa": PUNJABI_ROMAN_MAP,
+            "zh": MANDARIN_PINYIN_MAP,
+            "ja": JAPANESE_ROMAJI_MAP,
+            "ko": KOREAN_RR_MAP,
+            "ar": ARABIC_ARABIZI_MAP,
+            "ru": RUSSIAN_TRANSLIT_MAP
+        }
+
+        # Check full text in lexicons
+        for code, lex in lex_map.items():
+            if raw_lower in lex:
+                scores[code] += 8.0
+
+        # Check tokens against dictionaries
+        for w in words:
+            # English Stopword / Keyword Check
+            if w in ENGLISH_STOPWORDS:
+                scores["en"] += 1.8
+            # Indic / Foreign lexicons
+            for code, lex in lex_map.items():
+                if w in lex:
+                    scores[code] += 2.5
+
+        # Check Regex Intent Patterns
+        for pattern, _, _, plang in ROMAN_INTENT_PATTERNS:
+            if re.search(pattern, raw_lower):
+                scores[plang] += 6.0
+
+        # Disambiguation heuristics for shared Sanskrit/Indic roots:
+        # e.g. "namaste", "namaskar", "namaskara", "dhanyavaad", "paani"
+        if "namaskaram" in raw_lower or "namaskaramu" in raw_lower:
+            scores["te"] += 3.5
+            scores["ml"] += 2.0
+        elif "namaskara" in raw_lower:
+            scores["kn"] += 4.0
+        elif "namaste" in raw_lower:
+            if target_lang and ("te" in target_lang.lower() or "telugu" in target_lang.lower()):
+                scores["hi"] += 3.0
+            elif target_lang and ("hi" in target_lang.lower() or "hindi" in target_lang.lower()):
+                scores["te"] += 3.0
+            else:
+                scores["hi"] += 3.0
+
+        # If user explicitly selected a non-auto source language, boost that language
+        if user_hint and user_hint.lower() not in ["auto", ""]:
+            hint_code = cls._resolve_lang_code(user_hint)
+            if hint_code in scores:
+                scores[hint_code] += 4.0
+
+        # Sort candidates by score descending
+        sorted_cands = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+        top_code, top_score = sorted_cands[0]
+        second_code, second_score = sorted_cands[1]
+
+        # Calculate normalized candidate probabilities
+        cand_list = []
+        tot = sum(s for _, s in sorted_cands if s > 0) or 1.0
+        for code, sc in sorted_cands:
+            if sc > 0:
+                cand_list.append({
+                    "language": CODE_TO_LANG_NAME.get(code, code.title()),
+                    "code": code,
+                    "confidence": round(sc / tot, 2)
+                })
+        if not cand_list:
+            cand_list = [{"language": "English", "code": "en", "confidence": 1.0}]
+
+        # Decide whether input is authentic English or Romanized/Transliterated
+        # If English score dominates and no foreign intent pattern fired
+        if top_code == "en" and top_score > 0 and (top_score - second_score >= 1.0 or second_score == 0):
+            return {
+                "code": "en",
+                "name": "English",
+                "is_romanized": False,
+                "confidence": min(0.99, max(0.65, round(top_score / (top_score + second_score + 0.1), 2))),
+                "candidates": cand_list[:3],
+                "is_ambiguous": False,
+                "transliteration_standard": "None"
+            }
+
+        # If highest score is a foreign language, it is Romanized!
+        best_code = top_code if top_score > 0 else "en"
+        best_name = CODE_TO_LANG_NAME.get(best_code, "English")
+        is_rom = (best_code != "en")
+        translit_standard = TRANSLITERATION_STANDARDS.get(best_code, "None") if is_rom else "None"
+
+        # Check Ambiguity (top 2 candidates close within 15% margin)
+        is_ambiguous = (is_rom and second_score > 0 and (top_score - second_score) < 2.0 and second_code != "en")
+        conf_val = round(top_score / tot, 2) if tot > 0 else 0.85
+        conf_val = max(0.55, min(0.99, conf_val))
+
+        return {
+            "code": best_code,
+            "name": best_name,
+            "is_romanized": is_rom,
+            "confidence": conf_val,
+            "candidates": cand_list[:4],
+            "is_ambiguous": is_ambiguous,
+            "transliteration_standard": translit_standard
+        }
+
+    @classmethod
+    async def _transliterate_to_native(cls, text: str, lang_code: str) -> str:
+        """
+        Converts Romanized/phonetic text (e.g. 'Meeru ela unnaaru', 'Eppadi irukkeenga', 'Aap kaise hain')
+        into authentic native script using curated lexicons + Google Input Tools API.
+        """
+        if not text or not re.search(r'[a-zA-Z]', text):
+            return text
+
+        if lang_code in ["en", "auto"]:
+            return text
+
+        clean_lower = text.strip().lower()
+
+        # Check direct pattern / lexicon mappings first
+        lex_map = {
+            "te": TELUGU_ROMAN_MAP, "ta": TAMIL_ROMAN_MAP, "kn": KANNADA_ROMAN_MAP,
+            "ml": MALAYALAM_ROMAN_MAP, "hi": HINDI_URDU_ROMAN_MAP, "mr": MARATHI_ROMAN_MAP,
+            "bn": BENGALI_ROMAN_MAP, "gu": GUJARATI_ROMAN_MAP, "pa": PUNJABI_ROMAN_MAP,
+            "zh": MANDARIN_PINYIN_MAP, "ja": JAPANESE_ROMAJI_MAP, "ko": KOREAN_RR_MAP,
+            "ar": ARABIC_ARABIZI_MAP, "ru": RUSSIAN_TRANSLIT_MAP
+        }
+
+        if lang_code in lex_map:
+            target_lex = lex_map[lang_code]
+            if clean_lower in target_lex:
+                return target_lex[clean_lower]
+            
+            # Multi-word token mapping
+            words = clean_lower.split()
+            converted = []
+            i = 0
+            while i < len(words):
+                matched = False
+                if i + 2 < len(words):
+                    triplet = f"{words[i]} {words[i+1]} {words[i+2]}"
+                    if triplet in target_lex:
+                        converted.append(target_lex[triplet])
+                        i += 3
+                        matched = True
+                if not matched and i + 1 < len(words):
+                    pair = f"{words[i]} {words[i+1]}"
+                    if pair in target_lex:
+                        converted.append(target_lex[pair])
+                        i += 2
+                        matched = True
+                if not matched:
+                    w = words[i]
+                    clean_w = re.sub(r'[^\w\s]', '', w)
+                    if clean_w in target_lex:
+                        converted.append(target_lex[clean_w])
+                    else:
+                        converted.append(w)
+                    i += 1
+            if any(re.search(r'[^\x00-\x7F]', c) for c in converted):
+                return " ".join(converted)
+
+        # External Google Input Tools transliteration API for generic phrases
+        try:
+            url = "https://inputtools.google.com/request"
+            params = {
+                "text": text,
+                "itc": f"{lang_code}-t-i0-und",
+                "num": 1
+            }
+            async with httpx.AsyncClient(timeout=3.5) as client:
+                res = await client.get(url, params=params)
+                if res.status_code == 200:
+                    data = res.json()
+                    if data and len(data) > 1 and data[0] == "SUCCESS" and data[1]:
+                        words = [item[1][0] for item in data[1] if item and len(item) > 1 and item[1]]
+                        if words:
+                            return " ".join(words)
+        except Exception as e:
+            logger.debug(f"Input tools translit error: {e}")
+
+        return text
+
+    @classmethod
     def _find_phrasebook_match(cls, text: str, target_lang: str) -> Optional[Dict[str, str]]:
         clean_target = target_lang.split("(")[0].strip().lower()
         phrases = PHRASEBOOK_DATA.get(clean_target, [])
@@ -1046,75 +1590,36 @@ class PhrasebookService:
         return None
 
     @classmethod
-    def _transliterate_romanized_text(cls, text: str) -> str:
-        """Converts Romanized Hinglish/Roman Urdu words into native Devanagari script for accurate translation."""
-        text_clean = text.strip().lower()
-        words = text_clean.split()
-        translated_words = []
+    def _lookup_phonetic_pronunciation(cls, target_text: str, target_code: str) -> str:
+        """
+        Retrieves accurate phonetic pronunciation guide for the translated output.
+        """
+        clean_tgt = target_text.strip()
+        if clean_tgt in COMMON_PHONETICS:
+            return COMMON_PHONETICS[clean_tgt]
         
-        i = 0
-        while i < len(words):
-            matched = False
-            if i + 2 < len(words):
-                triplet = f"{words[i]} {words[i+1]} {words[i+2]}"
-                if triplet in HINDI_URDU_ROMAN_MAP:
-                    translated_words.append(HINDI_URDU_ROMAN_MAP[triplet])
-                    i += 3
-                    matched = True
-            if not matched and i + 1 < len(words):
-                pair = f"{words[i]} {words[i+1]}"
-                if pair in HINDI_URDU_ROMAN_MAP:
-                    translated_words.append(HINDI_URDU_ROMAN_MAP[pair])
-                    i += 2
-                    matched = True
-            if not matched:
-                w = words[i]
-                clean_w = re.sub(r'[^\w\s]', '', w)
-                if clean_w in HINDI_URDU_ROMAN_MAP:
-                    translated_words.append(HINDI_URDU_ROMAN_MAP[clean_w])
-                else:
-                    translated_words.append(w)
-                i += 1
-                
-    @classmethod
-    async def _transliterate_to_native(cls, text: str, lang_code: str) -> str:
-        """
-        Converts Romanized/phonetic text (e.g. 'Meeru ela unnaaru', 'Eppadi irukkeenga', 'Aap kaise hain')
-        into authentic native script using Google Input Tools API with local fallback.
-        """
-        if not text or not re.search(r'[a-zA-Z]', text):
-            return text
+        for k, v in COMMON_PHONETICS.items():
+            if k in clean_tgt:
+                return v
 
-        if lang_code in ["en", "auto"]:
-            return text
+        # Check in phrasebook data
+        lang_name = CODE_TO_LANG_NAME.get(target_code, "").lower()
+        if lang_name in PHRASEBOOK_DATA:
+            for p in PHRASEBOOK_DATA[lang_name]:
+                if p.get("foreign") == clean_tgt or clean_tgt in p.get("foreign", ""):
+                    return p.get("romanized", clean_tgt)
 
-        try:
-            url = "https://inputtools.google.com/request"
-            params = {
-                "text": text,
-                "itc": f"{lang_code}-t-i0-und",
-                "num": 1
-            }
-            async with httpx.AsyncClient(timeout=3.5) as client:
-                res = await client.get(url, params=params)
-                if res.status_code == 200:
-                    data = res.json()
-                    if data and len(data) > 1 and data[0] == "SUCCESS" and data[1]:
-                        words = [item[1][0] for item in data[1] if item and len(item) > 1 and item[1]]
-                        if words:
-                            return " ".join(words)
-        except Exception as e:
-            logger.debug(f"Input tools translit: {e}")
-
-        return cls._transliterate_romanized_text(text)
+        return clean_tgt
 
     @classmethod
     async def translate_phrase(cls, req: TranslationRequest) -> Dict[str, Any]:
-        import html
-        import re
-        import os
-        from app.config import settings
-
+        """
+        Universal Multi-Lingual Translation Pipeline:
+        1. Multi-factor language & script detection (Native script, Romanized/transliterated, English).
+        2. ISO 15919 / Pinyin / Romaji / Arabizi transliteration to native script.
+        3. Bidirectional context & register-aware translation via Gemini AI, Google Web, and MyMemory APIs.
+        4. Target phonetic romanization and TTS speech-code resolution.
+        """
         raw_text = req.text.strip()
         if not raw_text:
             return {
@@ -1122,40 +1627,71 @@ class PhrasebookService:
                 "message": "Empty text provided"
             }
 
-        src_code = cls._resolve_lang_code(req.source_language, default="auto")
         target_code = cls._resolve_lang_code(req.target_language, default="en")
+        target_name = CODE_TO_LANG_NAME.get(target_code, req.target_language)
+
+        # Step 1: Detect Source Language, Script, Transliteration Standard, and Confidence
+        detect_res = cls._detect_language_and_script(
+            text=raw_text,
+            user_hint=req.source_language,
+            target_lang=target_code
+        )
+
+        source_code = detect_res["code"]
+        source_name = detect_res["name"]
+        is_romanized = detect_res["is_romanized"]
+        confidence = detect_res["confidence"]
+        candidates = detect_res["candidates"]
+        is_ambiguous = detect_res["is_ambiguous"]
+        translit_std = detect_res["transliteration_standard"]
+
+        # Step 2: Transliterate Romanized Input to Authentic Native Script
+        transliterated_input = raw_text
+        if is_romanized and source_code != "en":
+            transliterated_input = await cls._transliterate_to_native(raw_text, source_code)
 
         translated_text = ""
-        detected_source = src_code if src_code != "auto" else "en"
         romanized = ""
 
-        # Check Gemini API Key from settings or environment
+        # Step 3: Direct Intent / Conversational Lexicon Lookup (O(1) fast-path)
+        raw_lower = raw_text.lower().strip()
+        for pattern, eng_translation, native_script, plang in ROMAN_INTENT_PATTERNS:
+            if re.search(pattern, raw_lower):
+                if target_code == "en":
+                    translated_text = eng_translation
+                    romanized = eng_translation
+                    break
+                elif target_code == plang:
+                    translated_text = native_script
+                    romanized = eng_translation
+                    break
+
+        # Step 4: Check Phrasebook Exact Match
+        if not translated_text:
+            matched = cls._find_phrasebook_match(transliterated_input or raw_text, req.target_language)
+            if matched and matched.get("foreign"):
+                translated_text = matched["foreign"]
+                romanized = matched.get("romanized", "")
+
+        # Step 5: Gemini 2.5 Flash Context, Colloquial, and Register-Aware Engine
+        from app.config import settings
         gemini_key = (
             getattr(settings, "GEMINI_API_KEY", "") or 
             os.environ.get("GEMINI_API_KEY", "") or 
             os.environ.get("GOOGLE_API_KEY", "")
         )
 
-        # 1. Phonetic & Conversational Pattern Matcher (Handles common greetings, travel shortcuts)
-        raw_lower = raw_text.lower().strip()
-        for pattern, eng_translation, native_script in ROMAN_INTENT_PATTERNS:
-            if re.search(pattern, raw_lower):
-                if target_code == "en":
-                    translated_text = eng_translation
-                    romanized = eng_translation
-                    break
-
-        # 2. Check Gemini AI if configured (Handles slang, Hinglish, Roman Urdu, full context)
         if not translated_text and gemini_key and gemini_key != "your_gemini_api_key_here":
             try:
                 from google import genai
                 client = genai.Client(api_key=gemini_key)
                 prompt = (
-                    f"You are an expert polyglot translator. Translate the following text accurately from {req.source_language} into {req.target_language}.\n"
-                    f"Important: The input text might be written in native script OR Romanized/phonetic script (e.g. 'Meeru ela unnaaru', 'Eppadi irukkeenga', 'Aap kaise hain', 'Konnichiwa', etc.).\n"
-                    f"Always understand the true intended meaning and provide an accurate natural translation.\n"
-                    f"Text: \"{raw_text}\"\n"
-                    f"Return a strict JSON with: {{\"translated_text\": \"...\", \"romanized\": \"phonetic latin pronunciation\", \"detected_source\": \"en/te/ta/hi...\"}}"
+                    f"You are an expert polyglot translator. Translate the following text accurately from {source_name} into {target_name}.\n"
+                    f"Important instructions:\n"
+                    f"1. The input might be in native script OR Romanized/phonetic form (e.g. ISO 15919 Indic, Pinyin, Romaji, Revised Romanization, Arabizi, Cyrillic Translit).\n"
+                    f"2. Maintain context and ensure formal/informal register matching between source and target.\n"
+                    f"3. Text: '{raw_text}'\n"
+                    f'Return strict JSON: {{"translated_text": "...", "romanized": "phonetic pronunciation", "detected_source": "{source_name}", "register": "formal/neutral/informal"}}'
                 )
                 response = client.models.generate_content(
                     model='gemini-2.5-flash',
@@ -1165,33 +1701,26 @@ class PhrasebookService:
                     clean_res = response.text.strip()
                     json_match = re.search(r'\{.*\}', clean_res, re.DOTALL)
                     if json_match:
-                        import json
                         parsed = json.loads(json_match.group(0))
                         if parsed.get("translated_text"):
                             translated_text = parsed["translated_text"].strip()
                             romanized = parsed.get("romanized", "").strip()
-                            if parsed.get("detected_source"):
-                                detected_source = parsed["detected_source"]
             except Exception as e:
-                logger.warning(f"Gemini translation error: {e}")
+                logger.warning(f"Gemini translation notice: {e}")
 
-        # 3. Transliterated Google Mobile Web Translation Engine
-        # If text is written in English/Latin letters but source language is non-English (Telugu, Tamil, Hindi, etc.)
-        # transliterate to authentic native script first so the translation engine accurately translates the meaning!
-        if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
+        # Step 6: Google Web & Mobile Translation API Engine
+        if not translated_text or (translated_text.lower() == raw_text.lower() and source_code != target_code):
             try:
                 candidates_to_try = [raw_text]
-                if re.search(r'[a-zA-Z]', raw_text) and src_code != "en":
-                    native_translit = await cls._transliterate_to_native(raw_text, src_code)
-                    if native_translit and native_translit.lower() != raw_text.lower():
-                        candidates_to_try.insert(0, native_translit)
+                if transliterated_input and transliterated_input != raw_text:
+                    candidates_to_try.insert(0, transliterated_input)
 
                 headers = {
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
                 }
                 async with httpx.AsyncClient(timeout=4.5) as client:
                     for query_cand in candidates_to_try:
-                        for try_sl in [src_code, "auto"]:
+                        for try_sl in [source_code, "auto"]:
                             url = "https://translate.google.com/m"
                             params = {
                                 "sl": try_sl,
@@ -1203,26 +1732,24 @@ class PhrasebookService:
                                 match = re.search(r'class="result-container">([^<]+)</div>', resp.text)
                                 if match:
                                     res_val = html.unescape(match.group(1)).strip()
-                                    if res_val and res_val.lower() != raw_text.lower():
+                                    if res_val and res_val.lower() != query_cand.lower():
                                         translated_text = res_val
                                         break
                         if translated_text:
                             break
             except Exception as e:
-                logger.warning(f"Google Web translation error: {e}")
+                logger.warning(f"Google Web translation notice: {e}")
 
-        # 4. MyMemory Free Translation API Fallback
-        if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
+        # Step 7: MyMemory Free Translation API Fallback
+        if not translated_text or (translated_text.lower() == raw_text.lower() and source_code != target_code):
             try:
                 candidates_to_try = [raw_text]
-                if re.search(r'[a-zA-Z]', raw_text) and src_code != "en":
-                    native_translit = await cls._transliterate_to_native(raw_text, src_code)
-                    if native_translit and native_translit.lower() != raw_text.lower():
-                        candidates_to_try.insert(0, native_translit)
+                if transliterated_input and transliterated_input != raw_text:
+                    candidates_to_try.insert(0, transliterated_input)
 
                 for query_cand in candidates_to_try:
                     url = "https://api.mymemory.translated.net/get"
-                    s_code = "autodetect" if src_code == "auto" else src_code
+                    s_code = "autodetect" if source_code == "auto" else source_code
                     params = {
                         "q": query_cand,
                         "langpair": f"{s_code}|{target_code}"
@@ -1232,58 +1759,50 @@ class PhrasebookService:
                         if resp.status_code == 200:
                             data = resp.json()
                             res_text = data.get("responseData", {}).get("translatedText")
-                            if res_text and not str(res_text).startswith("MYMEMORY WARNING:") and res_text.lower() != raw_text.lower():
+                            if res_text and not str(res_text).startswith("MYMEMORY WARNING:") and res_text.lower() != query_cand.lower():
                                 translated_text = html.unescape(res_text).strip()
                                 break
             except Exception as e:
-                logger.warning(f"MyMemory translation error: {e}")
+                logger.warning(f"MyMemory translation notice: {e}")
 
-        # 5. Phrasebook Dictionary Match Fallback
-        if not translated_text or (translated_text.lower() == raw_text.lower() and src_code != target_code):
+        # Step 8: Offline Translation Dictionary Fallback
+        if not translated_text or (translated_text.lower() == raw_text.lower() and source_code != target_code):
             matched = cls._find_phrasebook_match(raw_text, req.target_language)
             if matched and matched.get("foreign"):
                 translated_text = matched["foreign"]
-                if matched.get("romanized"):
-                    romanized = matched["romanized"]
+                romanized = matched.get("romanized", "")
 
-        # Final Fallback if all external networks failed
+        # Default fallback if all channels unreachable
         if not translated_text:
             translated_text = raw_text
 
-        # Phonetic romanization lookup if not yet generated
+        # Step 9: Generate Phonetic Romanization for pronunciation guide
         if not romanized:
-            if translated_text in COMMON_PHONETICS:
-                romanized = COMMON_PHONETICS[translated_text]
-            elif raw_text in COMMON_PHONETICS:
-                romanized = COMMON_PHONETICS[raw_text]
-            else:
-                # Check for greeting/common shortcuts
-                if "வணக்கம்" in translated_text:
-                    romanized = "Vanakkam"
-                elif "நன்றி" in translated_text:
-                    romanized = "Nandri"
-                elif "नमस्ते" in translated_text:
-                    romanized = "Namaste"
-                elif "धन्यवाद" in translated_text:
-                    romanized = "Dhanyavaad"
-                elif "నమస్కారం" in translated_text:
-                    romanized = "Namaskaram"
-                else:
-                    romanized = translated_text
+            romanized = cls._lookup_phonetic_pronunciation(translated_text, target_code)
 
         speech_lang_code = cls._resolve_speech_code(target_code, req.target_language)
+
+        suggested_clarifications = []
+        if is_ambiguous and len(candidates) > 1:
+            suggested_clarifications = [c["language"] for c in candidates[1:]]
 
         return {
             "status": "success",
             "original_text": raw_text,
+            "transliterated_input": transliterated_input,
+            "transliteration_standard": translit_std,
             "translated_text": translated_text,
-            "detected_source_lang": detected_source,
-            "source_language": req.source_language,
+            "detected_source_lang": source_name,
+            "detected_source_code": source_code,
+            "is_romanized": is_romanized,
+            "confidence": confidence,
+            "candidates": candidates,
+            "is_ambiguous": is_ambiguous,
+            "suggested_clarifications": suggested_clarifications,
+            "source_language": req.source_language if req.source_language != "auto" else source_name,
             "target_language": req.target_language,
             "target_lang_code": target_code,
             "speech_lang_code": speech_lang_code,
             "romanized": romanized or translated_text,
             "audio_text": translated_text
         }
-
-

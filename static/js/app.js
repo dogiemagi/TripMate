@@ -1799,24 +1799,54 @@ function initTranslationStudio() {
       const encRomanized = encodeURIComponent(data.romanized || '');
       const langCode = data.speech_lang_code || 'en-US';
 
+      const confPercent = Math.round((data.confidence || 0.95) * 100);
+      const isTranslit = Boolean(data.transliteration_standard && data.transliteration_standard !== 'None');
+      const hasClarifications = Boolean(data.is_ambiguous && data.suggested_clarifications && data.suggested_clarifications.length > 0);
+
       resultBox.innerHTML = `
         <div class="translation-result-card">
           <div style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-              <span class="activity-badge" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan); border-color:rgba(6,182,212,0.3);">
-                ${data.source_language} → ${data.target_language}
-              </span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.4rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+                <span class="activity-badge" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan); border-color:rgba(6,182,212,0.3);">
+                  ${data.detected_source_lang || data.source_language} → ${data.target_language}
+                </span>
+                <span class="activity-badge" style="background:rgba(16,185,129,0.12); color:#34d399; border-color:rgba(16,185,129,0.25); font-size:0.72rem;">
+                  <i data-lucide="shield-check" style="width:11px; height:11px;"></i> ${confPercent}% Confidence
+                </span>
+                ${isTranslit ? `
+                  <span class="activity-badge" style="background:rgba(168,85,247,0.15); color:#c084fc; border-color:rgba(168,85,247,0.3); font-size:0.72rem;">
+                    <i data-lucide="languages" style="width:11px; height:11px;"></i> ${data.transliteration_standard}
+                  </span>
+                ` : ''}
+              </div>
               <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.2rem 0.6rem;" onclick="copyTranslationText('${encNative}')">
                 <i data-lucide="copy" style="width:12px; height:12px;"></i> Copy
               </button>
             </div>
 
-            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">Original: "${sanitizeAndConvertEmojis(data.original_text)}"</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+              Original Input: "<span style="color:#e2e8f0;">${sanitizeAndConvertEmojis(data.original_text)}</span>"
+              ${data.transliterated_input && data.transliterated_input !== data.original_text ? `
+                <span style="color:var(--accent-cyan); margin-left:0.35rem;">→ Native Transliteration: <b>"${data.transliterated_input}"</b></span>
+              ` : ''}
+            </div>
+
             <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff; line-height: 1.3; margin: 0.35rem 0;">${data.translated_text}</h3>
             
             ${data.romanized && data.romanized !== data.translated_text ? `
               <div style="font-size: 0.95rem; color: var(--accent-cyan); display:flex; align-items:center; gap:0.35rem; margin-top: 0.35rem;">
-                <i data-lucide="mic" style="width:14px; height:14px;"></i> Pronunciation: <i>${data.romanized}</i>
+                <i data-lucide="mic" style="width:14px; height:14px;"></i> Pronunciation Guide: <i>${data.romanized}</i>
+              </div>
+            ` : ''}
+
+            ${hasClarifications ? `
+              <div style="margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); font-size: 0.8rem; color: #fbbf24; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <i data-lucide="help-circle" style="width:14px; height:14px;"></i>
+                <span>Ambiguity Detected. Did you mean:</span>
+                ${data.suggested_clarifications.map(c => `
+                  <button type="button" class="btn btn-secondary" style="font-size:0.72rem; padding:0.1rem 0.5rem; border-color:rgba(245, 158, 11, 0.4);" onclick="setTranslationSourceAndRetranslate('${c}')">${c}</button>
+                `).join('')}
               </div>
             ` : ''}
           </div>
@@ -1847,6 +1877,18 @@ function copyTranslationText(encText) {
     navigator.clipboard.writeText(text).then(() => {
       showNotificationToast('Translated text copied to clipboard!', 'success');
     });
+  }
+}
+
+function setTranslationSourceAndRetranslate(langName) {
+  const srcSelect = document.getElementById('translator-source-lang');
+  const translateBtn = document.getElementById('translate-action-btn');
+  if (srcSelect) {
+    srcSelect.value = langName;
+  }
+  showNotificationToast(`Source language switched to ${langName}. Retranslating...`, 'info');
+  if (translateBtn) {
+    translateBtn.click();
   }
 }
 
