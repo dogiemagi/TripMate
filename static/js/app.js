@@ -263,8 +263,16 @@ function formatCostFromINR(inrAmount) {
 
 
 // ---------------------------------------------------------
-// Navigation Tabs Controller
+// Navigation Tabs Controller & Scroller
 // ---------------------------------------------------------
+function scrollStudioTabs(delta) {
+  const container = document.getElementById('studio-tabs-scroller');
+  if (container) {
+    container.scrollBy({ left: delta, behavior: 'smooth' });
+  }
+}
+window.scrollStudioTabs = scrollStudioTabs;
+
 function initNavigationTabs() {
   const tabButtons = document.querySelectorAll('.tab-btn');
   const tabPanes = document.querySelectorAll('.tab-pane');
@@ -280,6 +288,9 @@ function initNavigationTabs() {
       if (activePane) {
         activePane.classList.add('active');
       }
+
+      // Smoothly bring the clicked tab into view within the horizontal scroller
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
 
       if (targetTab === 'tab-itinerary') {
         setTimeout(() => {
@@ -315,7 +326,7 @@ function initLeafletMap() {
       attributionControl: true
     }).setView([28.6139, 77.2090], 12);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors & CARTO',
       maxZoom: 19
     }).addTo(mapInstance);
@@ -417,10 +428,10 @@ function initMultimodalVision() {
       <div class="glass-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
           <div>
-            <h2 style="font-size: 1.35rem; font-weight: 700; color: #fff;">${data.title || 'Visual Recognition'}</h2>
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--ttw-ink);">${data.title || 'Visual Recognition'}</h2>
             <p style="color: var(--accent-cyan); font-size: 0.88rem;">${data.location || data.category || 'Multimodal Intelligence'}</p>
           </div>
-          <span class="brand-badge">${data.engine || 'Voyage AI'}</span>
+          <span class="brand-badge">${data.engine || 'TripMate AI'}</span>
         </div>
         <div class="vision-results-content">
           ${formattedHtml}
@@ -696,10 +707,10 @@ async function loadWeatherData(city, startDate = null, endDate = null) {
     (data.forecast || []).forEach(f => {
       forecastHtml += `
         <div class="forecast-card">
-          <div style="font-weight: 600; font-size: 0.9rem; color: #fff;">${f.day_name}</div>
+          <div style="font-weight: 600; font-size: 0.9rem; color: var(--ttw-ink);">${f.day_name}</div>
           <div style="font-size: 0.75rem; color: var(--text-muted);">${f.date}</div>
           <div class="forecast-icon"><i data-lucide="${f.icon || 'sun'}"></i></div>
-          <div style="font-weight: 700; font-size: 1.1rem; color: #fff;">${f.temp_max_c}°C</div>
+          <div style="font-weight: 700; font-size: 1.1rem; color: var(--ttw-ink);">${f.temp_max_c}°C</div>
           <div style="font-size: 0.8rem; color: var(--text-muted);">${f.temp_min_c}°C</div>
           <div style="font-size: 0.72rem; color: var(--accent-cyan); margin-top: 0.5rem; display:flex; align-items:center; justify-content:center; gap:0.25rem;">
             <i data-lucide="droplets" style="width:12px; height:12px;"></i> ${f.precipitation_chance_pct}% rain
@@ -715,7 +726,7 @@ async function loadWeatherData(city, startDate = null, endDate = null) {
       <div class="weather-hero">
         <div>
           <span class="brand-badge">${data.country || 'Global'}</span>
-          <h2 style="font-size: 2.2rem; font-weight: 800; margin-top: 0.35rem;">${cityLabel}</h2>
+          <h2 style="font-size: 2.2rem; font-weight: 800; margin-top: 0.35rem; color: var(--ttw-ink);">${cityLabel}</h2>
           <p style="color: var(--text-secondary); font-size: 1rem; margin-bottom: 1rem;">${curr.condition} | <strong>${dateRangeLabel}</strong></p>
           <div>
             <span class="weather-metric-badge"><i data-lucide="wind"></i> ${curr.windspeed_kmh} km/h Wind</span>
@@ -729,7 +740,7 @@ async function loadWeatherData(city, startDate = null, endDate = null) {
       </div>
 
       <div class="glass-card" style="margin-bottom: 1.5rem;">
-        <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display:flex; align-items:center; gap: 0.5rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 0.5rem; display:flex; align-items:center; gap: 0.5rem;">
           <i data-lucide="compass" style="color: var(--accent-cyan);"></i> AI Travel Climate Advisory
         </h3>
         <p style="color: var(--text-secondary); font-size: 0.95rem;">${curr.advice}</p>
@@ -738,7 +749,7 @@ async function loadWeatherData(city, startDate = null, endDate = null) {
         </p>
       </div>
 
-      <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem;">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem;">
         <i data-lucide="calendar-check"></i> Forecast Timeline (${dateRangeLabel})
       </h3>
       <div class="grid-4" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));">
@@ -783,7 +794,7 @@ function initItineraryPlanner() {
         (day.activities || []).forEach(act => { act.visited = true; });
       });
       renderItinerary(currentItineraryData);
-      showNotificationToast('All visiting spots marked as visited! 🎉', 'success');
+      showNotificationToast('All visiting spots marked as visited!', 'success');
     });
   }
 
@@ -962,7 +973,7 @@ function updateVisitedProgress() {
       statusBadge.textContent = `In Progress (${pct}%)`;
       statusBadge.style.color = 'var(--accent-amber)';
     } else {
-      statusBadge.textContent = 'Trip Completed! 🎉';
+      statusBadge.textContent = 'Trip Completed!';
       statusBadge.style.color = 'var(--accent-emerald)';
     }
   }
@@ -1066,7 +1077,7 @@ function renderItinerary(data) {
         mapCoords.push([act.lat, act.lon]);
 
         const pinClass = isVisited ? 'custom-map-pin visited-pin' : 'custom-map-pin';
-        const pinContent = isVisited ? `✓` : `${pointNum}`;
+        const pinContent = isVisited ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polyline points="20 6 9 17 4 12"></polyline></svg>` : `${pointNum}`;
 
         const customPinIcon = L.divIcon({
           className: 'custom-map-pin-container',
@@ -1083,7 +1094,7 @@ function renderItinerary(data) {
               <strong style="color:#0284c7; font-size:0.95rem;">#${pointNum} Day ${day.day}: ${sanitizeAndConvertEmojis(act.title)}</strong><br/>
               <span style="color:#64748b; font-size:0.82rem;">Time: ${act.time} | Cost: ${formattedActCost}</span><br/>
               <span style="display:inline-block; margin-top:2px; font-size:0.75rem; color:${isVisited ? '#10b981' : '#f59e0b'}; font-weight:700;">
-                ${isVisited ? '✓ Completed / Visited' : '⏳ Scheduled to Visit'}
+                ${isVisited ? 'Completed / Visited' : 'Scheduled to Visit'}
               </span>
               <p style="font-size:0.8rem; margin-top:4px; color:#334155;">${sanitizeAndConvertEmojis(act.desc)}</p>
             </div>
@@ -1108,7 +1119,7 @@ function renderItinerary(data) {
                 <span class="activity-badge"><i data-lucide="map-pin" style="width:11px; height:11px; margin-right:3px;"></i> Spot #${pointNum} | ${act.category}</span>
               </div>
             </div>
-            <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.35rem;">${sanitizeAndConvertEmojis(act.title)}</h4>
+            <h4 style="font-size: 1.05rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 0.35rem;">${sanitizeAndConvertEmojis(act.title)}</h4>
             <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 0.5rem;">${sanitizeAndConvertEmojis(act.desc)}</p>
             <div style="display: flex; gap: 1.25rem; font-size: 0.78rem; color: var(--text-muted); align-items:center; flex-wrap:wrap;">
               <span style="display:flex; align-items:center; gap:0.25rem;"><i data-lucide="hourglass" style="width:12px; height:12px;"></i> ${act.duration}</span>
@@ -1131,7 +1142,7 @@ function renderItinerary(data) {
       <div class="glass-card" style="margin-bottom: 1.5rem;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
           <div>
-            <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff;">${sanitizeAndConvertEmojis(day.theme)}</h3>
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--ttw-ink);">${sanitizeAndConvertEmojis(day.theme)}</h3>
             <p style="color: var(--accent-cyan); font-size: 0.85rem; display:flex; align-items:center; gap:0.35rem;">
               <i data-lucide="sparkles" style="width:14px; height:14px;"></i> Highlights: ${sanitizeAndConvertEmojis(day.highlight)}
             </p>
@@ -1150,22 +1161,22 @@ function renderItinerary(data) {
   const formattedRouteDist = `${Math.round(totalDistanceKm * 10) / 10} km`;
 
   container.innerHTML = `
-    <div class="glass-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));">
+    <div class="glass-card" style="margin-bottom: 1.5rem; background: #ffffff; border: 1px solid var(--ttw-line);">
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
-          <h2 style="font-size: 1.5rem; font-weight: 800;">${data.destination} - ${data.total_days} Day Masterplan</h2>
+          <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--ttw-ink);">${data.destination} - ${data.total_days} Day Masterplan</h2>
           <p style="color: var(--text-secondary); font-size: 0.9rem;">
             Style: ${data.travel_style} | Pace: ${data.pace} | Est. Total: <strong style="color:var(--accent-emerald); font-size:1.05rem;">${formattedTotalTrip}</strong> (${formattedDailyRate}/day)
           </p>
         </div>
         <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-          <span class="brand-badge" style="background:rgba(16,185,129,0.15); color:var(--accent-emerald); border-color:rgba(16,185,129,0.3);">
+          <span class="brand-badge" style="background:rgba(16,185,129,0.1); color:var(--accent-emerald); border-color:rgba(16,185,129,0.25);">
             <i data-lucide="route" style="width:12px; height:12px; margin-right:4px;"></i> TSP Route: ${formattedRouteDist}
           </span>
-          <span class="brand-badge"><i data-lucide="train" style="width:12px; height:12px; margin-right:4px;"></i> ${data.summary.recommended_transit_pass}</span>
+          <span class="brand-badge"><i data-lucide="train" style="width:12px; height:12px; margin-right:4px;"></i> ${(data.summary.recommended_transit_pass || 'Public Transit').replace(/_/g, ' ')}</span>
         </div>
       </div>
-      <p style="color: #94a3b8; font-size: 0.88rem; margin-top: 0.75rem; display:flex; align-items:center; gap:0.4rem;">
+      <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 0.75rem; display:flex; align-items:center; gap:0.4rem;">
         <i data-lucide="lightbulb" style="color:var(--accent-amber); width:16px; height:16px;"></i> ${sanitizeAndConvertEmojis(data.summary.smart_tip)}
       </p>
     </div>
@@ -1175,12 +1186,25 @@ function renderItinerary(data) {
   // Draw Leaflet map route polyline & dynamically center on queried destination
   if (mapInstance) {
     if (mapCoords.length > 0) {
-      mapPolyline = L.polyline(mapCoords, {
-        color: '#06b6d4',
-        weight: 3.5,
+      // Dual-layer route: high-contrast halo underlay + vibrant luxury travel coral track
+      const routeGlow = L.polyline(mapCoords, {
+        color: '#ffffff',
+        weight: 7,
         opacity: 0.9,
-        dashArray: '6, 8'
-      }).addTo(mapInstance);
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+
+      const routeTrack = L.polyline(mapCoords, {
+        color: '#ff385c', // Luxury travel coral-rose (high contrast on map)
+        weight: 4,
+        opacity: 0.95,
+        dashArray: '8, 8',
+        lineCap: 'round',
+        lineJoin: 'round'
+      });
+
+      mapPolyline = L.layerGroup([routeGlow, routeTrack]).addTo(mapInstance);
 
       const bounds = L.latLngBounds(mapCoords);
       mapInstance.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
@@ -1245,7 +1269,7 @@ async function loadFoodData(city) {
         <div class="dish-card">
           <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-              <h4 style="font-size: 1.15rem; font-weight: 700; color: #fff;">${d.name}</h4>
+              <h4 style="font-size: 1.15rem; font-weight: 700; color: var(--ttw-ink);">${d.name}</h4>
               <span style="font-weight: 700; color: var(--accent-amber); font-size: 0.9rem;">${priceDisplay}</span>
             </div>
             <div style="font-size: 0.78rem; color: var(--accent-cyan); margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.35rem;">
@@ -1255,7 +1279,7 @@ async function loadFoodData(city) {
           </div>
           <div>
             <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;">${pills}</div>
-            <div style="font-size: 0.8rem; color: #93c5fd; display:flex; align-items:center; gap:0.35rem;">
+            <div style="font-size: 0.8rem; color: #0284c7; display:flex; align-items:center; gap:0.35rem;">
               <i data-lucide="map-pin" style="width:14px; height:14px; color:var(--accent-rose);"></i> <strong>Top Spot:</strong> ${d.must_try_spot}
             </div>
           </div>
@@ -1270,7 +1294,7 @@ async function loadFoodData(city) {
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
             <span class="brand-badge">Foodie Score: ${data.foodie_rating}/10</span>
-            <h2 style="font-size: 1.6rem; font-weight: 800; margin-top: 0.35rem;">${data.city} Gastronomy Guide</h2>
+            <h2 style="font-size: 1.6rem; font-weight: 800; margin-top: 0.35rem; color: var(--ttw-ink);">${data.city} Gastronomy Guide</h2>
             <p style="color: var(--text-secondary); font-size: 0.95rem;">${data.culinary_tradition}</p>
           </div>
         </div>
@@ -1281,7 +1305,7 @@ async function loadFoodData(city) {
       </div>
 
       <div class="glass-card">
-        <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem; display:flex; align-items:center; gap: 0.5rem;">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 0.75rem; display:flex; align-items:center; gap: 0.5rem;">
           <i data-lucide="utensils" style="color: var(--accent-amber);"></i> Street Food & Dining Etiquette
         </h3>
         <ul style="padding-left: 1.25rem; color: var(--text-secondary); line-height: 1.7;">
@@ -1313,8 +1337,8 @@ function initCurrencyBudget() {
       const sym = CURRENCY_SYMBOLS[data.to_currency] || '';
       resultBox.innerHTML = `
         <div style="font-size: 0.88rem; color: var(--text-muted);">${data.amount.toLocaleString()} ${data.from_currency} =</div>
-        <div style="font-size: 2.2rem; font-weight: 800; color: var(--accent-cyan); line-height: 1.1; margin: 0.35rem 0;">
-          ${sym}${data.converted_amount.toLocaleString()} <span style="font-size: 1rem; color: #fff;">${data.to_currency}</span>
+        <div style="font-size: 2.2rem; font-weight: 800; color: #0284c7; line-height: 1.1; margin: 0.35rem 0;">
+          ${sym}${data.converted_amount.toLocaleString()} <span style="font-size: 1rem; color: var(--ttw-ink);">${data.to_currency}</span>
         </div>
         <div style="font-size: 0.78rem; color: var(--text-secondary);">1 ${data.from_currency} = ${data.exchange_rate} ${data.to_currency}</div>
       `;
@@ -1339,24 +1363,27 @@ function initCurrencyBudget() {
 
       let itemsHtml = '';
       for (const [key, val] of Object.entries(data.cost_breakdown || {})) {
+        const cleanKey = String(key).replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         itemsHtml += `
-          <div style="display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--glass-border);">
-            <span style="color: var(--text-secondary); font-size: 0.9rem;">${key}</span>
-            <span style="font-weight: 700; color: #fff;">${sym}${val.toLocaleString()}</span>
+          <div style="display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--ttw-line);">
+            <span style="color: var(--text-secondary); font-size: 0.9rem;">${cleanKey}</span>
+            <span style="font-weight: 700; color: var(--ttw-ink);">${sym}${val.toLocaleString()}</span>
           </div>
         `;
       }
 
+      const formattedTier = String(data.budget_tier || '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
       breakdownBox.innerHTML = `
         <div style="margin-bottom: 1rem;">
           <div style="font-size: 0.85rem; color: var(--text-muted);">Est. Total (${days} Days in ${city}):</div>
-          <div style="font-size: 2rem; font-weight: 800; color: var(--accent-emerald);">${sym}${data.total_budget.toLocaleString()} ${activeCurrency}</div>
-          <div style="font-size: 0.85rem; color: var(--accent-cyan);">${sym}${data.daily_budget.toLocaleString()} / day (${data.budget_tier} Tier)</div>
+          <div style="font-size: 2rem; font-weight: 800; color: #059669;">${sym}${data.total_budget.toLocaleString()} ${activeCurrency}</div>
+          <div style="font-size: 0.85rem; color: #0284c7;">${sym}${data.daily_budget.toLocaleString()} / day (${formattedTier} Tier)</div>
         </div>
         <div style="margin-bottom: 1.25rem;">${itemsHtml}</div>
         <div>
-          <h4 style="font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.4rem;">
-            <i data-lucide="sparkles" style="color:var(--accent-cyan);"></i> Smart Savings Tips:
+          <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.4rem;">
+            <i data-lucide="sparkles" style="color:#0284c7;"></i> Smart Savings Tips:
           </h4>
           <ul style="padding-left: 1.2rem; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6;">
             ${(data.money_saving_hacks || []).map(h => `<li>${h}</li>`).join('')}
@@ -1492,7 +1519,7 @@ function renderPackingChecklist(destination = 'Trip', season = 'Summer', days = 
       <div class="checklist-item ${isChecked ? 'checked' : ''}" onclick="toggleCheckItem(${idx}, this, event)">
         <input type="checkbox" class="checklist-checkbox" id="chk-${idx}" ${isChecked ? 'checked' : ''} onchange="toggleCheckItem(${idx}, this.closest('.checklist-item'), event)" />
         <div style="flex: 1;">
-          <span class="item-title" style="font-size: 0.92rem; color: #fff;">${sanitizeAndConvertEmojis(item.item)}</span>
+          <span class="item-title" style="font-size: 0.92rem; color: var(--ttw-ink);">${sanitizeAndConvertEmojis(item.item)}</span>
           <span style="font-size: 0.72rem; color: var(--accent-cyan); margin-left: 0.5rem; text-transform: uppercase;">[${item.category}]</span>
           ${isCustom ? '<span style="font-size: 0.68rem; color: var(--accent-amber); margin-left: 0.35rem;">(Custom)</span>' : ''}
         </div>
@@ -1506,7 +1533,7 @@ function renderPackingChecklist(destination = 'Trip', season = 'Summer', days = 
     <div class="checklist-progress-card">
       <div class="checklist-progress-header">
         <div>
-          <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">${destination} (${season}) - ${days} Days</h3>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ttw-ink);">${destination} (${season}) - ${days} Days</h3>
           <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.2rem; display:flex; align-items:center; gap:0.4rem;">
             <i data-lucide="briefcase"></i> ${luggageAdvice || 'Luggage & Outfit Index'}
           </p>
@@ -1629,7 +1656,16 @@ const SPEECH_RECOGNITION_LANG_MAP = {
   Urdu: 'ur-IN',
   Bengali: 'bn-IN',
   Marathi: 'mr-IN',
-  auto: 'en-US'
+  Kannada: 'kn-IN',
+  Malayalam: 'ml-IN',
+  Gujarati: 'gu-IN',
+  Punjabi: 'pa-IN',
+  Italian: 'it-IT',
+  Portuguese: 'pt-BR',
+  Russian: 'ru-RU',
+  Arabic: 'ar-SA',
+  Mandarin: 'zh-CN',
+  Korean: 'ko-KR'
 };
 
 function initPhrasebook() {
@@ -1657,6 +1693,9 @@ function initTranslationStudio() {
   const inputTxt = document.getElementById('translator-input-text');
   const resultBox = document.getElementById('translation-result-container');
   const voiceMicBtn = document.getElementById('translator-mic-btn');
+  const recordingBar = document.getElementById('translator-recording-bar');
+  const recordingText = document.getElementById('recording-status-text');
+  const stopRecBtn = document.getElementById('translator-stop-rec-btn');
   const studioCard = document.getElementById('live-voice-translation-studio');
   const toggleStudioBtn = document.getElementById('btn-toggle-translation-studio');
   const closeStudioBtn = document.getElementById('btn-close-translation-studio');
@@ -1695,8 +1734,12 @@ function initTranslationStudio() {
   // Language Swap
   if (swapBtn) {
     swapBtn.addEventListener('click', () => {
-      const srcVal = srcSelect.value === 'auto' ? 'English' : srcSelect.value;
+      const srcVal = srcSelect.value;
       const tgtVal = tgtSelect.value;
+      if (srcVal === 'auto') {
+        showNotificationToast('Cannot swap while Auto-Detect is selected.', 'info');
+        return;
+      }
       srcSelect.value = tgtVal;
       tgtSelect.value = srcVal;
 
@@ -1723,68 +1766,247 @@ function initTranslationStudio() {
     });
   });
 
-  // Voice speech recognition for translation
+  // Dual-Engine Speech & 16-bit PCM WAV Recording
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (voiceMicBtn && SpeechRecognition) {
-    let recognition = null;
-    let isListening = false;
+  let activeRecognition = null;
+  let audioCtx = null;
+  let scriptNode = null;
+  let micSource = null;
+  let audioStream = null;
+  let pcmChunks = [];
+  let isRecording = false;
+  let recordTimer = null;
+  let recordSeconds = 0;
+  let liveTranscriptCaptured = false;
 
-    voiceMicBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (isListening && recognition) {
-        recognition.stop();
+  function encodePcmWav(samples, sampleRate) {
+    let totalLen = 0;
+    for (let i = 0; i < samples.length; i++) totalLen += samples[i].length;
+    const merged = new Float32Array(totalLen);
+    let offset = 0;
+    for (let i = 0; i < samples.length; i++) {
+      merged.set(samples[i], offset);
+      offset += samples[i].length;
+    }
+
+    const buffer = new ArrayBuffer(44 + merged.length * 2);
+    const view = new DataView(buffer);
+
+    function writeStr(pos, str) {
+      for (let i = 0; i < str.length; i++) view.setUint8(pos + i, str.charCodeAt(i));
+    }
+
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + merged.length * 2, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeStr(36, 'data');
+    view.setUint32(40, merged.length * 2, true);
+
+    let dataOff = 44;
+    for (let i = 0; i < merged.length; i++, dataOff += 2) {
+      let s = Math.max(-1, Math.min(1, merged[i]));
+      view.setInt16(dataOff, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+    }
+    return new Blob([view], { type: 'audio/wav' });
+  }
+
+  async function startRecording() {
+    try {
+      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      pcmChunks = [];
+      liveTranscriptCaptured = false;
+
+      // Setup Web Audio PCM Recorder
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      micSource = audioCtx.createMediaStreamSource(audioStream);
+      scriptNode = audioCtx.createScriptProcessor(4096, 1, 1);
+
+      scriptNode.onaudioprocess = (e) => {
+        if (!isRecording) return;
+        const input = e.inputBuffer.getChannelData(0);
+        pcmChunks.push(new Float32Array(input));
+      };
+
+      micSource.connect(scriptNode);
+      scriptNode.connect(audioCtx.destination);
+
+      isRecording = true;
+      recordSeconds = 0;
+      if (recordingBar) recordingBar.style.display = 'flex';
+      if (voiceMicBtn) voiceMicBtn.classList.add('recording');
+
+      const srcName = srcSelect.value === 'auto' ? 'Auto-Detect' : srcSelect.value;
+      if (recordingText) {
+        recordingText.textContent = `Listening (${srcName})... Speak now, click Stop when finished.`;
+      }
+
+      recordTimer = setInterval(() => {
+        recordSeconds++;
+        if (recordingText) {
+          recordingText.textContent = `Listening (${srcName}, ${recordSeconds}s)... Click Stop when finished.`;
+        }
+      }, 1000);
+
+      // Concurrently run Web Speech Recognition for instant visual transcription
+      if (SpeechRecognition) {
+        try {
+          const recLangCode = SPEECH_RECOGNITION_LANG_MAP[srcSelect.value] || 'en-US';
+          activeRecognition = new SpeechRecognition();
+          activeRecognition.continuous = true;
+          activeRecognition.interimResults = true;
+          activeRecognition.lang = recLangCode;
+
+          activeRecognition.onresult = (ev) => {
+            let fullText = '';
+            for (let i = 0; i < ev.results.length; i++) {
+              fullText += ev.results[i][0].transcript + ' ';
+            }
+            if (fullText.trim()) {
+              inputTxt.value = fullText.trim();
+              liveTranscriptCaptured = true;
+            }
+          };
+
+          activeRecognition.onerror = (ev) => {
+            console.warn('Live speech recognition notice:', ev.error);
+          };
+
+          activeRecognition.start();
+        } catch (rErr) {
+          console.debug('Live speech start notice:', rErr);
+        }
+      }
+
+      showNotificationToast(`Recording started. Speak in ${srcName}...`, 'info');
+    } catch (err) {
+      console.warn('Microphone access notice:', err);
+      showNotificationToast('Microphone access denied or unavailable. Please check browser permissions.', 'error');
+    }
+  }
+
+  async function stopRecording() {
+    if (!isRecording) return;
+    isRecording = false;
+    clearInterval(recordTimer);
+
+    if (recordingBar) recordingBar.style.display = 'none';
+    if (voiceMicBtn) voiceMicBtn.classList.remove('recording');
+
+    if (activeRecognition) {
+      try { activeRecognition.stop(); } catch (e) {}
+      activeRecognition = null;
+    }
+
+    if (scriptNode) {
+      try { scriptNode.disconnect(); } catch (e) {}
+      scriptNode = null;
+    }
+    if (micSource) {
+      try { micSource.disconnect(); } catch (e) {}
+      micSource = null;
+    }
+    const sampleRate = audioCtx ? audioCtx.sampleRate : 44100;
+    if (audioCtx) {
+      try { audioCtx.close(); } catch (e) {}
+      audioCtx = null;
+    }
+    if (audioStream) {
+      audioStream.getTracks().forEach(t => t.stop());
+      audioStream = null;
+    }
+
+    // If live speech recognition already captured text into the input box:
+    if (liveTranscriptCaptured && inputTxt.value.trim()) {
+      showNotificationToast(`Captured: "${inputTxt.value.trim()}"`, 'success');
+      await executeTranslation();
+      return;
+    }
+
+    // Otherwise, encode genuine 16-bit PCM WAV and send to backend
+    if (pcmChunks.length > 0) {
+      const wavBlob = encodePcmWav(pcmChunks, sampleRate);
+      if (wavBlob.size > 1000) {
+        await executeVoiceTranslation(wavBlob);
         return;
       }
+    }
 
-      try {
-        const srcLang = srcSelect.value || 'English';
-        const recLangCode = SPEECH_RECOGNITION_LANG_MAP[srcLang] || 'en-US';
+    showNotificationToast('Audio recording was too short or silent. Please try speaking again.', 'warning');
+  }
 
-        recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = recLangCode;
-
-        recognition.onstart = () => {
-          isListening = true;
-          voiceMicBtn.classList.add('recording');
-          showNotificationToast(`Listening in ${srcLang} (${recLangCode}). Speak now...`, 'info');
-        };
-
-        recognition.onresult = (event) => {
-          if (event.results && event.results[0] && event.results[0][0]) {
-            const transcript = event.results[0][0].transcript;
-            if (transcript) {
-              inputTxt.value = transcript;
-              showNotificationToast(`Captured: "${transcript}"`, 'success');
-              executeTranslation();
-            }
-          }
-        };
-
-        recognition.onerror = (event) => {
-          console.warn('Voice translation speech recognition error:', event.error);
-          voiceMicBtn.classList.remove('recording');
-        };
-
-        recognition.onend = () => {
-          isListening = false;
-          voiceMicBtn.classList.remove('recording');
-        };
-
-        recognition.start();
-      } catch (err) {
-        console.error('Speech recognition error:', err);
-        voiceMicBtn.classList.remove('recording');
+  if (voiceMicBtn) {
+    voiceMicBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
       }
     });
+  }
+
+  if (stopRecBtn) {
+    stopRecBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      stopRecording();
+    });
+  }
+
+  async function executeVoiceTranslation(audioBlob) {
+    const src = srcSelect.value;
+    const tgt = tgtSelect.value;
+
+    translateBtn.disabled = true;
+    translateBtn.innerHTML = `<div class="spinner"></div> Transcribing...`;
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `
+      <div style="text-align:center; padding: 1.5rem;">
+        <div class="spinner"></div>
+        <p style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.85rem;">
+          Transcribing audio in <b>${src}</b> and translating to <b>${tgt}</b>...
+        </p>
+      </div>
+    `;
+
+    try {
+      const data = await API.translateVoice(audioBlob, src, tgt);
+      if (data.transcribed_text) {
+        inputTxt.value = data.transcribed_text;
+      }
+      renderTranslationResult(data);
+      showNotificationToast(`Transcribed: "${data.transcribed_text}"`, 'success');
+    } catch (err) {
+      resultBox.innerHTML = `
+        <div class="glass-card" style="color: var(--accent-rose); padding: 1.25rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
+            <i data-lucide="alert-circle" style="color:var(--accent-rose);"></i>
+            <strong>Voice Translation Failed</strong>
+          </div>
+          <p style="font-size:0.85rem; margin:0;">${err.message}</p>
+        </div>
+      `;
+      initLucideIcons();
+      showNotificationToast(err.message, 'error');
+    } finally {
+      translateBtn.disabled = false;
+      translateBtn.innerHTML = `<i data-lucide="sparkles"></i> Translate & Listen`;
+      initLucideIcons();
+    }
   }
 
   async function executeTranslation() {
     const text = inputTxt.value.trim();
     if (!text) {
       inputTxt.focus();
-      showNotificationToast('Please type or speak a phrase to translate.', 'info');
+      showNotificationToast('Please type or record a phrase to translate.', 'info');
       return;
     }
 
@@ -1794,83 +2016,101 @@ function initTranslationStudio() {
     translateBtn.disabled = true;
     translateBtn.innerHTML = `<div class="spinner"></div> Translating...`;
     resultBox.style.display = 'block';
-    resultBox.innerHTML = `<div style="text-align:center; padding: 1.5rem;"><div class="spinner"></div><p style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.85rem;">Translating to ${tgt} with speech synthesis...</p></div>`;
+    resultBox.innerHTML = `<div style="text-align:center; padding: 1.5rem;"><div class="spinner"></div><p style="margin-top:0.5rem; color:var(--text-secondary); font-size:0.85rem;">Translating from ${src} to ${tgt}...</p></div>`;
 
     try {
       const data = await API.translatePhrase(text, src, tgt);
-      resultBox.dataset.translatedText = data.translated_text;
-
-      const encNative = encodeURIComponent(data.translated_text);
-      const encRomanized = encodeURIComponent(data.romanized || '');
-      const langCode = data.speech_lang_code || 'en-US';
-
-      const confPercent = Math.round((data.confidence || 0.95) * 100);
-      const isTranslit = Boolean(data.transliteration_standard && data.transliteration_standard !== 'None');
-      const hasClarifications = Boolean(data.is_ambiguous && data.suggested_clarifications && data.suggested_clarifications.length > 0);
-
+      renderTranslationResult(data);
+      showNotificationToast('Translation ready! Click the speaker icon to listen.', 'success');
+    } catch (err) {
       resultBox.innerHTML = `
-        <div class="translation-result-card">
-          <div style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.4rem;">
-              <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-                <span class="activity-badge" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan); border-color:rgba(6,182,212,0.3);">
-                  ${data.detected_source_lang || data.source_language} → ${data.target_language}
-                </span>
-                <span class="activity-badge" style="background:rgba(16,185,129,0.12); color:#34d399; border-color:rgba(16,185,129,0.25); font-size:0.72rem;">
-                  <i data-lucide="shield-check" style="width:11px; height:11px;"></i> ${confPercent}% Confidence
-                </span>
-                ${isTranslit ? `
-                  <span class="activity-badge" style="background:rgba(168,85,247,0.15); color:#c084fc; border-color:rgba(168,85,247,0.3); font-size:0.72rem;">
-                    <i data-lucide="languages" style="width:11px; height:11px;"></i> ${data.transliteration_standard}
-                  </span>
-                ` : ''}
-              </div>
-              <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.2rem 0.6rem;" onclick="copyTranslationText('${encNative}')">
-                <i data-lucide="copy" style="width:12px; height:12px;"></i> Copy
-              </button>
-            </div>
-
-            <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">
-              Original Input: "<span style="color:#e2e8f0;">${sanitizeAndConvertEmojis(data.original_text)}</span>"
-              ${data.transliterated_input && data.transliterated_input !== data.original_text ? `
-                <span style="color:var(--accent-cyan); margin-left:0.35rem;">→ Native Transliteration: <b>"${data.transliterated_input}"</b></span>
-              ` : ''}
-            </div>
-
-            <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff; line-height: 1.3; margin: 0.35rem 0;">${data.translated_text}</h3>
-            
-            ${data.romanized && data.romanized !== data.translated_text ? `
-              <div style="font-size: 0.95rem; color: var(--accent-cyan); display:flex; align-items:center; gap:0.35rem; margin-top: 0.35rem;">
-                <i data-lucide="mic" style="width:14px; height:14px;"></i> Pronunciation Guide: <i>${data.romanized}</i>
-              </div>
-            ` : ''}
-
-            ${hasClarifications ? `
-              <div style="margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); font-size: 0.8rem; color: #fbbf24; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-                <i data-lucide="help-circle" style="width:14px; height:14px;"></i>
-                <span>Ambiguity Detected. Did you mean:</span>
-                ${data.suggested_clarifications.map(c => `
-                  <button type="button" class="btn btn-secondary" style="font-size:0.72rem; padding:0.1rem 0.5rem; border-color:rgba(245, 158, 11, 0.4);" onclick="setTranslationSourceAndRetranslate('${c}')">${c}</button>
-                `).join('')}
-              </div>
-            ` : ''}
+        <div class="glass-card" style="color: var(--accent-rose); padding: 1.25rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
+            <i data-lucide="alert-circle" style="color:var(--accent-rose);"></i>
+            <strong>Translation Failed</strong>
           </div>
-
-          <button type="button" class="audio-play-btn" onclick="playSpeech('${encNative}', '${encRomanized}', '${langCode}', this)" title="Listen to Native Pronunciation" style="margin-top:0.25rem;">
-            <i data-lucide="volume-2" style="width:20px; height:20px;"></i>
-          </button>
+          <p style="font-size:0.85rem; margin:0;">${err.message}</p>
         </div>
       `;
       initLucideIcons();
-      showNotificationToast('Translation ready! Click the speaker icon to listen.', 'success');
-    } catch (err) {
-      resultBox.innerHTML = `<div class="glass-card" style="color: var(--accent-rose);"><i data-lucide="alert-circle"></i> Translation failed. ${err.message}</div>`;
-      initLucideIcons();
+      showNotificationToast(err.message, 'error');
     } finally {
       translateBtn.disabled = false;
       translateBtn.innerHTML = `<i data-lucide="sparkles"></i> Translate & Listen`;
       initLucideIcons();
     }
+  }
+
+  function renderTranslationResult(data) {
+    resultBox.dataset.translatedText = data.translated_text;
+
+    const encNative = encodeURIComponent(data.translated_text);
+    const encRomanized = encodeURIComponent(data.romanized || '');
+    const langCode = data.speech_lang_code || 'en-US';
+
+    const confPercent = Math.round((data.confidence || 0.95) * 100);
+    const isTranslit = Boolean(data.transliteration_standard && data.transliteration_standard !== 'None');
+    const hasClarifications = Boolean(data.is_ambiguous && data.suggested_clarifications && data.suggested_clarifications.length > 0);
+
+    resultBox.innerHTML = `
+      <div class="translation-result-card">
+        <div style="flex: 1;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.4rem;">
+            <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+              <span class="activity-badge" style="background:rgba(6,182,212,0.15); color:var(--accent-cyan); border-color:rgba(6,182,212,0.3);">
+                ${data.detected_source_lang || data.source_language} → ${data.target_language}
+              </span>
+              <span class="activity-badge" style="background:rgba(16,185,129,0.12); color:#34d399; border-color:rgba(16,185,129,0.25); font-size:0.72rem;">
+                <i data-lucide="shield-check" style="width:11px; height:11px;"></i> ${confPercent}% Confidence
+              </span>
+              ${isTranslit ? `
+                <span class="activity-badge" style="background:rgba(168,85,247,0.15); color:#c084fc; border-color:rgba(168,85,247,0.3); font-size:0.72rem;">
+                  <i data-lucide="languages" style="width:11px; height:11px;"></i> ${data.transliteration_standard}
+                </span>
+              ` : ''}
+              ${data.audio_input_processed ? `
+                <span class="activity-badge" style="background:rgba(59,130,246,0.15); color:#60a5fa; border-color:rgba(59,130,246,0.3); font-size:0.72rem;">
+                  <i data-lucide="mic" style="width:11px; height:11px;"></i> Voice Transcribed
+                </span>
+              ` : ''}
+            </div>
+            <button type="button" class="btn btn-secondary" style="font-size:0.75rem; padding:0.2rem 0.6rem;" onclick="copyTranslationText('${encNative}')">
+              <i data-lucide="copy" style="width:12px; height:12px;"></i> Copy
+            </button>
+          </div>
+
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.25rem;">
+            Source Input (${data.source_language}): "<span style="color:var(--ttw-ink); font-weight:600;">${sanitizeAndConvertEmojis(data.original_text)}</span>"
+            ${data.transliterated_input && data.transliterated_input !== data.original_text ? `
+              <span style="color:var(--accent-cyan); margin-left:0.35rem;">→ Native Transliteration: <b>"${data.transliterated_input}"</b></span>
+            ` : ''}
+          </div>
+
+          <h3 style="font-size: 1.5rem; font-weight: 800; color: var(--ttw-ink); line-height: 1.3; margin: 0.35rem 0;">${data.translated_text}</h3>
+          
+          ${data.romanized && data.romanized !== data.translated_text ? `
+            <div style="font-size: 0.95rem; color: var(--accent-cyan); display:flex; align-items:center; gap:0.35rem; margin-top: 0.35rem;">
+              <i data-lucide="mic" style="width:14px; height:14px;"></i> Pronunciation Guide: <i>${data.romanized}</i>
+            </div>
+          ` : ''}
+
+          ${hasClarifications ? `
+            <div style="margin-top: 0.75rem; padding: 0.5rem 0.75rem; background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); font-size: 0.8rem; color: #b45309; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <i data-lucide="help-circle" style="width:14px; height:14px;"></i>
+              <span>Ambiguity Detected. Did you mean:</span>
+              ${data.suggested_clarifications.map(c => `
+                <button type="button" class="btn btn-secondary" style="font-size:0.72rem; padding:0.1rem 0.5rem; border-color:rgba(245, 158, 11, 0.4);" onclick="setTranslationSourceAndRetranslate('${c}')">${c}</button>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+
+        <button type="button" class="audio-play-btn" onclick="playSpeech('${encNative}', '${encRomanized}', '${langCode}', this)" title="Listen to Native Pronunciation" style="margin-top:0.25rem;">
+          <i data-lucide="volume-2" style="width:20px; height:20px;"></i>
+        </button>
+      </div>
+    `;
+    initLucideIcons();
   }
 
   translateBtn.addEventListener('click', executeTranslation);
@@ -1915,7 +2155,7 @@ async function loadPhrases(language = 'Hindi', category = 'All') {
         <div class="phrase-card">
           <div style="flex: 1;">
             <span class="activity-badge" style="font-size: 0.65rem;">${p.category}</span>
-            <h4 style="font-size: 1.25rem; font-weight: 700; color: #fff; margin: 0.35rem 0 0.15rem;">${p.foreign}</h4>
+            <h4 style="font-size: 1.25rem; font-weight: 700; color: var(--ttw-ink); margin: 0.35rem 0 0.15rem;">${p.foreign}</h4>
             <div style="font-size: 0.88rem; color: var(--accent-cyan); display:flex; align-items:center; gap:0.35rem;">
               <i data-lucide="mic" style="width:13px; height:13px;"></i> <i>${p.romanized}</i>
             </div>
@@ -2402,4 +2642,286 @@ function formatMarkdown(text) {
   return output.join('\n');
 }
 
+(function initChatWidget() {
+  let chatOpen = false;
+  let chatMessages = []; // { role: 'user' | 'assistant', content: string }
+  let isChatLoading = false;
 
+  const fab = document.getElementById('chat-fab');
+  const panel = document.getElementById('ttw-chat-panel');
+  const messagesContainer = document.getElementById('ttw-chat-messages');
+  const input = document.getElementById('ttw-chat-input');
+  const sendBtn = document.getElementById('ttw-chat-send-btn');
+  const closeBtn = document.getElementById('chat-close-btn');
+  const clearBtn = document.getElementById('chat-clear-btn');
+  const micBtn = document.getElementById('ttw-chat-mic-btn');
+  const suggestionsContainer = document.getElementById('ttw-chat-suggestions');
+
+  if (!fab || !panel) return;
+
+  // Show welcome message
+  function showWelcome() {
+    addAIMessage(
+      "Hi! I'm **TripMate AI** — your personal trip planning assistant.\n\n" +
+      "Tell me where you want to go, your budget, and travel dates, and I'll craft a personalized day-by-day itinerary for you. Or just ask anything about travel!"
+    );
+  }
+
+  // Open / Close chat panel
+  function openChat() {
+    chatOpen = true;
+    panel.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    fab.classList.add('is-open');
+    fab.querySelector('.ttw-chat-icon-open').style.display = 'none';
+    fab.querySelector('.ttw-chat-icon-close').style.display = '';
+    if (chatMessages.length === 0) showWelcome();
+    setTimeout(() => input && input.focus(), 300);
+  }
+
+  function closeChat() {
+    chatOpen = false;
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    fab.classList.remove('is-open');
+    fab.querySelector('.ttw-chat-icon-open').style.display = '';
+    fab.querySelector('.ttw-chat-icon-close').style.display = 'none';
+  }
+
+  fab.addEventListener('click', () => {
+    if (chatOpen) { closeChat(); } else { openChat(); }
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeChat);
+
+  // Clear conversation
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      chatMessages = [];
+      messagesContainer.innerHTML = '';
+      if (suggestionsContainer) suggestionsContainer.style.display = 'flex';
+      showWelcome();
+    });
+  }
+
+  // Add AI message to UI
+  function addAIMessage(text) {
+    const msgEl = buildMessageEl('ai', text);
+    messagesContainer.appendChild(msgEl);
+    scrollToBottom();
+  }
+
+  // Add User message to UI
+  function addUserMessage(text) {
+    const msgEl = buildMessageEl('user', text);
+    messagesContainer.appendChild(msgEl);
+    scrollToBottom();
+  }
+
+  function buildMessageEl(role, text) {
+    const wrapper = document.createElement('div');
+    wrapper.className = `ttw-chat-msg ${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'ttw-chat-msg-avatar';
+
+    if (role === 'ai') {
+      avatar.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/>
+      </svg>`;
+    } else {
+      avatar.textContent = 'You';
+      avatar.style.fontSize = '9px';
+      avatar.style.fontWeight = '700';
+    }
+
+    const bubble = document.createElement('div');
+    bubble.className = 'ttw-chat-bubble';
+    bubble.innerHTML = formatChatText(text);
+
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(bubble);
+    return wrapper;
+  }
+
+  // Simple markdown-like formatter for chat bubbles
+  function formatChatText(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
+      .replace(/•\s/g, '&bull;&nbsp;');
+  }
+
+  // Show typing indicator
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'ttw-chat-typing';
+    el.id = 'ttw-chat-typing-indicator';
+    el.innerHTML = `
+      <div class="ttw-chat-msg-avatar">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/>
+        </svg>
+      </div>
+      <div class="ttw-typing-bubble">
+        <div class="ttw-typing-dot"></div>
+        <div class="ttw-typing-dot"></div>
+        <div class="ttw-typing-dot"></div>
+      </div>
+    `;
+    messagesContainer.appendChild(el);
+    scrollToBottom();
+  }
+
+  function hideTyping() {
+    const el = document.getElementById('ttw-chat-typing-indicator');
+    if (el) el.remove();
+  }
+
+  function scrollToBottom() {
+    setTimeout(() => {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }, 50);
+  }
+
+  // Send message
+  async function sendMessage(messageText) {
+    const text = (messageText || (input ? input.value.trim() : '')).trim();
+    if (!text || isChatLoading) return;
+
+    // Clear input
+    if (input) { input.value = ''; autoResizeTextarea(); }
+
+    // Hide suggestions after first message
+    if (suggestionsContainer) suggestionsContainer.style.display = 'none';
+
+    // Add user message
+    chatMessages.push({ role: 'user', content: text });
+    addUserMessage(text);
+
+    // Disable send, show typing
+    isChatLoading = true;
+    if (sendBtn) sendBtn.disabled = true;
+    showTyping();
+
+    try {
+      // Get destination context from itinerary input
+      const destInput = document.getElementById('itinerary-dest');
+      const destination = destInput ? destInput.value : '';
+
+      // Build messages for API (max last 20 messages to avoid token limits)
+      const apiMessages = chatMessages.slice(-20).map(m => ({
+        role: m.role === 'ai' ? 'assistant' : m.role,
+        content: m.content
+      }));
+
+      const data = await API.sendChatMessage(apiMessages, destination);
+      hideTyping();
+
+      const reply = data.reply || "I'm here to help! What destination are you planning?";
+      chatMessages.push({ role: 'ai', content: reply });
+      addAIMessage(reply);
+
+    } catch (err) {
+      hideTyping();
+      const fallback = "I'm having a brief moment — please try again! Or use the Studio tools above to plan your trip directly.";
+      chatMessages.push({ role: 'ai', content: fallback });
+      addAIMessage(fallback);
+    } finally {
+      isChatLoading = false;
+      if (sendBtn) sendBtn.disabled = false;
+      if (input) input.focus();
+    }
+  }
+
+  // Send on button click
+  if (sendBtn) sendBtn.addEventListener('click', () => sendMessage());
+
+  // Send on Enter (Shift+Enter for newline)
+  if (input) {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+    input.addEventListener('input', autoResizeTextarea);
+  }
+
+  function autoResizeTextarea() {
+    if (!input) return;
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 100) + 'px';
+  }
+
+  // Suggestion pills
+  if (suggestionsContainer) {
+    suggestionsContainer.querySelectorAll('.ttw-chat-suggestion-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        const prompt = pill.getAttribute('data-prompt');
+        if (prompt) sendMessage(prompt);
+      });
+    });
+  }
+
+  // Voice input (mic button in chat)
+  if (micBtn) {
+    let chatRecognition = null;
+    let chatIsRecording = false;
+
+    micBtn.addEventListener('click', () => {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showToast('Voice input not supported in this browser', 'error');
+        return;
+      }
+
+      if (chatIsRecording) {
+        if (chatRecognition) chatRecognition.stop();
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      chatRecognition = new SpeechRecognition();
+      chatRecognition.lang = 'en-US';
+      chatRecognition.interimResults = false;
+
+      chatRecognition.onstart = () => {
+        chatIsRecording = true;
+        micBtn.classList.add('recording');
+      };
+
+      chatRecognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        if (input) {
+          input.value = transcript;
+          autoResizeTextarea();
+          input.focus();
+        }
+      };
+
+      chatRecognition.onend = () => {
+        chatIsRecording = false;
+        micBtn.classList.remove('recording');
+      };
+
+      chatRecognition.onerror = () => {
+        chatIsRecording = false;
+        micBtn.classList.remove('recording');
+      };
+
+      chatRecognition.start();
+    });
+  }
+
+  // Expose function for external triggers (e.g. hero prompts, CTA section, sticky bar opening chat)
+  window.openTripMateChat = function(prefilledMessage) {
+    if (!chatOpen) openChat();
+    if (prefilledMessage) {
+      setTimeout(() => sendMessage(prefilledMessage), 400);
+    }
+  };
+  window.openVoyageChat = window.openTripMateChat;
+
+})();

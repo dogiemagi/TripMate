@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from typing import Optional
 from app.services.gemini_vision_service import MultimodalVisionService
 
@@ -16,10 +16,15 @@ async def analyze_landmark_or_menu(
     - Foreign menu translation, ingredient check & allergen scanner
     - Photo-based travel tips and optimal photography angles
     """
-    contents = await file.read()
-    return await MultimodalVisionService.analyze_image(
-        image_bytes=contents,
-        filename=file.filename or "upload.jpg",
-        mode=mode,
-        user_prompt=prompt
-    )
+    try:
+        contents = await file.read()
+        return await MultimodalVisionService.analyze_image(
+            image_bytes=contents,
+            filename=file.filename or "upload.jpg",
+            mode=mode,
+            user_prompt=prompt
+        )
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Visual analysis failed: {str(e)}")

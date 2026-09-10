@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Response, UploadFile, File, Form, HTTPException
 from app.models.schemas import PhrasebookQuery, TranslationRequest
 from app.services.phrasebook_service import PhrasebookService
 import httpx
@@ -17,9 +17,49 @@ async def get_phrases(query: PhrasebookQuery):
 @router.post("/translate")
 async def translate_text(req: TranslationRequest):
     """
-    Live voice & text translation with phonetic romanization and pronunciation synthesis.
+    Text translation with phonetic romanization and manual source/target language selection.
     """
-    return await PhrasebookService.translate_phrase(req)
+    if not req.text or not req.text.strip():
+        raise HTTPException(status_code=400, detail="Text to translate cannot be empty.")
+    try:
+        return await PhrasebookService.translate_phrase(req)
+    except Exception as e:
+        logger.error(f"Text translation error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
+
+@router.post("/voice-translate")
+async def voice_translate(
+    audio_file: UploadFile = File(..., description="Audio file recording (WAV, OGG, FLAC, WebM)"),
+    source_language: str = Form("auto", description="Source language (or 'auto' for auto-detect)"),
+    target_language: str = Form(..., description="Explicit target language (e.g. Tamil, English, Telugu)")
+):
+    """
+    Voice-to-Text-to-Translation Pipeline:
+    Transcribes spoken audio using the selected source language (or auto-detect if selected),
+    then translates the text into the chosen target language with pronunciation synthesis.
+    """
+    clean_src = source_language.strip() if source_language else "auto"
+    if not target_language or not target_language.strip():
+        raise HTTPException(status_code=400, detail="Target language must be specified.")
+
+    try:
+        audio_bytes = await audio_file.read()
+        if not audio_bytes or len(audio_bytes) < 64:
+            raise HTTPException(status_code=400, detail="Uploaded audio file is empty or corrupted.")
+
+        return await PhrasebookService.translate_voice_phrase(
+            audio_bytes=audio_bytes,
+            source_language=clean_src,
+            target_language=target_language.strip()
+        )
+    except ValueError as ve:
+        logger.warning(f"Voice translation validation notice: {ve}")
+        raise HTTPException(status_code=422, detail=str(ve))
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Voice translation processing error: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Voice translation failed: {str(e)}")
 
 
 @router.get("/audio")

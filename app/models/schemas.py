@@ -37,6 +37,6 @@ class PhrasebookQuery(BaseModel):
 
 class TranslationRequest(BaseModel):
     text: str = Field(..., example="Where is the train station?")
-    source_language: str = Field(default="auto", example="auto | English | Tamil | Telugu | Hindi | French")
-    target_language: str = Field(default="Tamil", example="Tamil | Telugu | English | Hindi | Japanese | French")
+    source_language: str = Field(default="English", example="English | Tamil | Telugu | Hindi | Spanish | French | German")
+    target_language: str = Field(default="Tamil", example="Tamil | Telugu | English | Hindi | Spanish | French | German")
 

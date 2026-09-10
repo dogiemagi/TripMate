@@ -1,0 +1,2932 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TripMate AI - Plan Smarter. Travel Happier.</title>
+  <meta name="description" content="Chat with TripMate AI to build your personalized dream trip in minutes. No credit card, no commitment." />
+  <link rel="icon" type="image/jpeg" href="/static/assets/tripmate-logo.jpg" />
+
+  <!-- Fonts: Plus Jakarta Sans & Instrument Serif -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    :root {
+      --ttw-ink: #111827;
+      --ttw-ink-2: #1f2937;
+      --ttw-ink-muted: #64748b;
+      --ttw-border: #e2e8f0;
+      --ttw-green-head: #234e35;
+      --ttw-blue-pin: #2563eb;
+      --ttw-purple-pin: #9333ea;
+      --ttw-green-pin: #10b981;
+      --ttw-font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --ttw-font-serif: 'Instrument Serif', Georgia, serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--ttw-font-sans);
+      color: var(--ttw-ink);
+      background: #ffffff;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Outer 3-Pane Layout (Slim Toolbar + Left Visual/Map + Right Chat) */
+    .ttw-chat-app {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+
+    /* 1. Left Slim Toolbar (Exact Tarzan Way Left Rail) */
+    .ttw-chat-toolbar {
+      width: 58px;
+      height: 100vh;
+      background: #ffffff;
+      border-right: 1px solid var(--ttw-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      z-index: 60;
+      flex-shrink: 0;
+    }
+
+    .toolbar-top-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .toolbar-brand-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: transform 0.15s ease;
+      overflow: hidden;
+    }
+
+    .toolbar-brand-btn:hover {
+      transform: scale(1.06);
+    }
+
+    .toolbar-brand-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .toolbar-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #475569;
+      cursor: pointer;
+      text-decoration: none;
+      position: relative;
+      transition: all 0.18s ease;
+    }
+
+    .toolbar-btn:hover {
+      background: #e2e8f0;
+      color: #111827;
+      transform: scale(1.05);
+    }
+
+    /* Tooltip */
+    .toolbar-btn[data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: calc(100% + 10px);
+      top: 50%;
+      transform: translateY(-50%);
+      background: #111827;
+      color: #ffffff;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .toolbar-btn[data-tooltip]:hover::after {
+      opacity: 1;
+    }
+
+    .toolbar-profile-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      cursor: pointer;
+    }
+
+    /* 2. Left Main Pane (Switches between Scenic Photo Hero & Leaflet Map) */
+    .ttw-left-pane {
+      flex: 1;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      background: #0f172a;
+    }
+
+    /* 2A. Scenic Photo Hero View (The Tarzan Way /chat Initial Screen) */
+    .ttw-hero-view {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.1) 40%, rgba(0, 0, 0, 0.78) 100%),
+        url('https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1800&auto=format&fit=crop&q=85') center/cover no-repeat;
+      color: #ffffff;
+      padding: 36px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 20;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    .ttw-hero-view.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    /* Top 'New chat' pill in left hero */
+    .hero-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .hero-new-chat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(17, 24, 39, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+
+    .hero-new-chat-pill:hover {
+      background: rgba(17, 24, 39, 0.85);
+    }
+
+    .ttw-hero-content {
+      max-width: 560px;
+    }
+
+    .ttw-hero-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 22px;
+      letter-spacing: -0.01em;
+    }
+
+    .ttw-hero-title {
+      font-size: clamp(2.3rem, 3.8vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+      color: #ffffff;
+      text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .ttw-hero-stats-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 9px 24px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .ttw-hero-stats-bar .sep {
+      opacity: 0.35;
+    }
+
+    .ttw-hero-stats-bar .star {
+      color: #facc15;
+      margin-right: 4px;
+    }
+
+    /* 2B. Leaflet Map View (Displayed once Destination / Itinerary is Active) */
+    .ttw-map-view {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      background: #e2e8f0;
+    }
+
+    #chat-leaflet-map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-recenter-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 30;
+      width: 38px;
+      height: 38px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #334155;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: all 0.15s ease;
+    }
+
+    .map-recenter-btn:hover {
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    /* Custom Leaflet Pins */
+    .tarzan-pin {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+      border: 2.5px solid #ffffff;
+      position: relative;
+    }
+
+    .tarzan-pin::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+    }
+
+    .tarzan-pin.blue { background: #2563eb; }
+    .tarzan-pin.blue::after { border-top: 6px solid #2563eb; }
+    .tarzan-pin.coral { background: #ff385c; }
+    .tarzan-pin.coral::after { border-top: 6px solid #ff385c; }
+
+    .tarzan-pin.purple { background: #8b5cf6; }
+    .tarzan-pin.purple::after { border-top: 6px solid #8b5cf6; }
+
+    .tarzan-pin.amber { background: #f59e0b; }
+    .tarzan-pin.amber::after { border-top: 6px solid #f59e0b; }
+
+    .tarzan-pin.green { background: #10b981; }
+    .tarzan-pin.green::after { border-top: 6px solid #10b981; }
+
+    .tarzan-pin-label {
+      background: rgba(255, 255, 255, 0.95);
+      color: #111827;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+      position: absolute;
+      top: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+      border: 1px solid #e2e8f0;
+      pointer-events: none;
+    }
+
+    /* 3. Right Conversational Stream & Step Wizard Panel */
+    .ttw-chat-pane {
+      width: 48%;
+      max-width: 660px;
+      min-width: 440px;
+      height: 100vh;
+      background: #ffffff;
+      border-left: 1px solid var(--ttw-border);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Top Agent Bar */
+    .ttw-agent-bar {
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--ttw-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #ffffff;
+      flex-shrink: 0;
+      z-index: 40;
+    }
+
+    .agent-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .agent-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1.5px solid #e2e8f0;
+      background: #f8fafc;
+      flex-shrink: 0;
+    }
+
+    .agent-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .agent-name {
+      font-size: 15.5px;
+      font-weight: 700;
+      color: var(--ttw-ink);
+      line-height: 1.2;
+    }
+
+    .agent-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .agent-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      animation: pulseGreen 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseGreen {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.6; }
+    }
+
+    .dest-pill-btn {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #0369a1;
+      background: #e0f2fe;
+      padding: 5px 12px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s ease;
+    }
+
+    .dest-pill-btn:hover {
+      background: #bae6fd;
+    }
+
+    /* Scrollable Conversation Stream */
+    .ttw-stream-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px 120px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Assistant & User Message Rows */
+    .msg-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .msg-row.user {
+      justify-content: flex-end;
+    }
+
+    .msg-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      flex-shrink: 0;
+      background: #fff;
+    }
+
+    .msg-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .msg-bubble {
+      padding: 14px 20px;
+      border-radius: 18px;
+      font-size: 14.5px;
+      line-height: 1.55;
+      max-width: 84%;
+    }
+
+    .msg-row.ai .msg-bubble {
+      background: #f8fafc;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      border-top-left-radius: 4px;
+    }
+
+    .msg-row.user .msg-bubble {
+      background: #111827;
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+    }
+
+    /* ==========================================================================
+       Step 1/4 Card (Where to Next? - Exact Screenshot Match)
+       ========================================================================== */
+    .ttw-wizard-card {
+      background: #fbfbf9;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 26px 28px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      margin-top: 4px;
+    }
+
+    .wizard-progress-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .wizard-bar-segments {
+      flex: 1;
+      display: flex;
+      gap: 6px;
+    }
+
+    .wizard-seg {
+      height: 3.5px;
+      flex: 1;
+      background: #e2e8f0;
+      border-radius: 999px;
+      transition: background 0.3s ease;
+    }
+
+    .wizard-seg.filled {
+      background: #111827;
+    }
+
+    .wizard-counter {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .wizard-counter span {
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .wizard-title {
+      font-size: 21px;
+      font-weight: 800;
+      color: var(--ttw-ink);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .wizard-subtitle {
+      font-size: 13.5px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    /* Search Input */
+    .wizard-search-wrap {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    .wizard-search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+    }
+
+    .wizard-search-input {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--ttw-ink);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .wizard-search-input:focus {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    /* 8 Destinations Grid */
+    .destinations-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .dest-tile {
+      position: relative;
+      height: 114px;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      user-select: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dest-tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+    }
+
+    .dest-tile.selected {
+      border-color: #111827;
+      box-shadow: 0 0 0 2px #111827;
+    }
+
+    .dest-tile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .dest-tile:hover .dest-tile-img {
+      transform: scale(1.08);
+    }
+
+    .dest-tile-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.82) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 8px 10px;
+    }
+
+    .dest-badge {
+      align-self: flex-start;
+      font-size: 8.5px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 3px 6px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .dest-badge.pink { background: #ffe4e6; color: #be123c; }
+    .dest-badge.yellow { background: #fef08a; color: #854d0e; }
+    .dest-badge.cyan { background: #cffafe; color: #0e7490; }
+    .dest-badge.white-pill { background: #ffffff; color: #1e293b; }
+    .dest-badge.dark-navy { background: #0f172a; color: #ffffff; }
+
+    .dest-name-row {
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .dest-check {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: #111827;
+      font-size: 10px;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+    }
+
+    .dest-tile.selected .dest-check {
+      display: inline-flex;
+    }
+
+    /* Continue Button - exact match to screenshot */
+    .wizard-submit-btn {
+      width: 100%;
+      padding: 13px 20px;
+      background: #94a3b8;
+      color: #ffffff;
+      font-size: 14.5px;
+      font-weight: 700;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .wizard-submit-btn:not(:disabled) {
+      background: #111827;
+      cursor: pointer;
+    }
+
+    .wizard-submit-btn:not(:disabled):hover {
+      background: #1f2937;
+      transform: translateY(-1px);
+    }
+
+    .wizard-submit-btn:disabled {
+      background: #cbd5e1;
+      color: #94a3b8;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Chips for Step 2 & 3 */
+    .chips-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .chip-item {
+      padding: 9px 18px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .chip-item:hover {
+      border-color: #94a3b8;
+      background: #f8fafc;
+    }
+
+    .chip-item.selected {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    /* ==========================================================================
+       Step 3 "Who's coming?" Wizard Elements (Screenshot 2)
+       ========================================================================== */
+    .party-pills-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 16px;
+    }
+
+    .party-pill {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .party-pill:hover {
+      border-color: #94a3b8;
+      background: #f8fafc;
+    }
+
+    .party-pill.selected {
+      background: #0f172a;
+      border-color: #0f172a;
+      color: #ffffff;
+    }
+
+    .party-pill .check-icon {
+      font-weight: 800;
+      margin-right: 2px;
+    }
+
+    .wizard-steppers-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 6px 18px;
+      margin-bottom: 22px;
+    }
+
+    .stepper-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 0;
+      border-bottom: 1px solid #edf2f7;
+    }
+
+    .stepper-row:last-child {
+      border-bottom: none;
+    }
+
+    .stepper-label {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .stepper-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    .stepper-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .stepper-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #0f172a;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .stepper-btn:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    .stepper-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .stepper-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    .wizard-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .wizard-back-btn {
+      padding: 13px 26px;
+      border-radius: 12px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 14.5px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .wizard-back-btn:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+
+    .wizard-continue-btn {
+      flex: 1;
+      padding: 13px 26px;
+      border-radius: 12px;
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+      font-size: 14.5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+    }
+
+    .wizard-continue-btn:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    /* Kaira Thought Bubble */
+    .kaira-thought-bubble {
+      margin: 12px 0 16px 44px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size: 14px;
+      color: #1e293b;
+      line-height: 1.5;
+    }
+
+    .kaira-thought-meta {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* ==========================================================================
+       Itinerary Masterplan Card (Screenshot 1 Exact)
+       ========================================================================== */
+    .msg-row.ai.masterplan-row {
+      align-items: flex-start;
+      margin-bottom: 24px;
+      gap: 12px;
+    }
+
+    .msg-row.ai.masterplan-row .msg-avatar {
+      margin-top: 10px;
+      flex-shrink: 0;
+    }
+
+    .msg-row.ai.masterplan-row .masterplan-wrapper {
+      flex: 1;
+      max-width: calc(100% - 46px);
+      width: 100%;
+    }
+
+    .masterplan-card {
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.09);
+      border: 1px solid #e2e8f0;
+      background: #ffffff;
+      margin-top: 0;
+    }
+
+    .masterplan-head {
+      background: #28583c;
+      color: #ffffff;
+      padding: 24px 26px 20px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .masterplan-chosen-badge {
+      background: #facc15;
+      color: #0f172a;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: inline-block;
+      margin-bottom: 12px;
+    }
+
+    .masterplan-dep-sub {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #b7d8c4;
+      margin-bottom: 4px;
+    }
+
+    .masterplan-title {
+      font-family: var(--ttw-font-serif);
+      font-style: italic;
+      font-size: 34px;
+      font-weight: 400;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+    }
+
+    .masterplan-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .masterplan-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.28);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .masterplan-body {
+      padding: 24px 24px 18px 48px;
+      position: relative;
+    }
+
+    .timeline-rail-line {
+      position: absolute;
+      left: 27px;
+      top: 32px;
+      bottom: 32px;
+      width: 1.5px;
+      border-left: 2px dashed #cbd5e1;
+    }
+
+    .timeline-stop {
+      position: relative;
+      margin-bottom: 22px;
+      cursor: pointer;
+    }
+
+    .timeline-stop:last-child {
+      margin-bottom: 0;
+    }
+
+    .stop-dot {
+      position: absolute;
+      left: -28px;
+      top: 3px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #94a3b8;
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 0 0 1.5px #cbd5e1;
+    }
+
+    .stop-dot.blue { background: #2563eb; box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35); }
+    .stop-dot.purple { background: #8b5cf6; box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.35); }
+    .stop-dot.green { background: #10b981; box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35); }
+
+    .stop-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stop-city {
+      font-size: 15px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.01em;
+    }
+
+    .stop-role {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .stop-nights-badge {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .stop-desc {
+      margin-top: 5px;
+      font-size: 13.5px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .transit-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #475569;
+      margin-top: 8px;
+    }
+
+    .masterplan-summary-box {
+      margin: 18px 22px 14px;
+      padding: 18px 20px;
+      background: #fcfcfb;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .price-col {
+      flex-shrink: 0;
+    }
+
+    .price-label {
+      font-size: 10.5px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+
+    .price-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.03em;
+    }
+
+    .perks-col {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .perk-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .perk-item svg {
+      color: #10b981;
+      flex-shrink: 0;
+    }
+
+    .masterplan-notice {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #64748b;
+      padding: 0 24px 16px;
+    }
+
+    .masterplan-notice svg {
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+
+    .masterplan-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 22px 22px;
+    }
+
+    .masterplan-modify-btn {
+      flex: 1;
+      padding: 13px 20px;
+      border-radius: 999px;
+      background: #ffffff;
+      border: 1.5px solid #0f172a;
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .masterplan-modify-btn:hover {
+      background: #f8fafc;
+    }
+
+    .masterplan-confirm-btn {
+      flex: 1.7;
+      padding: 13px 22px;
+      border-radius: 999px;
+      background: #eef840;
+      color: #0f172a;
+      font-weight: 800;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+      box-shadow: 0 4px 14px rgba(238, 248, 64, 0.45);
+    }
+
+    .masterplan-confirm-btn:hover {
+      background: #facc15;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(250, 204, 21, 0.55);
+    }
+
+    .suggestion-pills-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-top: 10px;
+    }
+
+    .sugg-pill {
+      white-space: nowrap;
+      padding: 8px 16px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .sugg-pill:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      color: #0f172a;
+    }
+
+    .sugg-pill.primary {
+      background: #111827;
+      color: #ffffff;
+      border-color: #111827;
+    }
+
+    /* Fixed Bottom Input Bar */
+    .ttw-chat-bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1px solid var(--ttw-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 50;
+    }
+
+    .chat-plus-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .chat-plus-btn:hover {
+      background: #e2e8f0;
+      color: #111827;
+    }
+
+    .chat-text-field {
+      flex: 1;
+      padding: 12px 20px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 999px;
+      font-size: 14.5px;
+      font-family: inherit;
+      color: var(--ttw-ink);
+      outline: none;
+      transition: all 0.18s ease;
+    }
+
+    .chat-text-field:focus {
+      background: #ffffff;
+      border-color: #0ea5e9;
+      box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.12);
+    }
+
+    .chat-submit-btn {
+      padding: 11px 24px;
+      background: #111827;
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 700;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+      transition: all 0.18s ease;
+    }
+
+    .chat-submit-btn:hover {
+      background: #1f2937;
+      transform: scale(1.02);
+    }
+
+    @media (max-width: 960px) {
+      .ttw-chat-app {
+        flex-direction: column;
+      }
+      .ttw-chat-toolbar {
+        width: 100vw;
+        height: 48px;
+        flex-direction: row;
+        padding: 0 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--ttw-border);
+      }
+      .toolbar-top-group {
+        flex-direction: row;
+      }
+      .ttw-left-pane {
+        height: 40vh;
+      }
+      .ttw-chat-pane {
+        width: 100vw;
+        height: 60vh;
+        max-width: 100%;
+        min-width: 100%;
+      }
+      .destinations-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="ttw-chat-app">
+    <!-- 1. Left Slim Toolbar (Exact Tarzan Way Left Rail) -->
+    <aside class="ttw-chat-toolbar">
+      <div class="toolbar-top-group">
+        <a href="/" class="toolbar-brand-btn" title="TripMate Home">
+          <img src="/static/assets/tripmate-logo.jpg" alt="TripMate AI" />
+        </a>
+
+        <a href="/" class="toolbar-btn" data-tooltip="Expand / Back">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </a>
+
+        <button type="button" class="toolbar-btn" style="background:#1e293b; color:#fbbf24; border-color:#1e293b;" data-tooltip="New chat" onclick="resetToStep1()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="toolbar-profile-btn" title="Travel Profile">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      </div>
+    </aside>
+
+    <!-- 2. Left Main Pane (Hero Photo initially -> Transitions to Leaflet Map) -->
+    <section class="ttw-left-pane">
+      <!-- 2A. Scenic Hero View (Matches Screenshot Exact Initial State) -->
+      <div class="ttw-hero-view" id="ttw-hero-view">
+        <div class="hero-top-row">
+          <button type="button" class="hero-new-chat-pill" onclick="resetToStep1()">
+            <span>New chat</span>
+          </button>
+        </div>
+
+        <div class="ttw-hero-content">
+          <div class="ttw-hero-pill-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+            </svg>
+            <span>Pick a place to begin</span>
+          </div>
+
+          <h1 class="ttw-hero-title">
+            Like asking a friend who's been everywhere.
+          </h1>
+
+          <div class="ttw-hero-stats-bar">
+            <div><span class="star">★</span> 4.9/5 Google</div>
+            <span class="sep">|</span>
+            <div>10,000+ trips</div>
+            <span class="sep">|</span>
+            <div>Real curators</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2B. Leaflet Interactive Route Map (Activates upon selecting a trip) -->
+      <div class="ttw-map-view" id="ttw-map-view">
+        <div id="chat-leaflet-map"></div>
+        <button type="button" class="map-recenter-btn" onclick="recenterMap()" title="Recenter Route Map">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="12 8 12 12 14 14"></polygon>
+          </svg>
+        </button>
+        <button type="button" class="map-fullscreen-btn" onclick="toggleMapFullscreen()" title="Toggle Fullscreen" style="position: absolute; top: 16px; right: 16px; width: 38px; height: 38px; background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; z-index: 500; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2.2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <polyline points="21 15 21 21 15 21"></polyline>
+            <polyline points="3 9 3 3 9 3"></polyline>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- 3. Right Conversational Stream & Step Wizard Panel -->
+    <main class="ttw-chat-pane">
+      <!-- Agent Header -->
+      <header class="ttw-agent-bar">
+        <div class="agent-meta">
+          <div class="agent-avatar">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Kaira" />
+          </div>
+          <div>
+            <div class="agent-name">Kaira</div>
+            <div class="agent-status">
+              <span class="agent-dot"></span>
+              <span>online · ~2s reply</span>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="dest-pill-btn" id="current-dest-pill-btn" onclick="openPresetQuickSwitch()" style="display: none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span id="header-dest-label">Bali, Indonesia</span>
+        </button>
+      </header>
+
+      <!-- Scrollable Message Stream -->
+      <div class="ttw-stream-scroll" id="chat-stream">
+        <!-- Message 1: Bot Greeting Bubble -->
+        <div class="msg-row ai">
+          <div class="msg-avatar">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Kaira" />
+          </div>
+          <div class="msg-bubble">
+            Hi, I'm Kaira, your travel friend. Let's build something good - a few quick taps and I'll get to work.
+          </div>
+        </div>
+
+        <!-- Step 3/4 Card (Who's coming? - Matching Screenshot 2 Exact) -->
+        <div class="ttw-wizard-card" id="step-3-card">
+          <div class="wizard-progress-row">
+            <div class="wizard-bar-segments">
+              <div class="wizard-seg filled"></div>
+              <div class="wizard-seg filled"></div>
+              <div class="wizard-seg filled"></div>
+              <div class="wizard-seg"></div>
+            </div>
+            <div class="wizard-counter">3<span>/4</span></div>
+          </div>
+
+          <h2 class="wizard-title">Who's coming?</h2>
+          <p class="wizard-subtitle">So I can pace the trip and size the stays.</p>
+
+          <div class="party-pills-wrap" id="party-pills-wrap">
+            <div class="party-pill" onclick="selectPartyPill(this, 'Just me')"><span>🧍</span> Just me</div>
+            <div class="party-pill" onclick="selectPartyPill(this, 'Couple')"><span>👩‍❤️‍👨</span> Couple</div>
+            <div class="party-pill" onclick="selectPartyPill(this, 'Family')"><span>👨‍👩‍👧</span> Family</div>
+            <div class="party-pill selected" onclick="selectPartyPill(this, 'Friends')"><span class="check-icon">✓ </span><span>🥂</span> Friends</div>
+            <div class="party-pill" onclick="selectPartyPill(this, 'Parents / seniors')"><span>🧓</span> Parents / seniors</div>
+          </div>
+
+          <div class="wizard-steppers-box">
+            <div class="stepper-row">
+              <div>
+                <div class="stepper-label">Adults</div>
+                <div class="stepper-sub">12+ years</div>
+              </div>
+              <div class="stepper-controls">
+                <button type="button" class="stepper-btn" onclick="changeGuestCount('adults', -1)">−</button>
+                <span class="stepper-val" id="stepper-adults-val">2</span>
+                <button type="button" class="stepper-btn" onclick="changeGuestCount('adults', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="stepper-row">
+              <div>
+                <div class="stepper-label">Children</div>
+                <div class="stepper-sub">2 to 11 years</div>
+              </div>
+              <div class="stepper-controls">
+                <button type="button" class="stepper-btn" onclick="changeGuestCount('children', -1)">−</button>
+                <span class="stepper-val" id="stepper-children-val">0</span>
+                <button type="button" class="stepper-btn" onclick="changeGuestCount('children', 1)">+</button>
+              </div>
+            </div>
+
+            <div class="stepper-row">
+              <div>
+                <div class="stepper-label">Infants</div>
+                <div class="stepper-sub">under 2 years</div>
+              </div>
+              <div class="stepper-controls">
+                <button type="button" class="stepper-btn" onclick="changeGuestCount('infants', -1)">−</button>
+                <span class="stepper-val" id="stepper-infants-val">0</span>
+                <button type="button" class="stepper-btn" onclick="changeGuestCount('infants', 1)">+</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="wizard-actions-row">
+            <button type="button" class="wizard-back-btn" onclick="goBackToStep2()">Back</button>
+            <button type="button" class="wizard-continue-btn" onclick="submitStep3()">
+              <span>Continue</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fixed Bottom Chat Bar -->
+      <footer class="ttw-chat-bottom-bar">
+        <button type="button" class="chat-plus-btn" title="Add special requirement" onclick="showQuickOptions()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+
+        <input type="text" id="chat-free-input" class="chat-text-field" placeholder="Just tell me anything you're planning..." autocomplete="off" />
+
+        <button type="button" id="chat-send-action-btn" class="chat-submit-btn" style="background:#ffffff; color:#111827; border:1.5px solid #cbd5e1;" onclick="handleSendText()">
+          <span>Send</span>
+        </button>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // App State
+    const activeTrip = {
+      destination: 'Chennai',
+      days: 7,
+      party: 'Friends',
+      budget: 'Balanced',
+      step: 3
+    };
+
+    let guestCounts = {
+      adults: 2,
+      children: 0,
+      infants: 0
+    };
+
+    let chatHistory = [];
+    let leafletMap = null;
+    let markersGroup = null;
+    let routePolyline = null;
+
+    // Presets with exact geographic coordinates matching The Tarzan Way
+    const MASTER_PRESETS = {
+      chennai: {
+        name: 'Chennai',
+        title: 'Chennai',
+        chosenTimes: 'ROUTE CHOSEN 974 TIMES',
+        depCity: 'Hyderabad',
+        flightDur: 'Flight ~1h15',
+        date: 'March 2027',
+        nights: '7N',
+        stopsCount: '1 stop',
+        price: '₹18–32K',
+        center: [13.0827, 80.2707],
+        zoom: 11,
+        stops: [
+          {
+            name: 'Chennai',
+            nights: '7N',
+            desc: 'Temple-lined streets, Marina sunsets, and vibrant South Indian cultural heritage.',
+            transit: 'Flight ~1h15',
+            lat: 13.0827,
+            lng: 80.2707,
+            color: 'blue',
+            num: 1
+          }
+        ],
+        path: [
+          [17.3850, 78.4867],
+          [13.0827, 80.2707]
+        ]
+      },
+      bali: {
+        name: 'Bali, Indonesia',
+        title: 'Ubud · Canggu · Seminyak',
+        chosenTimes: 'ROUTE CHOSEN 974 TIMES',
+        date: 'November 2026',
+        nights: '7N',
+        stopsCount: '3 stops',
+        depCity: 'Hyderabad',
+        flightDur: 'Flight ~8h',
+        price: '₹55–80K',
+        center: [-8.58, 115.20],
+        zoom: 11,
+        stops: [
+          {
+            name: 'Ubud',
+            nights: '3N',
+            desc: 'Explore emerald rice terraces, temple rituals, jungle waterfalls, and Balinese artistic traditions.',
+            transit: 'Taxi ~1h15',
+            lat: -8.5069,
+            lng: 115.2625,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Canggu',
+            nights: '2N',
+            desc: 'Ease into coastal Bali with beach sunsets, creative cafés, and relaxed village lanes.',
+            transit: 'Taxi ~30m',
+            lat: -8.6478,
+            lng: 115.1385,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'Seminyak',
+            nights: '2N',
+            desc: 'Finish beside the airport amid golden beaches, stylish streets, and sunset shores.',
+            transit: 'Flight ~8h',
+            lat: -8.6913,
+            lng: 115.1682,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [-8.5069, 115.2625],
+          [-8.58, 115.20],
+          [-8.6478, 115.1385],
+          [-8.67, 115.155],
+          [-8.6913, 115.1682]
+        ]
+      },
+      japan: {
+        name: 'Japan Golden Route',
+        title: 'Tokyo · Kyoto · Osaka',
+        date: 'October 2026',
+        nights: '9N',
+        stopsCount: '3 stops',
+        depCity: 'Delhi',
+        flightDur: 'Flight ~7h30',
+        price: '₹1.5L–2.1L',
+        center: [35.20, 137.50],
+        zoom: 7,
+        stops: [
+          {
+            name: 'Tokyo',
+            nights: '4N',
+            desc: 'Shibuya crossing, historic Asakusa shrines, futuristic digital art, and world-class ramen.',
+            transit: 'Shinkansen Bullet ~2h15',
+            lat: 35.6762,
+            lng: 139.6503,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Kyoto',
+            nights: '3N',
+            desc: 'Fushimi Inari torii gates, golden Kinkaku-ji, serene bamboo groves, and Gion tea houses.',
+            transit: 'Express Rail ~30m',
+            lat: 35.0116,
+            lng: 135.7681,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'Osaka',
+            nights: '2N',
+            desc: 'Dotonbori street food, Osaka castle park, vibrant nightlife, and local takoyaki.',
+            transit: 'Flight ~8h',
+            lat: 34.6937,
+            lng: 135.5023,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [35.6762, 139.6503],
+          [35.30, 137.80],
+          [35.0116, 135.7681],
+          [34.85, 135.60],
+          [34.6937, 135.5023]
+        ]
+      },
+      europe: {
+        name: 'Europe Highlights',
+        title: 'Paris · Swiss Alps · Rome',
+        date: 'September 2026',
+        nights: '10N',
+        stopsCount: '3 stops',
+        depCity: 'Mumbai',
+        flightDur: 'Flight ~9h',
+        price: '₹1.8L–2.6L',
+        center: [45.0, 7.5],
+        zoom: 6,
+        stops: [
+          {
+            name: 'Paris',
+            nights: '4N',
+            desc: 'Eiffel Tower sunsets, Louvre masterpieces, Le Marais boutique cafes, and Seine cruises.',
+            transit: 'TGV Lyria ~4h',
+            lat: 48.8566,
+            lng: 2.3522,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Zurich & Interlaken',
+            nights: '3N',
+            desc: 'Panoramic alpine cogwheels, turquoise glacial waters, and snow-capped peaks.',
+            transit: 'EuroCity Train ~5h',
+            lat: 47.3769,
+            lng: 8.5417,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'Rome',
+            nights: '3N',
+            desc: 'Ancient Colosseum, Vatican museums, Trastevere evening walks, and artisan gelato.',
+            transit: 'Flight ~9h',
+            lat: 41.9028,
+            lng: 12.4964,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [48.8566, 2.3522],
+          [48.1, 5.5],
+          [47.3769, 8.5417],
+          [44.5, 10.5],
+          [41.9028, 12.4964]
+        ]
+      },
+      thailand: {
+        name: 'Thailand Tropical',
+        title: 'Bangkok · Chiang Mai · Phuket',
+        date: 'December 2026',
+        nights: '7N',
+        stopsCount: '3 stops',
+        depCity: 'Delhi',
+        flightDur: 'Flight ~4h15',
+        price: '₹45–65K',
+        center: [13.75, 100.5],
+        zoom: 6,
+        stops: [
+          {
+            name: 'Bangkok',
+            nights: '2N',
+            desc: 'Grand Palace, Wat Arun river views, street food night markets, and floating markets.',
+            transit: 'Domestic Flight ~1h15',
+            lat: 13.7563,
+            lng: 100.5018,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Chiang Mai',
+            nights: '2N',
+            desc: 'Lush mountain temples, ethical elephant sanctuaries, and artisan night bazaars.',
+            transit: 'Domestic Flight ~2h',
+            lat: 18.7883,
+            lng: 98.9853,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'Phuket',
+            nights: '3N',
+            desc: 'Emerald Andaman waters, island catamaran cruises, white sandy beaches, and fresh seafood.',
+            transit: 'Flight ~4h30',
+            lat: 7.8804,
+            lng: 98.3923,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [13.7563, 100.5018],
+          [16.2, 99.8],
+          [18.7883, 98.9853],
+          [13.5, 99.0],
+          [7.8804, 98.3923]
+        ]
+      },
+      dubai: {
+        name: 'Dubai Luxury Escape',
+        title: 'Downtown · Desert Dunes · Marina',
+        date: 'December 2026',
+        nights: '5N',
+        stopsCount: '3 stops',
+        depCity: 'Mumbai',
+        flightDur: 'Flight ~3h30',
+        price: '₹65–85K',
+        center: [25.10, 55.30],
+        zoom: 11,
+        stops: [
+          {
+            name: 'Downtown Dubai',
+            nights: '2N',
+            desc: 'Burj Khalifa summit, dancing Dubai Mall fountains, and souk gold & spice alleys.',
+            transit: '4x4 Dune Transfer ~45m',
+            lat: 25.1972,
+            lng: 55.2744,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Desert Conservation',
+            nights: '1N',
+            desc: 'Stargazing in desert luxury camp, red dune drives, and authentic Bedouin dining.',
+            transit: 'Transfer ~1h',
+            lat: 24.8333,
+            lng: 55.6667,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'Dubai Marina & Palm',
+            nights: '2N',
+            desc: 'Luxury yacht cruises, JBR beach promenade, Atlantis water adventures, and rooftop dining.',
+            transit: 'Flight ~3h30',
+            lat: 25.0805,
+            lng: 55.1403,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [25.1972, 55.2744],
+          [25.0, 55.45],
+          [24.8333, 55.6667],
+          [24.95, 55.35],
+          [25.0805, 55.1403]
+        ]
+      },
+      vietnam: {
+        name: 'Vietnam Odyssey',
+        title: 'Hanoi · Ha Long Bay · Hoi An',
+        date: 'November 2026',
+        nights: '7N',
+        stopsCount: '3 stops',
+        depCity: 'Delhi',
+        flightDur: 'Flight ~4h30',
+        price: '₹45–68K',
+        center: [16.5, 106.5],
+        zoom: 6,
+        stops: [
+          {
+            name: 'Hanoi',
+            nights: '2N',
+            desc: 'Old Quarter alley dining, egg coffee culture, French colonial architecture, and Hoan Kiem serene lake.',
+            transit: 'Express Limousine ~2h30',
+            lat: 21.0285,
+            lng: 105.8542,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Ha Long Bay',
+            nights: '2N',
+            desc: 'Overnight luxury cruise navigating limestone islets, emerald sea kayaking, and sunset deck dining.',
+            transit: 'Domestic Flight ~1h15',
+            lat: 20.9101,
+            lng: 107.1839,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'Hoi An',
+            nights: '3N',
+            desc: 'Lantern-illuminated canals, tailor boutiques, golden sandy An Bang beach, and authentic banh mi.',
+            transit: 'Flight ~4h30',
+            lat: 15.8801,
+            lng: 108.3380,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [21.0285, 105.8542],
+          [20.9101, 107.1839],
+          [18.5, 106.5],
+          [15.8801, 108.3380]
+        ]
+      },
+      maldives: {
+        name: 'Maldives Paradise',
+        title: 'Male · Maafushi · Ari Atoll',
+        date: 'December 2026',
+        nights: '5N',
+        stopsCount: '3 stops',
+        depCity: 'Kochi',
+        flightDur: 'Flight ~1h45',
+        price: '₹85K–1.3L',
+        center: [3.9, 73.2],
+        zoom: 8,
+        stops: [
+          {
+            name: 'Male & Hulhumale',
+            nights: '1N',
+            desc: 'Speedboat airport transfer, tropical arrival dinner, and waterfront promenade walks.',
+            transit: 'Speedboat ~35m',
+            lat: 4.1755,
+            lng: 73.5093,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Maafushi Island',
+            nights: '2N',
+            desc: 'Turquoise lagoons, sea turtle & nurse shark snorkeling safaris, and secluded sandbank picnics.',
+            transit: 'Seaplane ~30m',
+            lat: 3.9419,
+            lng: 73.4907,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'South Ari Atoll',
+            nights: '2N',
+            desc: 'Overwater bungalow experience, coral reef manta encounters, and private starlit beach dining.',
+            transit: 'Flight ~2h',
+            lat: 3.5500,
+            lng: 72.8500,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [4.1755, 73.5093],
+          [3.9419, 73.4907],
+          [3.75, 73.1],
+          [3.5500, 72.8500]
+        ]
+      },
+      singapore: {
+        name: 'Singapore Wonder',
+        title: 'Marina Bay · Sentosa · Orchard',
+        date: 'October 2026',
+        nights: '4N',
+        stopsCount: '3 stops',
+        depCity: 'Chennai',
+        flightDur: 'Flight ~4h',
+        price: '₹52–75K',
+        center: [1.31, 103.83],
+        zoom: 12,
+        stops: [
+          {
+            name: 'Marina Bay',
+            nights: '2N',
+            desc: 'Gardens by the Bay Supertrees, Marina Bay Sands SkyPark, spectra light show, and Lau Pa Sat satay.',
+            transit: 'MRT / Cable Car ~25m',
+            lat: 1.2847,
+            lng: 103.8610,
+            color: 'blue',
+            num: 1
+          },
+          {
+            name: 'Sentosa Island',
+            nights: '1N',
+            desc: 'Universal Studios thrill rides, S.E.A. Aquarium deep ocean wonders, and Tanjong beach clubs.',
+            transit: 'Taxi ~15m',
+            lat: 1.2494,
+            lng: 103.8303,
+            color: 'purple',
+            num: 2
+          },
+          {
+            name: 'Clarke Quay & Orchard',
+            nights: '1N',
+            desc: 'River taxi cruise, heritage shophouse cocktail bars, and premier botanical shopping boulevards.',
+            transit: 'Flight ~4h',
+            lat: 1.2905,
+            lng: 103.8465,
+            color: 'green',
+            num: 3
+          }
+        ],
+        path: [
+          [1.2847, 103.8610],
+          [1.265, 103.845],
+          [1.2494, 103.8303],
+          [1.275, 103.838],
+          [1.2905, 103.8465]
+        ]
+      }
+    };
+
+    // Live search filter
+    document.getElementById('dest-search-input').addEventListener('input', function(e) {
+      const q = e.target.value.toLowerCase().trim();
+      const tiles = document.querySelectorAll('#dest-grid .dest-tile');
+
+      tiles.forEach(tile => {
+        const name = tile.getAttribute('data-dest').toLowerCase();
+        if (!q || name.includes(q)) {
+          tile.style.display = 'block';
+        } else {
+          tile.style.display = 'none';
+        }
+      });
+
+      const btn = document.getElementById('step-1-btn');
+      if (q.length >= 2) {
+        activeTrip.destination = e.target.value.trim();
+        btn.disabled = false;
+      }
+    });
+
+    // Destination card pick
+    function pickDestination(el, name) {
+      document.querySelectorAll('#dest-grid .dest-tile').forEach(t => t.classList.remove('selected'));
+      el.classList.add('selected');
+      activeTrip.destination = name;
+      document.getElementById('dest-search-input').value = name;
+      const btn = document.getElementById('step-1-btn');
+      btn.disabled = false;
+    }
+
+    // Advance Step 1 -> Step 2
+    function submitStep1() {
+      const dest = activeTrip.destination || document.getElementById('dest-search-input').value.trim() || 'Bali';
+      activeTrip.destination = dest;
+
+      appendUserBubble(`I want to explore ${dest}`);
+      scrollToBottom();
+
+      setTimeout(() => {
+        appendStep2Card();
+      }, 250);
+    }
+
+    // Step 1: Destination Selection (if user navigates Back)
+    function appendStep1Card() {
+      activeTrip.step = 1;
+      const stream = document.getElementById('chat-stream');
+      const card = document.createElement('div');
+      card.className = 'ttw-wizard-card';
+      card.id = 'step-1-card';
+      card.innerHTML = `
+        <div class="wizard-progress-row">
+          <div class="wizard-bar-segments">
+            <div class="wizard-seg filled"></div>
+            <div class="wizard-seg"></div>
+            <div class="wizard-seg"></div>
+            <div class="wizard-seg"></div>
+          </div>
+          <div class="wizard-counter">1<span>/4</span></div>
+        </div>
+
+        <h2 class="wizard-title">Where to next?</h2>
+        <p class="wizard-subtitle">Tap a place to pick one, or search any city or country to add several.</p>
+
+        <div class="wizard-search-wrap">
+          <span class="wizard-search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input type="text" id="dest-search-input" class="wizard-search-input" placeholder="Search any city or country" value="${activeTrip.destination || 'Chennai'}" autocomplete="off" />
+        </div>
+
+        <div class="destinations-grid" id="dest-grid">
+          <div class="dest-tile ${activeTrip.destination === 'Chennai' ? 'selected' : ''}" data-dest="Chennai" onclick="pickDestination(this, 'Chennai')">
+            <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=500&auto=format&fit=crop&q=80" alt="Chennai" class="dest-tile-img" />
+            <div class="dest-tile-overlay">
+              <span class="dest-badge yellow">ROUTE CHOSEN 974 TIMES</span>
+              <div class="dest-name-row">
+                <span>Chennai</span>
+                <span class="dest-check">✓</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dest-tile ${activeTrip.destination === 'Vietnam' ? 'selected' : ''}" data-dest="Vietnam" onclick="pickDestination(this, 'Vietnam')">
+            <img src="https://images.unsplash.com/photo-1528127269322-539801943592?w=500&auto=format&fit=crop&q=80" alt="Vietnam" class="dest-tile-img" />
+            <div class="dest-tile-overlay">
+              <span class="dest-badge pink">♥ LOVED BY SOLO</span>
+              <div class="dest-name-row">
+                <span>Vietnam</span>
+                <span class="dest-check">✓</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dest-tile ${activeTrip.destination === 'Bali' ? 'selected' : ''}" data-dest="Bali" onclick="pickDestination(this, 'Bali')">
+            <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&auto=format&fit=crop&q=80" alt="Bali" class="dest-tile-img" />
+            <div class="dest-tile-overlay">
+              <span class="dest-badge pink">♥ HONEYMOON</span>
+              <div class="dest-name-row">
+                <span>Bali</span>
+                <span class="dest-check">✓</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="dest-tile ${activeTrip.destination === 'Thailand' ? 'selected' : ''}" data-dest="Thailand" onclick="pickDestination(this, 'Thailand')">
+            <img src="https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=500&auto=format&fit=crop&q=80" alt="Thailand" class="dest-tile-img" />
+            <div class="dest-tile-overlay">
+              <span class="dest-badge yellow">MOST BOOKED</span>
+              <div class="dest-name-row">
+                <span>Thailand</span>
+                <span class="dest-check">✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="step-1-btn" class="wizard-submit-btn" onclick="submitStep1()">
+          <span>Continue</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      `;
+      stream.appendChild(card);
+      scrollToBottom();
+    }
+
+    // Step 2: Duration selection
+    function appendStep2Card() {
+      activeTrip.step = 2;
+      const stream = document.getElementById('chat-stream');
+      const card = document.createElement('div');
+      card.className = 'ttw-wizard-card';
+      card.id = 'step-2-card';
+      card.innerHTML = `
+        <div class="wizard-progress-row">
+          <div class="wizard-bar-segments">
+            <div class="wizard-seg filled"></div>
+            <div class="wizard-seg filled"></div>
+            <div class="wizard-seg"></div>
+            <div class="wizard-seg"></div>
+          </div>
+          <div class="wizard-counter">2<span>/4</span></div>
+        </div>
+
+        <h2 class="wizard-title">How many days are you planning?</h2>
+        <p class="wizard-subtitle">Pick the optimal trip duration for ${activeTrip.destination || 'Chennai'}.</p>
+
+        <div class="chips-cluster" id="duration-chips">
+          <div class="chip-item ${activeTrip.days === 3 ? 'selected' : ''}" onclick="selectDuration(this, 3)">3 Days (Weekend Escape)</div>
+          <div class="chip-item ${activeTrip.days === 5 ? 'selected' : ''}" onclick="selectDuration(this, 5)">5 Days (Classic Tour)</div>
+          <div class="chip-item ${activeTrip.days === 7 ? 'selected' : ''}" onclick="selectDuration(this, 7)">7 Days (Full Exploration)</div>
+          <div class="chip-item ${activeTrip.days === 10 ? 'selected' : ''}" onclick="selectDuration(this, 10)">10 Days (Deep Immersion)</div>
+          <div class="chip-item ${activeTrip.days === 14 ? 'selected' : ''}" onclick="selectDuration(this, 14)">14 Days (Grand Discovery)</div>
+        </div>
+
+        <div class="wizard-actions-row">
+          <button type="button" class="wizard-back-btn" onclick="goBackToStep1()">Back</button>
+          <button type="button" class="wizard-continue-btn" onclick="submitStep2()">
+            <span>Continue</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      `;
+      stream.appendChild(card);
+      scrollToBottom();
+    }
+
+    function selectDuration(el, days) {
+      document.querySelectorAll('#duration-chips .chip-item').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      activeTrip.days = days;
+    }
+
+    function submitStep1() {
+      const s1 = document.getElementById('step-1-card');
+      if (s1) s1.remove();
+      appendStep2Card();
+    }
+
+    function submitStep2() {
+      const s2 = document.getElementById('step-2-card');
+      if (s2) s2.remove();
+      appendStep3Card();
+    }
+
+    function goBackToStep1() {
+      const s2 = document.getElementById('step-2-card');
+      if (s2) s2.remove();
+      appendStep1Card();
+    }
+
+    function goBackToStep2() {
+      const s3 = document.getElementById('step-3-card');
+      if (s3) s3.remove();
+      appendStep2Card();
+    }
+
+    // Step 3: Who's coming? (Matches Screenshot 2 Exact)
+    function appendStep3Card() {
+      activeTrip.step = 3;
+      const stream = document.getElementById('chat-stream');
+      const card = document.createElement('div');
+      card.className = 'ttw-wizard-card';
+      card.id = 'step-3-card';
+      card.innerHTML = `
+        <div class="wizard-progress-row">
+          <div class="wizard-bar-segments">
+            <div class="wizard-seg filled"></div>
+            <div class="wizard-seg filled"></div>
+            <div class="wizard-seg filled"></div>
+            <div class="wizard-seg"></div>
+          </div>
+          <div class="wizard-counter">3<span>/4</span></div>
+        </div>
+
+        <h2 class="wizard-title">Who's coming?</h2>
+        <p class="wizard-subtitle">So I can pace the trip and size the stays.</p>
+
+        <div class="party-pills-wrap" id="party-pills-wrap">
+          <div class="party-pill ${activeTrip.party === 'Just me' ? 'selected' : ''}" onclick="selectPartyPill(this, 'Just me')"><span>🧍</span> Just me</div>
+          <div class="party-pill ${activeTrip.party === 'Couple' ? 'selected' : ''}" onclick="selectPartyPill(this, 'Couple')"><span>👩‍❤️‍👨</span> Couple</div>
+          <div class="party-pill ${activeTrip.party === 'Family' ? 'selected' : ''}" onclick="selectPartyPill(this, 'Family')"><span>👨‍👩‍👧</span> Family</div>
+          <div class="party-pill ${activeTrip.party === 'Friends' ? 'selected' : ''}" onclick="selectPartyPill(this, 'Friends')"><span class="check-icon">✓ </span><span>🥂</span> Friends</div>
+          <div class="party-pill ${activeTrip.party === 'Parents / seniors' ? 'selected' : ''}" onclick="selectPartyPill(this, 'Parents / seniors')"><span>🧓</span> Parents / seniors</div>
+        </div>
+
+        <div class="wizard-steppers-box">
+          <div class="stepper-row">
+            <div>
+              <div class="stepper-label">Adults</div>
+              <div class="stepper-sub">12+ years</div>
+            </div>
+            <div class="stepper-controls">
+              <button type="button" class="stepper-btn" onclick="changeGuestCount('adults', -1)">−</button>
+              <span class="stepper-val" id="stepper-adults-val">${guestCounts.adults}</span>
+              <button type="button" class="stepper-btn" onclick="changeGuestCount('adults', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="stepper-row">
+            <div>
+              <div class="stepper-label">Children</div>
+              <div class="stepper-sub">2 to 11 years</div>
+            </div>
+            <div class="stepper-controls">
+              <button type="button" class="stepper-btn" onclick="changeGuestCount('children', -1)">−</button>
+              <span class="stepper-val" id="stepper-children-val">${guestCounts.children}</span>
+              <button type="button" class="stepper-btn" onclick="changeGuestCount('children', 1)">+</button>
+            </div>
+          </div>
+
+          <div class="stepper-row">
+            <div>
+              <div class="stepper-label">Infants</div>
+              <div class="stepper-sub">under 2 years</div>
+            </div>
+            <div class="stepper-controls">
+              <button type="button" class="stepper-btn" onclick="changeGuestCount('infants', -1)">−</button>
+              <span class="stepper-val" id="stepper-infants-val">${guestCounts.infants}</span>
+              <button type="button" class="stepper-btn" onclick="changeGuestCount('infants', 1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="wizard-actions-row">
+          <button type="button" class="wizard-back-btn" onclick="goBackToStep2()">Back</button>
+          <button type="button" class="wizard-continue-btn" onclick="submitStep3()">
+            <span>Continue</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      `;
+      stream.appendChild(card);
+      scrollToBottom();
+    }
+
+    function selectPartyPill(el, partyName) {
+      document.querySelectorAll('#party-pills-wrap .party-pill').forEach(p => {
+        p.classList.remove('selected');
+        const chk = p.querySelector('.check-icon');
+        if (chk) chk.remove();
+      });
+      el.classList.add('selected');
+      const chk = document.createElement('span');
+      chk.className = 'check-icon';
+      chk.textContent = '✓ ';
+      el.prepend(chk);
+      activeTrip.party = partyName;
+    }
+
+    function changeGuestCount(type, delta) {
+      if (type === 'adults') {
+        guestCounts.adults = Math.max(1, guestCounts.adults + delta);
+        const el = document.getElementById('stepper-adults-val');
+        if (el) el.textContent = guestCounts.adults;
+      } else if (type === 'children') {
+        guestCounts.children = Math.max(0, guestCounts.children + delta);
+        const el = document.getElementById('stepper-children-val');
+        if (el) el.textContent = guestCounts.children;
+      } else if (type === 'infants') {
+        guestCounts.infants = Math.max(0, guestCounts.infants + delta);
+        const el = document.getElementById('stepper-infants-val');
+        if (el) el.textContent = guestCounts.infants;
+      }
+    }
+
+    // Step 3 Submit -> Switches to Route Map & Renders Masterplan Card (Matches Screenshot 1 Exact)
+    async function submitStep3() {
+      const s3 = document.getElementById('step-3-card');
+      if (s3) s3.remove();
+
+      const planKey = getMatchingPresetKey(activeTrip.destination || 'Chennai');
+      const plan = MASTER_PRESETS[planKey] || MASTER_PRESETS.chennai;
+
+      // 1. Activate Left Pane Leaflet Map with Chennai
+      activateMapWithPlan(plan);
+
+      // 2. Render Masterplan Card matching Screenshot 1
+      renderMasterplanCard(plan);
+    }
+
+    function getMatchingPresetKey(dest) {
+      const d = (dest || '').toLowerCase();
+      if (d.includes('chennai') || d.includes('madras')) return 'chennai';
+      if (d.includes('vietnam') || d.includes('hanoi')) return 'vietnam';
+      if (d.includes('japan') || d.includes('tokyo')) return 'japan';
+      if (d.includes('europe') || d.includes('paris')) return 'europe';
+      if (d.includes('thailand') || d.includes('bangkok')) return 'thailand';
+      if (d.includes('dubai')) return 'dubai';
+      if (d.includes('maldives')) return 'maldives';
+      if (d.includes('singapore')) return 'singapore';
+      return 'chennai';
+    }
+
+    // Transitions Left Pane to Leaflet Route Map
+    function activateMapWithPlan(plan) {
+      const heroView = document.getElementById('ttw-hero-view');
+      if (heroView) heroView.classList.add('hidden');
+
+      const destBtn = document.getElementById('current-dest-pill-btn');
+      if (destBtn) {
+        destBtn.style.display = 'inline-flex';
+        const label = document.getElementById('header-dest-label');
+        if (label) label.textContent = plan.name;
+      }
+
+      // Initialize Leaflet if not yet created
+      if (!leafletMap) {
+        leafletMap = L.map('chat-leaflet-map', {
+          zoomControl: false,
+          attributionControl: false
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(leafletMap);
+
+        L.control.zoom({ position: 'topleft' }).addTo(leafletMap);
+      }
+
+      renderMapPinsAndRoute(plan);
+    }
+
+    function activateMap(presetKey) {
+      const plan = MASTER_PRESETS[presetKey] || MASTER_PRESETS.chennai;
+      activateMapWithPlan(plan);
+    }
+
+    function renderMapPinsAndRoute(preset) {
+      if (!leafletMap) return;
+
+      if (markersGroup) leafletMap.removeLayer(markersGroup);
+      if (routePolyline) leafletMap.removeLayer(routePolyline);
+
+      markersGroup = L.featureGroup();
+
+      preset.stops.forEach(stop => {
+        const pinHtml = `
+          <div class="tarzan-pin ${stop.color || 'blue'}">
+            <span>${stop.num}</span>
+          </div>
+        `;
+        const customIcon = L.divIcon({
+          className: 'tarzan-pin-container',
+          html: pinHtml,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+          popupAnchor: [0, -32]
+        });
+
+        const m = L.marker([stop.lat, stop.lng], { icon: customIcon })
+          .bindPopup(`
+            <div style="font-family:'Plus Jakarta Sans',sans-serif; padding:4px 6px;">
+              <strong style="font-size:14px; color:#111827;">${stop.name} (${stop.nights})</strong>
+              <p style="font-size:12px; color:#64748b; margin-top:4px; max-width:200px;">${stop.desc}</p>
+            </div>
+          `);
+        markersGroup.addLayer(m);
+      });
+
+      markersGroup.addTo(leafletMap);
+
+      if (preset.stops.length === 1) {
+        leafletMap.setView(preset.center || [preset.stops[0].lat, preset.stops[0].lng], preset.zoom || 11);
+      } else {
+        if (preset.path) {
+          const routeHalo = L.polyline(preset.path, {
+            color: '#ffffff',
+            weight: 6.5,
+            opacity: 0.9,
+            lineCap: 'round',
+            lineJoin: 'round'
+          });
+
+          const routeTrack = L.polyline(preset.path, {
+            color: '#ff385c',
+            weight: 3.8,
+            dashArray: '8, 8',
+            opacity: 0.95,
+            lineCap: 'round',
+            lineJoin: 'round'
+          });
+
+          routePolyline = L.layerGroup([routeHalo, routeTrack]).addTo(leafletMap);
+        }
+        leafletMap.fitBounds(markersGroup.getBounds(), { padding: [60, 60], maxZoom: 13 });
+      }
+
+      leafletMap.invalidateSize();
+    }
+
+    function recenterMap() {
+      if (leafletMap && markersGroup) {
+        leafletMap.fitBounds(markersGroup.getBounds(), { padding: [60, 60] });
+      }
+    }
+
+    function toggleMapFullscreen() {
+      const leftPane = document.querySelector('.ttw-left-pane');
+      if (leftPane) {
+        if (!document.fullscreenElement) {
+          leftPane.requestFullscreen().catch(err => {
+            console.warn('Fullscreen error:', err);
+          });
+        } else {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Render the exact Itinerary Masterplan Card (Matches Screenshot 1 Exact)
+    function renderMasterplanCard(preset) {
+      const stream = document.getElementById('chat-stream');
+
+      let stopsHtml = '';
+      preset.stops.forEach((stop, idx) => {
+        stopsHtml += `
+          <div class="timeline-stop" onclick="focusMapPin(${stop.lat}, ${stop.lng})">
+            <div class="stop-dot ${stop.color || 'blue'}"></div>
+            <div class="stop-header">
+              <span class="stop-city">${stop.name}</span>
+              <span class="stop-nights-badge">${stop.nights}</span>
+            </div>
+            <p class="stop-desc">${stop.desc}</p>
+            <div class="transit-pill">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/></svg>
+              <span>${stop.transit || preset.flightDur || 'Flight ~1h15'}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      const row = document.createElement('div');
+      row.className = 'msg-row ai masterplan-row';
+      row.id = 'itinerary-result-row';
+      row.innerHTML = `
+        <div class="msg-avatar">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Kaira" />
+        </div>
+        <div class="masterplan-wrapper">
+          <div class="masterplan-card" id="itinerary-result-card">
+            <div class="masterplan-head">
+              <div class="masterplan-chosen-badge">${preset.chosenTimes || 'ROUTE CHOSEN 974 TIMES'}</div>
+              <div class="masterplan-dep-sub">FROM ${(preset.depCity || 'HYDERABAD').toUpperCase()}</div>
+              <h1 class="masterplan-title">${preset.title || preset.name}</h1>
+              <div class="masterplan-meta-row">
+                <span class="masterplan-pill">
+                  <span style="font-size:12px;">🗓️</span>
+                  <span>${preset.date || 'March 2027'}</span>
+                </span>
+                <span class="masterplan-pill">${preset.nights || '7N'}</span>
+                <span class="masterplan-pill">${preset.stopsCount || '1 stop'}</span>
+              </div>
+            </div>
+
+            <div class="masterplan-body">
+              <div class="timeline-rail-line"></div>
+
+              <!-- Departure -->
+              <div class="timeline-stop">
+                <div class="stop-dot"></div>
+                <div class="stop-header">
+                  <span class="stop-city">${preset.depCity || 'Hyderabad'}</span>
+                  <span class="stop-role">DEPARTURE</span>
+                </div>
+                <div class="transit-pill">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z"/></svg>
+                  <span>${preset.flightDur || 'Flight ~1h15'}</span>
+                </div>
+              </div>
+
+              ${stopsHtml}
+
+              <!-- Return -->
+              <div class="timeline-stop">
+                <div class="stop-dot"></div>
+                <div class="stop-header">
+                  <span class="stop-city">${preset.depCity || 'Hyderabad'}</span>
+                  <span class="stop-role">RETURN</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Summary & Perks Box -->
+            <div class="masterplan-summary-box">
+              <div class="price-col">
+                <div class="price-label">EST / PERSON</div>
+                <div class="price-val">${preset.price || '₹18–32K'}</div>
+              </div>
+              <div class="perks-col">
+                <div class="perk-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Flights, stays, transfers included</span>
+                </div>
+                <div class="perk-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Nothing to pay now</span>
+                </div>
+                <div class="perk-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>₹5,000 off when you book</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notice -->
+            <div class="masterplan-notice">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <span>Range moves with your dates and hotel choice</span>
+            </div>
+
+            <!-- Actions -->
+            <div class="masterplan-actions-row">
+              <button type="button" class="masterplan-modify-btn" onclick="modifyRoute()">Modify</button>
+              <button type="button" class="masterplan-confirm-btn" onclick="confirmRoute()">
+                <span>Confirm Route & Sign In</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Follow-up suggestion pills -->
+          <div class="suggestion-pills-row">
+            <button type="button" class="sugg-pill" onclick="sendSuggestion('Yes, this route works')">Yes, this route works</button>
+            <button type="button" class="sugg-pill" onclick="sendSuggestion('Add more coastal stops')">Add more coastal stops</button>
+            <button type="button" class="sugg-pill" onclick="sendSuggestion('Include cultural workshops')">Include cultural workshops</button>
+            <button type="button" class="sugg-pill" onclick="sendSuggestion('How do I get there?')">How do I get :</button>
+          </div>
+        </div>
+      `;
+
+      stream.appendChild(row);
+
+      // Update bottom bar placeholder and send button
+      const input = document.getElementById('chat-free-input');
+      if (input) input.placeholder = 'Ask me anything';
+      const sendBtn = document.getElementById('chat-send-action-btn');
+      if (sendBtn) {
+        sendBtn.style.background = '#0f172a';
+        sendBtn.style.color = '#ffffff';
+        sendBtn.style.border = 'none';
+      }
+
+      scrollToBottom();
+    }
+
+    function modifyRoute() {
+      const resultRow = document.getElementById('itinerary-result-row');
+      if (resultRow) resultRow.remove();
+      appendStep3Card();
+    }
+
+    function confirmRoute() {
+      appendUserBubble('Confirm Route & Sign In');
+      setTimeout(() => {
+        const row = document.createElement('div');
+        row.className = 'msg-row ai';
+        row.innerHTML = `
+          <div class="msg-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Kaira" /></div>
+          <div class="msg-bubble" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;">
+            🎉 <strong>Route confirmed!</strong> Your itinerary has been reserved. Signing you into TripMate AI to unlock offline maps, vouchers, and direct curator support.
+          </div>
+        `;
+        document.getElementById('chat-stream').appendChild(row);
+        scrollToBottom();
+      }, 300);
+    }
+
+
+    function focusMapPin(lat, lng) {
+      if (leafletMap) {
+        leafletMap.flyTo([lat, lng], 13, { duration: 1 });
+      }
+    }
+
+    function sendSuggestion(text) {
+      appendUserBubble(text);
+      sendQueryToAI(text);
+    }
+
+    // Handle Free-text Chat Input
+    function handleSendText() {
+      const input = document.getElementById('chat-free-input');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      appendUserBubble(text);
+      scrollToBottom();
+
+      // Check if user entered one of our destinations
+      const tLower = text.toLowerCase();
+      if (tLower.includes('chennai') || tLower.includes('madras')) {
+        activeTrip.destination = 'Chennai';
+        activateMap('chennai');
+        renderMasterplanCard(MASTER_PRESETS.chennai);
+        return;
+      } else if (tLower.includes('vietnam') || tLower.includes('hanoi')) {
+        activeTrip.destination = 'Vietnam';
+        activateMap('vietnam');
+        renderMasterplanCard(MASTER_PRESETS.vietnam);
+        return;
+      } else if (tLower.includes('japan') || tLower.includes('tokyo')) {
+        activeTrip.destination = 'Japan';
+        activateMap('japan');
+        renderMasterplanCard(MASTER_PRESETS.japan);
+        return;
+      } else if (tLower.includes('europe') || tLower.includes('paris')) {
+        activeTrip.destination = 'Europe';
+        activateMap('europe');
+        renderMasterplanCard(MASTER_PRESETS.europe);
+        return;
+      } else if (tLower.includes('thailand') || tLower.includes('bangkok') || tLower.includes('phuket')) {
+        activeTrip.destination = 'Thailand';
+        activateMap('thailand');
+        renderMasterplanCard(MASTER_PRESETS.thailand);
+        return;
+      } else if (tLower.includes('dubai')) {
+        activeTrip.destination = 'Dubai';
+        activateMap('dubai');
+        renderMasterplanCard(MASTER_PRESETS.dubai);
+        return;
+      } else if (tLower.includes('maldives')) {
+        activeTrip.destination = 'Maldives';
+        activateMap('maldives');
+        renderMasterplanCard(MASTER_PRESETS.maldives);
+        return;
+      } else if (tLower.includes('singapore')) {
+        activeTrip.destination = 'Singapore';
+        activateMap('singapore');
+        renderMasterplanCard(MASTER_PRESETS.singapore);
+        return;
+      } else if (tLower.includes('bali')) {
+        activeTrip.destination = 'Bali';
+        activateMap('bali');
+        renderMasterplanCard(MASTER_PRESETS.bali);
+        return;
+      }
+
+      sendQueryToAI(text);
+    }
+
+    async function sendQueryToAI(text) {
+      const stream = document.getElementById('chat-stream');
+
+      const typing = document.createElement('div');
+      typing.className = 'msg-row ai';
+      typing.id = 'typing-indicator';
+      typing.innerHTML = `
+        <div class="msg-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Kaira" /></div>
+        <div class="msg-bubble" style="font-style:italic; color:#64748b;">Kaira is thinking...</div>
+      `;
+      stream.appendChild(typing);
+      scrollToBottom();
+
+      try {
+        chatHistory.push({ role: 'user', content: text });
+
+        const res = await fetch('/api/v1/chat/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: chatHistory,
+            destination: activeTrip.destination || 'Travel'
+          })
+        });
+
+        const data = await res.json();
+        const typingEl = document.getElementById('typing-indicator');
+        if (typingEl) typingEl.remove();
+
+        const reply = data.reply || "I'm right here! I can refine any day of your itinerary or add local culinary gems.";
+        chatHistory.push({ role: 'assistant', content: reply });
+        appendAIBubble(reply);
+      } catch (e) {
+        const typingEl = document.getElementById('typing-indicator');
+        if (typingEl) typingEl.remove();
+        appendAIBubble("I've tuned the itinerary! Tell me if you'd like to customize any day or explore flights.");
+      }
+    }
+
+    function appendUserBubble(text) {
+      const stream = document.getElementById('chat-stream');
+      const row = document.createElement('div');
+      row.className = 'msg-row user';
+      row.innerHTML = `<div class="msg-bubble">${escapeHtml(text)}</div>`;
+      stream.appendChild(row);
+      scrollToBottom();
+    }
+
+    function appendAIBubble(text) {
+      const stream = document.getElementById('chat-stream');
+      const row = document.createElement('div');
+      row.className = 'msg-row ai';
+      row.innerHTML = `
+        <div class="msg-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80" alt="Kaira" /></div>
+        <div class="msg-bubble">${formatMarkdownText(text)}</div>
+      `;
+      stream.appendChild(row);
+      scrollToBottom();
+    }
+
+    function formatMarkdownText(t) {
+      return t
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>')
+        .replace(/•\s/g, '&bull;&nbsp;');
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function scrollToBottom() {
+      const stream = document.getElementById('chat-stream');
+      setTimeout(() => {
+        stream.scrollTop = stream.scrollHeight;
+      }, 50);
+    }
+
+    document.getElementById('chat-free-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        handleSendText();
+      }
+    });
+
+    function showQuickOptions() {
+      appendAIBubble("You can ask me anything about travel visas, luggage checklists, currency budgeting, or local foodie spots!");
+    }
+
+    // Reset to initial screen on "New chat" (+)
+    function resetToStep1() {
+      window.location.href = '/chat';
+    }
+
+    function openPresetQuickSwitch() {
+      const keys = ['chennai', 'bali', 'vietnam', 'japan', 'europe', 'thailand', 'dubai', 'maldives', 'singapore'];
+      const nextKey = keys[(Math.floor(Math.random() * keys.length))];
+      activateMap(nextKey);
+      renderMasterplanCard(MASTER_PRESETS[nextKey]);
+    }
+
+    // Check if ?q= was passed
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q) {
+        const qLower = q.toLowerCase();
+        if (qLower.includes('chennai') || qLower.includes('madras')) {
+          activeTrip.destination = 'Chennai';
+          activateMap('chennai');
+          renderMasterplanCard(MASTER_PRESETS.chennai);
+        } else if (qLower.includes('bali')) {
+          activeTrip.destination = 'Bali';
+          activateMap('bali');
+          renderMasterplanCard(MASTER_PRESETS.bali);
+        } else if (qLower.includes('vietnam') || qLower.includes('hanoi')) {
+          activeTrip.destination = 'Vietnam';
+          activateMap('vietnam');
+          renderMasterplanCard(MASTER_PRESETS.vietnam);
+        } else if (qLower.includes('japan') || qLower.includes('tokyo')) {
+          activeTrip.destination = 'Japan';
+          activateMap('japan');
+          renderMasterplanCard(MASTER_PRESETS.japan);
+        } else if (qLower.includes('europe') || qLower.includes('paris')) {
+          activeTrip.destination = 'Europe';
+          activateMap('europe');
+          renderMasterplanCard(MASTER_PRESETS.europe);
+        } else if (qLower.includes('thailand') || qLower.includes('bangkok') || qLower.includes('phuket')) {
+          activeTrip.destination = 'Thailand';
+          activateMap('thailand');
+          renderMasterplanCard(MASTER_PRESETS.thailand);
+        } else if (qLower.includes('dubai')) {
+          activeTrip.destination = 'Dubai';
+          activateMap('dubai');
+          renderMasterplanCard(MASTER_PRESETS.dubai);
+        } else if (qLower.includes('maldives')) {
+          activeTrip.destination = 'Maldives';
+          activateMap('maldives');
+          renderMasterplanCard(MASTER_PRESETS.maldives);
+        } else if (qLower.includes('singapore')) {
+          activeTrip.destination = 'Singapore';
+          activateMap('singapore');
+          renderMasterplanCard(MASTER_PRESETS.singapore);
+        } else {
+          document.getElementById('dest-search-input').value = q;
+          activeTrip.destination = q;
+          document.getElementById('step-1-btn').disabled = false;
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

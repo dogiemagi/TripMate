@@ -84,7 +84,7 @@ const API = {
     return await res.json();
   },
 
-  async translatePhrase(text, sourceLanguage = 'auto', targetLanguage = 'Tamil') {
+  async translatePhrase(text, sourceLanguage = 'English', targetLanguage = 'Tamil') {
     const res = await fetch(`${this.baseUrl}/api/v1/phrasebook/translate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -94,7 +94,37 @@ const API = {
         target_language: targetLanguage
       })
     });
-    if (!res.ok) throw new Error('Translation request failed');
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || errData.message || 'Translation request failed');
+    }
+    return await res.json();
+  },
+
+  async translateVoice(audioBlob, sourceLanguage = 'English', targetLanguage = 'Tamil') {
+    const formData = new FormData();
+    formData.append('audio_file', audioBlob, 'recording.wav');
+    formData.append('source_language', sourceLanguage);
+    formData.append('target_language', targetLanguage);
+
+    const res = await fetch(`${this.baseUrl}/api/v1/phrasebook/voice-translate`, {
+      method: 'POST',
+      body: formData
+    });
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || errData.message || 'Voice translation request failed');
+    }
+    return await res.json();
+  },
+
+  async sendChatMessage(messages, destination = '') {
+    const res = await fetch(`${this.baseUrl}/api/v1/chat/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, destination })
+    });
+    if (!res.ok) throw new Error('Chat request failed');
     return await res.json();
   }
 };

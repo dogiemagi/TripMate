@@ -12,7 +12,8 @@ from app.routers import (
     food,
     budget,
     packing,
-    phrasebook
+    phrasebook,
+    chat
 )
 
 # Logging configuration
@@ -27,7 +28,7 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description=(
-        "VoyageAI is a production-grade, multimodal AI travel platform. "
+        "TripMate AI is a production-grade, multimodal AI travel platform. "
         "It integrates real-time weather forecasts, AI multimodal vision analysis, "
         "interactive day-by-day trip planning, gastronomy discovery, currency conversions, "
         "smart packing checklists, and multilingual audio phrasebooks."
@@ -53,6 +54,7 @@ app.include_router(food.router)
 app.include_router(budget.router)
 app.include_router(packing.router)
 app.include_router(phrasebook.router)
+app.include_router(chat.router)
 
 # Healthcheck for Render & Cloud Monitors
 @app.get("/healthz", tags=["System"])
@@ -72,6 +74,14 @@ if os.path.exists(static_dir):
     @app.get("/", include_in_schema=False)
     async def serve_index():
         response = FileResponse(os.path.join(static_dir, "index.html"))
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
+    @app.get("/chat", include_in_schema=False)
+    async def serve_chat():
+        response = FileResponse(os.path.join(static_dir, "chat.html"))
         response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"

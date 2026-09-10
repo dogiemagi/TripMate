@@ -4,14 +4,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VoyageAI - Multimodal AI Travel Intelligence Platform</title>
+  <title>TripMate AI - Plan Smarter. Travel Happier.</title>
   <meta name="description"
-    content="Production-ready multimodal travel intelligence platform with AI vision, real-time weather radar, smart itinerary builder, gastronomy guide, and currency budgeting." />
+    content="Plan your dream trip in minutes with TripMate AI. Powered by multimodal AI travel intelligence, real-time weather radar, interactive day-by-day itineraries, gastronomy guides, and currency budgeting." />
+  <link rel="icon" type="image/jpeg" href="/static/assets/tripmate-logo.jpg" />
 
-  <!-- Fonts -->
+  <!-- Fonts: Plus Jakarta Sans & Instrument Serif (Editorial Luxury) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
 
   <!-- Lucide Icons -->
@@ -22,43 +24,67 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <!-- Application Stylesheet -->
-  <link rel="stylesheet" href="/static/css/styles.css?v=1.0.5" />
+  <link rel="stylesheet" href="/static/css/styles.css?v=2.0.0" />
 </head>
 
 <body>
-  <div class="app-container">
-
-    <!-- Top Navigation Bar -->
-    <header class="navbar">
-      <a href="/" class="nav-brand">
-        <div class="brand-icon-wrapper">
-          <i data-lucide="plane"></i>
+  <!-- ==========================================================================
+       Sticky Navigation Bar
+       ========================================================================== -->
+  <header class="ttw-navbar">
+    <div class="ttw-nav-inner">
+      <!-- Brand Lockup -->
+      <a href="/" class="ttw-brand" aria-label="TripMate Homepage">
+        <div class="ttw-brand-mark ttw-brand-mark-logo">
+          <img src="/static/assets/tripmate-logo.jpg" alt="TripMate AI" width="38" height="38" />
         </div>
-        <div class="brand-info">
-          <div class="brand-header-row">
-            <span class="brand-title">VoyageAI</span>
-            <span class="brand-badge">Multimodal</span>
-          </div>
-          <span class="brand-tagline">Your travel assistant is here</span>
+        <div class="ttw-brand-text">
+          <span class="ttw-brand-name">Trip<span>Mate</span></span>
+          <span class="ttw-brand-tagline">Plan Smarter. Travel Happier.</span>
         </div>
       </a>
 
-      <div class="nav-search">
-        <i data-lucide="search" id="global-search-icon" style="color: var(--text-muted); cursor: pointer;"></i>
-        <input type="text" id="global-city-search" placeholder="Search any city globally" />
-        <button type="button" id="global-mic-btn" class="nav-mic-btn" title="Speak to Search (Voice Input)">
-          <i data-lucide="mic"></i>
-        </button>
-        <button id="global-search-btn" class="nav-search-btn" title="Search Destination">
-          <i data-lucide="arrow-right"></i>
-        </button>
+      <!-- Center Search Pill (Where do you want to go?) -->
+      <div class="ttw-nav-search">
+        <span class="ttw-nav-search-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </span>
+        <input type="text" id="global-city-search" placeholder="Where do you want to go?" autocomplete="off" />
+        <div class="ttw-search-actions">
+          <button type="button" id="global-mic-btn" class="ttw-icon-btn" title="Voice Search (Speech to Text)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+              <line x1="12" y1="19" x2="12" y2="22"></line>
+            </svg>
+          </button>
+          <button type="button" id="global-search-btn" class="ttw-icon-btn ttw-search-go-btn"
+            title="Search Destination">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <div class="nav-actions">
-        <!-- Global Currency Switcher (Default: INR) -->
-        <div class="currency-picker-wrapper">
-          <i data-lucide="banknote" class="currency-picker-icon"></i>
-          <select id="global-currency-select" class="currency-select-input" title="Change Base Currency">
+      <!-- Nav Actions -->
+      <div class="ttw-nav-actions">
+        <!-- Global Currency Switcher -->
+        <div class="ttw-currency-pill" title="Base Currency">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+            <circle cx="12" cy="12" r="2"></circle>
+            <path d="M6 12h.01M18 12h.01"></path>
+          </svg>
+          <select id="global-currency-select" class="ttw-currency-select">
             <option value="INR" selected>INR (₹)</option>
             <option value="USD">USD ($)</option>
             <option value="EUR">EUR (€)</option>
@@ -71,148 +97,804 @@
           </select>
         </div>
 
-        <div class="status-badge">
-          <span class="status-dot"></span>
-          <span>API Cloud Active</span>
-        </div>
-        <a href="/docs" target="_blank" class="btn btn-secondary" style="padding: 0.45rem 0.9rem; font-size: 0.82rem;">
-          <i data-lucide="code-2"></i> API Docs
+        <a href="/docs" target="_blank" class="ttw-btn-outline" title="Open API Documentation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+          <span>API Docs</span>
+        </a>
+
+        <a href="#ai-studio" class="ttw-btn-primary">
+          <span>Start Planning</span>
         </a>
       </div>
-    </header>
+    </div>
+  </header>
 
-    <!-- Main Navigation Tabs -->
-    <nav class="tabs-container">
-      <ul class="nav-tabs">
-        <li>
-          <button class="tab-btn active" data-tab="tab-vision">
-            <i data-lucide="camera"></i> Photo Scanner
-          </button>
+  <!-- ==========================================================================
+       Hero Section (Signature The Tarzan Way Layout & Polaroid Collage)
+       ========================================================================== -->
+  <section class="ttw-hero">
+    <div class="ttw-container">
+      <div class="ttw-hero-grid">
+        <!-- Left Hero Content -->
+        <div class="ttw-hero-content">
+          <div class="ttw-kicker">
+            <span class="ttw-kicker-dot"></span>
+            <span>TripMate AI is online &middot; replies in ~2s</span>
+          </div>
+
+          <h1 class="ttw-hero-title">
+            Plan your trip in <span class="ttw-serif">minutes.</span>
+          </h1>
+
+          <p class="ttw-hero-lede">
+            AI plans it, real-time intelligence adds the vibe. No markups. No package pressure.
+            <b>Pay only for what you book.</b>
+          </p>
+
+          <a href="#ai-studio" class="ttw-hero-cta" onclick="switchToTab('tab-itinerary')">
+            <span>Start planning</span>
+            <div class="ttw-hero-cta-arrow">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </div>
+          </a>
+
+          <!-- Prompt Chips with Emojis -->
+          <div class="ttw-hero-prompts">
+            <button type="button" class="ttw-prompt-pill" onclick="quickPlanTrip('Tokyo, Japan', '10')">
+              <span class="ttw-pill-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M4 18V6a2 2 0 0 1 2-2h2l2 4h4l2-4h2a2 2 0 0 1 2 2v12" />
+                  <rect x="2" y="18" width="20" height="4" rx="1" />
+                </svg></span><span>10 days Japan</span>
+            </button>
+            <button type="button" class="ttw-prompt-pill" onclick="quickPlanTrip('Bali, Indonesia', '7')">
+              <span class="ttw-pill-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                </svg></span><span>Bali honeymoon</span>
+            </button>
+            <button type="button" class="ttw-prompt-pill" onclick="quickPlanTrip('Paris, France', '5')">
+              <span class="ttw-pill-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M2 20h20" />
+                  <path d="M5 20V8l7-5 7 5v12" />
+                  <path d="M9 20v-4h6v4" />
+                  <path d="M9 12h6" />
+                </svg></span><span>Europe under 1 lakh</span>
+            </button>
+            <button type="button" class="ttw-prompt-pill" onclick="quickPlanTrip('Auckland, New Zealand', '8')">
+              <span class="ttw-pill-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2" />
+                  <path d="M15 18H9" />
+                  <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14" />
+                  <circle cx="17" cy="18" r="2" />
+                  <circle cx="7" cy="18" r="2" />
+                </svg></span><span>New Zealand Road Trip</span>
+            </button>
+            <button type="button" class="ttw-prompt-pill" onclick="quickPlanTrip('Goa, India', '4')">
+              <span class="ttw-pill-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <circle cx="8" cy="8" r="6" />
+                  <path d="M18.09 10.37A6 6 0 1 1 10.34 18" />
+                  <path d="M7 6h1v4" />
+                  <path d="m16.71 13.88.7.71-2.82 2.82" />
+                </svg></span><span>Destinations under ₹1L</span>
+            </button>
+            <button type="button" class="ttw-prompt-pill" onclick="quickPlanTrip('Rome, Italy', '5')">
+              <span class="ttw-pill-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path
+                    d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z" />
+                </svg></span><span>Surprise me</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Hero Polaroid Collage & Floating Avatar -->
+        <div class="ttw-polaroid-wrap">
+          <!-- Polaroid 1: Kyoto Ramen -->
+          <div class="ttw-polaroid ttw-p1" onclick="quickPlanTrip('Kyoto, Japan', '6')">
+            <div class="ttw-polaroid-img"
+              style="background-image: url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=400&q=80&auto=format');">
+            </div>
+            <div class="ttw-polaroid-caption">Kyoto, 2am ramen</div>
+          </div>
+
+          <!-- Polaroid 2: Malé -->
+          <div class="ttw-polaroid ttw-p2" onclick="quickPlanTrip('Male, Maldives', '5')">
+            <div class="ttw-polaroid-img"
+              style="background-image: url('https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=400&q=80&auto=format');">
+            </div>
+            <div class="ttw-polaroid-caption">Malé, day 2</div>
+          </div>
+
+          <!-- Polaroid 3: Hoi An -->
+          <div class="ttw-polaroid ttw-p3" onclick="quickPlanTrip('Hoi An, Vietnam', '5')">
+            <div class="ttw-polaroid-img"
+              style="background-image: url('https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80&auto=format');">
+            </div>
+            <div class="ttw-polaroid-caption">Hoi An at 6am</div>
+          </div>
+
+          <!-- Polaroid 4: Santorini -->
+          <div class="ttw-polaroid ttw-p4" onclick="quickPlanTrip('Santorini, Greece', '6')">
+            <div class="ttw-polaroid-img"
+              style="background-image: url('https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&q=80&auto=format');">
+            </div>
+            <div class="ttw-polaroid-caption">Santorini, sunset</div>
+          </div>
+
+          <!-- Central Avatar Ring -->
+          <div class="ttw-hero-avatar-stack">
+            <div class="ttw-avatar-ring">
+              <img src="/static/assets/tripmate-logo.jpg" alt="TripMate AI Avatar" width="100" height="100"
+                style="border-radius: 50%;" />
+            </div>
+            <div class="ttw-avatar-badge">
+              <div class="ttw-avatar-hi">Hi, I'm TripMate AI.</div>
+              <div class="ttw-avatar-sub">
+                <span class="ttw-avatar-dot"></span> online &middot; ~2s reply
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Dark Navy Trust & Metric Rail (The Tarzan Way Signature)
+       ========================================================================== -->
+  <div class="ttw-rail">
+    <div class="ttw-container">
+      <ul class="ttw-rail-list">
+        <li class="ttw-rail-item">
+          <b class="ttw-rail-num">20+</b>
+          <span>AI engines &amp; human expert curators</span>
         </li>
-        <li>
-          <button class="tab-btn" data-tab="tab-weather">
-            <i data-lucide="cloud-sun"></i> Weather & Radar
-          </button>
+        <li class="ttw-rail-item">
+          <b class="ttw-rail-num">100+</b>
+          <span>countries, real routes &amp; live radar</span>
         </li>
-        <li>
-          <button class="tab-btn" data-tab="tab-itinerary">
-            <i data-lucide="map"></i> Smart Itinerary & Map
-          </button>
+        <li class="ttw-rail-item">
+          <b class="ttw-rail-num">94%</b>
+          <span>come back for a second trip</span>
         </li>
-        <li>
-          <button class="tab-btn" data-tab="tab-food">
-            <i data-lucide="utensils-crossed"></i> Gastronomy & Food
-          </button>
+        <li class="ttw-rail-item">
+          <b class="ttw-rail-num">2 secs</b>
+          <span>average reply time</span>
         </li>
-        <li>
-          <button class="tab-btn" data-tab="tab-budget">
-            <i data-lucide="coins"></i> Currency & Budget
-          </button>
-        </li>
-        <li>
-          <button class="tab-btn" data-tab="tab-packing">
-            <i data-lucide="backpack"></i> Packing Assistant
-          </button>
-        </li>
-        <li>
-          <button class="tab-btn" data-tab="tab-phrasebook">
-            <i data-lucide="languages"></i> Audio Phrasebook
-          </button>
+        <li class="ttw-rail-item">
+          <b class="ttw-rail-num">4.9 <svg width="14" height="14" viewBox="0 0 24 24" fill="#facc15" stroke="#facc15"
+              stroke-width="1.5" style="display:inline-block; vertical-align: -1px;">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg></b>
+          <span>rated across 10,000+ trips</span>
         </li>
       </ul>
-    </nav>
+    </div>
+  </div>
 
-    <!-- Main Dynamic Content Container -->
-    <main class="main-wrapper">
+  <!-- ==========================================================================
+       "This Month, I'm Loving..." Curated Showcase
+       ========================================================================== -->
+  <section class="ttw-loving-section">
+    <div class="ttw-container">
+      <div class="ttw-loving-header">
+        <div class="ttw-mini-avatar">
+          <img src="/static/assets/tripmate-logo.jpg" alt="TripMate AI Avatar" />
+        </div>
+        <h2 class="ttw-section-title">This month, <span class="ttw-serif">I'm loving...</span></h2>
+      </div>
+
+      <blockquote class="ttw-loving-quote">
+        "September is one of those sweet spots. <span class="ttw-highlight-badge">Japan is starting to ease into
+          autumn</span>, while <span class="ttw-highlight-badge">Bali is still sunny</span>, warm and easy to explore.
+        If I had ten days off right now, these are the trips I'd pick."
+      </blockquote>
+
+      <div class="ttw-loving-grid">
+        <!-- Pick 1: Japan -->
+        <div class="ttw-pick-card" onclick="quickPlanTrip('Tokyo, Japan', '9')">
+          <div class="ttw-pick-img"
+            style="background-image: url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=600&q=80&auto=format');">
+            <span class="ttw-pick-tag">TripMate Pick &middot; this month</span>
+          </div>
+          <div class="ttw-pick-body">
+            <h3 class="ttw-pick-title">Japan, before <span class="ttw-serif">autumn arrives</span></h3>
+            <p class="ttw-pick-blurb">Tokyo's neighbourhoods, Kyoto's temples, Hakone's hot springs and a slower side of
+              Japan before the peak crowds. 9 days of culture &amp; cuisine.</p>
+            <div class="ttw-pick-footer">
+              <div class="ttw-pick-price">₹1,60,000 <span>/ person</span></div>
+              <button type="button" class="ttw-btn-outline" style="padding: 6px 14px; font-size: 12.5px;">Tailor in
+                Studio &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pick 2: Bali -->
+        <div class="ttw-pick-card" onclick="quickPlanTrip('Bali, Indonesia', '8')">
+          <div class="ttw-pick-img"
+            style="background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80&auto=format');">
+            <span class="ttw-pick-tag">TripMate Pick &middot; this month</span>
+          </div>
+          <div class="ttw-pick-body">
+            <h3 class="ttw-pick-title">Bali, <span class="ttw-serif">sunny days &amp; slow stays</span></h3>
+            <p class="ttw-pick-blurb">Ubud's rice terraces, East Bali's quieter coast, beach sunsets and a few days
+              doing absolutely nothing. 8 days, curated for pure unwinding.</p>
+            <div class="ttw-pick-footer">
+              <div class="ttw-pick-price">₹68,000 <span>/ person</span></div>
+              <button type="button" class="ttw-btn-outline" style="padding: 6px 14px; font-size: 12.5px;">Tailor in
+                Studio &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pick 3: European Dream -->
+        <div class="ttw-pick-card" onclick="quickPlanTrip('Zurich, Switzerland', '7')">
+          <div class="ttw-pick-img"
+            style="background-image: url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=80&auto=format');">
+            <span class="ttw-pick-tag">TripMate Pick &middot; this month</span>
+          </div>
+          <div class="ttw-pick-body">
+            <h3 class="ttw-pick-title">The Alpine <span class="ttw-serif">Daydream</span></h3>
+            <p class="ttw-pick-blurb">Scenic mountain rail journeys through Interlaken, lakeside Zurich promenades, and
+              boutique stays. 7 days of crisp air and fondue.</p>
+            <div class="ttw-pick-footer">
+              <div class="ttw-pick-price">₹1,92,000 <span>/ person</span></div>
+              <button type="button" class="ttw-btn-outline" style="padding: 6px 14px; font-size: 12.5px;">Tailor in
+                Studio &rarr;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       "How It Works" 4-Step Cards
+       ========================================================================== -->
+  <section class="ttw-works-section">
+    <div class="ttw-container">
+      <div class="ttw-works-head">
+        <h2>How it <span class="ttw-serif">works.</span></h2>
+        <p>TripMate AI plans fast. Multimodal intelligence catches what generic bots miss. You only pay for what you
+          pick.</p>
+      </div>
+
+      <div class="ttw-works-grid">
+        <!-- Step 1 -->
+        <div class="ttw-step-card">
+          <div class="ttw-step-num">1</div>
+          <h3>Tell TripMate what's <span class="ttw-serif">on your mind.</span></h3>
+          <p>Budget, dates, must-haves. Type like you'd text a travel buddy. English, Hindi, Tamil, all supported.</p>
+          <div class="ttw-step-demo">
+            <div class="ttw-step-user-box">
+              <span class="ttw-step-you">You</span>
+              <div class="ttw-step-user-text">Vietnam, 6 days, Hoi An &amp; cruise, ₹1.4L couple</div>
+            </div>
+            <div class="ttw-step-ai">
+              <span>TripMate</span>
+              <div class="ttw-step-ai-msg">Here are tailored options...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="ttw-step-card">
+          <div class="ttw-step-num">2</div>
+          <h3>Multimodal AI &amp; Radar <span class="ttw-serif">fine-tune</span> it.</h3>
+          <p>Real-time atmospheric radar adjusts what AI can't predict: monsoon shifts, tourist traps, and quiet sunrise
+            spots.</p>
+          <div class="ttw-step-demo">
+            <div class="ttw-step-user-box">
+              <span class="ttw-step-you">Curator Insight</span>
+              <div class="ttw-step-user-text">Swaps afternoon boat for sunset cruise. Avoids peak rain window.</div>
+            </div>
+            <div class="ttw-step-ai">
+              <span>Radar</span>
+              <div class="ttw-step-ai-msg">Clear skies expected 5:30 PM.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="ttw-step-card">
+          <div class="ttw-step-num">3</div>
+          <h3>Change anything. <span class="ttw-serif">Unlimited</span> revisions.</h3>
+          <p>Different hotels? Extra days? Vegetarian meals only? Tweak parameters in real time with immediate
+            re-pricing.</p>
+          <div class="ttw-step-demo">
+            <div class="ttw-step-user-box">
+              <span class="ttw-step-you">You</span>
+              <div class="ttw-step-user-text">Switch to boutique heritage stay and relaxed pace.</div>
+            </div>
+            <div class="ttw-step-ai">
+              <span>Updated</span>
+              <div class="ttw-step-ai-msg">Route re-optimized instantly.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="ttw-step-card">
+          <div class="ttw-step-num">4</div>
+          <h3>Book only what you <span class="ttw-serif">pick.</span></h3>
+          <p>Zero hidden markups. Transparent daily budget, local currency conversions, audio phrasebooks, and packing
+            checklists.</p>
+          <div class="ttw-step-demo">
+            <div class="ttw-step-user-box">
+              <span class="ttw-step-you">Final Masterplan</span>
+              <div class="ttw-step-user-text">6 days &middot; stays + transit &middot; ₹1,38,400</div>
+            </div>
+            <div class="ttw-step-ai">
+              <span>Ready</span>
+              <div class="ttw-step-ai-msg">Fully synchronized across tools.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Connected Trips Catalog with Category Filter Tabs
+       ========================================================================== -->
+  <section class="ttw-trips-section">
+    <div class="ttw-container">
+      <span class="ttw-section-kicker">&star; Connected Trips</span>
+      <h2 class="ttw-section-title">AI-Planned Trips. Yours to <span class="ttw-serif">Personalize.</span></h2>
+      <p style="font-size: 16px; color: var(--ttw-ink-muted); margin-top: 6px;">
+        Real routes our travellers loved. Select any trip to tailor duration, dates, and budget directly in our Studio.
+      </p>
+
+      <!-- Category Filter Tabs -->
+      <div class="ttw-trips-filters">
+        <button type="button" class="ttw-filter-btn active" onclick="filterTrips('all', this)">All</button>
+        <button type="button" class="ttw-filter-btn" onclick="filterTrips('honeymoon', this)"><svg
+            class="ttw-filter-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path
+              d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+          </svg> Honeymoon</button>
+        <button type="button" class="ttw-filter-btn" onclick="filterTrips('family', this)"><svg class="ttw-filter-icon"
+            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg> Family</button>
+        <button type="button" class="ttw-filter-btn" onclick="filterTrips('adventure', this)"><svg
+            class="ttw-filter-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+          </svg> Adventure</button>
+        <button type="button" class="ttw-filter-btn" onclick="filterTrips('quick', this)"><svg class="ttw-filter-icon"
+            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z" />
+          </svg> Quick Escape</button>
+        <button type="button" class="ttw-filter-btn" onclick="filterTrips('premium', this)"><svg class="ttw-filter-icon"
+            width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path
+              d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z" />
+          </svg> Premium</button>
+      </div>
+
+      <!-- Trips Grid -->
+      <div class="ttw-trips-grid" id="ttw-trips-grid">
+        <!-- Trip 1 -->
+        <div class="ttw-trip-card" data-category="honeymoon" onclick="quickPlanTrip('Bali, Indonesia', '7')">
+          <div class="ttw-trip-img"
+            style="background-image: url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=500&q=80&auto=format');">
+            <span class="ttw-trip-tier">Honeymoon</span>
+          </div>
+          <div class="ttw-trip-body">
+            <div class="ttw-trip-route">
+              <span>Ubud</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Kuta</span>
+            </div>
+            <h3 class="ttw-trip-title">A Bali Affair</h3>
+            <div class="ttw-trip-includes">
+              <span class="ttw-include-tag">Flights</span>
+              <span class="ttw-include-tag">2 stays</span>
+              <span class="ttw-include-tag">3 activities</span>
+              <span class="ttw-include-tag">Private transfers</span>
+            </div>
+            <div class="ttw-trip-curator">
+              <div class="ttw-curator-avatar"></div>
+              <span>Curated by <b>Muskan Agarwal</b></span>
+            </div>
+            <div class="ttw-trip-meta">
+              <div class="ttw-trip-price">
+                <span class="ttw-trip-price-from">From</span>
+                <span class="ttw-trip-price-amount">₹77,406</span>
+                <span class="ttw-trip-price-per">/ person</span>
+              </div>
+              <span class="ttw-trip-cta">Tailor in Studio &rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip 2 -->
+        <div class="ttw-trip-card" data-category="premium honeymoon"
+          onclick="quickPlanTrip('Zurich, Switzerland', '8')">
+          <div class="ttw-trip-img"
+            style="background-image: url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500&q=80&auto=format');">
+            <span class="ttw-trip-tier">Premium &middot; Honeymoon</span>
+          </div>
+          <div class="ttw-trip-body">
+            <div class="ttw-trip-route">
+              <span>Interlaken</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Zurich</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Paris</span>
+            </div>
+            <h3 class="ttw-trip-title">The European Daydream</h3>
+            <div class="ttw-trip-includes">
+              <span class="ttw-include-tag">Flights</span>
+              <span class="ttw-include-tag">4 stays</span>
+              <span class="ttw-include-tag">6 activities</span>
+              <span class="ttw-include-tag">Panoramic rail</span>
+            </div>
+            <div class="ttw-trip-curator">
+              <div class="ttw-curator-avatar" style="background: radial-gradient(circle at 30% 30%, #f59e0b, #d97706);">
+              </div>
+              <span>Curated by <b>Somya Singhal</b></span>
+            </div>
+            <div class="ttw-trip-meta">
+              <div class="ttw-trip-price">
+                <span class="ttw-trip-price-from">From</span>
+                <span class="ttw-trip-price-amount">₹2,32,504</span>
+                <span class="ttw-trip-price-per">/ person</span>
+              </div>
+              <span class="ttw-trip-cta">Tailor in Studio &rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip 3 -->
+        <div class="ttw-trip-card" data-category="quick" onclick="quickPlanTrip('Bangkok, Thailand', '5')">
+          <div class="ttw-trip-img"
+            style="background-image: url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=500&q=80&auto=format');">
+            <span class="ttw-trip-tier">Quick Escape</span>
+          </div>
+          <div class="ttw-trip-body">
+            <div class="ttw-trip-route">
+              <span>Pattaya</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Bangkok</span>
+            </div>
+            <h3 class="ttw-trip-title">Bangkok &amp; Beaches</h3>
+            <div class="ttw-trip-includes">
+              <span class="ttw-include-tag">Flights</span>
+              <span class="ttw-include-tag">2 stays</span>
+              <span class="ttw-include-tag">4 activities</span>
+              <span class="ttw-include-tag">Speedboat pass</span>
+            </div>
+            <div class="ttw-trip-curator">
+              <div class="ttw-curator-avatar" style="background: radial-gradient(circle at 30% 30%, #f59e0b, #d97706);">
+              </div>
+              <span>Curated by <b>Somya Singhal</b></span>
+            </div>
+            <div class="ttw-trip-meta">
+              <div class="ttw-trip-price">
+                <span class="ttw-trip-price-from">From</span>
+                <span class="ttw-trip-price-amount">₹71,496</span>
+                <span class="ttw-trip-price-per">/ person</span>
+              </div>
+              <span class="ttw-trip-cta">Tailor in Studio &rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip 4 -->
+        <div class="ttw-trip-card" data-category="adventure premium" onclick="quickPlanTrip('Tokyo, Japan', '7')">
+          <div class="ttw-trip-img"
+            style="background-image: url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=500&q=80&auto=format');">
+            <span class="ttw-trip-tier">Adventure</span>
+          </div>
+          <div class="ttw-trip-body">
+            <div class="ttw-trip-route">
+              <span>Tokyo</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Kyoto</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Osaka</span>
+            </div>
+            <h3 class="ttw-trip-title">The Soul of Japan</h3>
+            <div class="ttw-trip-includes">
+              <span class="ttw-include-tag">Bullet train</span>
+              <span class="ttw-include-tag">3 stays</span>
+              <span class="ttw-include-tag">5 activities</span>
+              <span class="ttw-include-tag">Food tour</span>
+            </div>
+            <div class="ttw-trip-curator">
+              <div class="ttw-curator-avatar" style="background: radial-gradient(circle at 30% 30%, #3b82f6, #1d4ed8);">
+              </div>
+              <span>Curated by <b>Kenji Takahashi</b></span>
+            </div>
+            <div class="ttw-trip-meta">
+              <div class="ttw-trip-price">
+                <span class="ttw-trip-price-from">From</span>
+                <span class="ttw-trip-price-amount">₹1,48,200</span>
+                <span class="ttw-trip-price-per">/ person</span>
+              </div>
+              <span class="ttw-trip-cta">Tailor in Studio &rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip 5 -->
+        <div class="ttw-trip-card" data-category="quick premium" onclick="quickPlanTrip('Dubai, UAE', '4')">
+          <div class="ttw-trip-img"
+            style="background-image: url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500&q=80&auto=format');">
+            <span class="ttw-trip-tier">Quick Escape</span>
+          </div>
+          <div class="ttw-trip-body">
+            <div class="ttw-trip-route">
+              <span>Downtown</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Marina</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Desert</span>
+            </div>
+            <h3 class="ttw-trip-title">Dubai Vibes</h3>
+            <div class="ttw-trip-includes">
+              <span class="ttw-include-tag">Flights</span>
+              <span class="ttw-include-tag">1 stay</span>
+              <span class="ttw-include-tag">3 activities</span>
+              <span class="ttw-include-tag">Desert safari</span>
+            </div>
+            <div class="ttw-trip-curator">
+              <div class="ttw-curator-avatar" style="background: radial-gradient(circle at 30% 30%, #ef4444, #b91c1c);">
+              </div>
+              <span>Curated by <b>Shubh</b></span>
+            </div>
+            <div class="ttw-trip-meta">
+              <div class="ttw-trip-price">
+                <span class="ttw-trip-price-from">From</span>
+                <span class="ttw-trip-price-amount">₹64,995</span>
+                <span class="ttw-trip-price-per">/ person</span>
+              </div>
+              <span class="ttw-trip-cta">Tailor in Studio &rarr;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip 6 -->
+        <div class="ttw-trip-card" data-category="family" onclick="quickPlanTrip('Phu Quoc, Vietnam', '6')">
+          <div class="ttw-trip-img"
+            style="background-image: url('https://images.unsplash.com/photo-1528127269322-539801943592?w=500&q=80&auto=format');">
+            <span class="ttw-trip-tier">Family-Friendly</span>
+          </div>
+          <div class="ttw-trip-body">
+            <div class="ttw-trip-route">
+              <span>Hanoi</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+              <span>Phu Quoc</span>
+            </div>
+            <h3 class="ttw-trip-title">Phu Quoc &amp; Island Wonders</h3>
+            <div class="ttw-trip-includes">
+              <span class="ttw-include-tag">Flights</span>
+              <span class="ttw-include-tag">2 stays</span>
+              <span class="ttw-include-tag">5 activities</span>
+              <span class="ttw-include-tag">Cable car ride</span>
+            </div>
+            <div class="ttw-trip-curator">
+              <div class="ttw-curator-avatar" style="background: radial-gradient(circle at 30% 30%, #10b981, #047857);">
+              </div>
+              <span>Curated by <b>Vasu</b></span>
+            </div>
+            <div class="ttw-trip-meta">
+              <div class="ttw-trip-price">
+                <span class="ttw-trip-price-from">From</span>
+                <span class="ttw-trip-price-amount">₹66,170</span>
+                <span class="ttw-trip-price-per">/ person</span>
+              </div>
+              <span class="ttw-trip-cta">Tailor in Studio &rarr;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       AI Travel Intelligence Studio (7 Core Super-Tools)
+       ========================================================================== -->
+  <section class="ttw-studio-section" id="ai-studio">
+    <div class="ttw-container">
+      <div class="ttw-studio-head-box">
+        <div class="ttw-studio-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path
+              d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z" />
+          </svg>
+          <span>All-In-One Intelligence Suite</span>
+        </div>
+        <h2>Interactive Travel Studio</h2>
+        <p>Explore all 7 multimodal engines synchronized in real time with your selected destination and currency.</p>
+      </div>
+
+      <!-- Studio Navigation Tabs Hint & Controls -->
+      <div class="ttw-tabs-hint-row">
+        <button type="button" class="ttw-tab-nav-arrow" onclick="scrollStudioTabs(-240)" title="Scroll tabs left"
+          aria-label="Scroll left">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <div class="ttw-tabs-scroll-hint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>7 Intelligence Engines &bull; Click or scroll tabs to switch</span>
+        </div>
+        <button type="button" class="ttw-tab-nav-arrow" onclick="scrollStudioTabs(240)" title="Scroll tabs right"
+          aria-label="Scroll right">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Studio Navigation Tabs -->
+      <div class="ttw-tabs-wrapper">
+        <div class="ttw-tabs-container" id="studio-tabs-scroller">
+          <ul class="ttw-nav-tabs">
+            <li>
+              <button type="button" class="tab-btn active" data-tab="tab-vision">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+                  <circle cx="12" cy="13" r="3" />
+                </svg>
+                <span>Photo Scanner</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="tab-btn" data-tab="tab-weather">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2v2" />
+                  <path d="m4.93 4.93 1.41 1.41" />
+                  <path d="M20 12h2" />
+                  <path d="m19.07 4.93-1.41 1.41" />
+                  <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128" />
+                  <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z" />
+                </svg>
+                <span>Weather &amp; Radar</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="tab-btn" data-tab="tab-itinerary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
+                  <line x1="9" y1="3" x2="9" y2="18" />
+                  <line x1="15" y1="6" x2="15" y2="21" />
+                </svg>
+                <span>Smart Itinerary &amp; Map</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="tab-btn" data-tab="tab-food">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8Z" />
+                  <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7" />
+                  <path d="m2.1 21.8 6.4-6.3" />
+                  <path d="m19 5-7 7" />
+                </svg>
+                <span>Gastronomy &amp; Food</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="tab-btn" data-tab="tab-budget">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="8" cy="8" r="6" />
+                  <path d="M18.09 10.37A6 6 0 1 1 10.34 18" />
+                  <path d="M7 6h1v4" />
+                  <path d="m16.71 13.88.7.71-2.82 2.82" />
+                </svg>
+                <span>Currency &amp; Budget</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="tab-btn" data-tab="tab-packing">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 10a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" />
+                  <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                  <path d="M8 21v-5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v5" />
+                  <path d="M8 10h8" />
+                </svg>
+                <span>Packing Assistant</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="tab-btn" data-tab="tab-phrasebook">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="m5 8 6 6" />
+                  <path d="m4 14 6-6 2-3" />
+                  <path d="M2 5h12" />
+                  <path d="M7 2h1" />
+                  <path d="m22 22-5-10-5 10" />
+                  <path d="M14 18h6" />
+                </svg>
+                <span>Audio Phrasebook</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
 
       <!-- ================================================================= -->
       <!-- TAB 1: AI PHOTO SCANNER                                           -->
       <!-- ================================================================= -->
       <section id="tab-vision" class="tab-pane active">
-        <!-- Features Quick Summary Overview Card (Above Photo Scanner) -->
-        <div class="features-summary-card">
-          <div class="features-summary-header">
-            <span class="features-badge"><i data-lucide="sparkles"></i> All-In-One Travel Assistant</span>
-            <span class="features-summary-title">Explore All Built-in Tools & Features:</span>
-          </div>
-          <div class="features-mini-grid">
-            <div class="feature-mini-pill" onclick="switchToTab('tab-vision')" title="Click to view Photo Scanner">
-              <div class="pill-icon" style="color: var(--accent-cyan);"><i data-lucide="camera"></i></div>
-              <div class="pill-body">
-                <strong>Photo & Menu Scanner</strong>
-                <span>Instant landmark recognition, history & menu translator</span>
-              </div>
-            </div>
-
-            <div class="feature-mini-pill" onclick="switchToTab('tab-weather')" title="Click to view Weather & Radar">
-              <div class="pill-icon" style="color: #38bdf8;"><i data-lucide="cloud-sun"></i></div>
-              <div class="pill-body">
-                <strong>Weather & Live Radar</strong>
-                <span>Hourly forecasts, rain radar, UV index & packing advice</span>
-              </div>
-            </div>
-
-            <div class="feature-mini-pill" onclick="switchToTab('tab-itinerary')" title="Click to view Smart Itinerary">
-              <div class="pill-icon" style="color: #a855f7;"><i data-lucide="map"></i></div>
-              <div class="pill-body">
-                <strong>Smart Itinerary & Map</strong>
-                <span>Custom multi-day trip schedules with interactive map pins</span>
-              </div>
-            </div>
-
-            <div class="feature-mini-pill" onclick="switchToTab('tab-food')" title="Click to view Gastronomy & Food">
-              <div class="pill-icon" style="color: #f59e0b;"><i data-lucide="utensils-crossed"></i></div>
-              <div class="pill-body">
-                <strong>Gastronomy & Food</strong>
-                <span>Must-try dishes, vegetarian filters, prices & dietary tips</span>
-              </div>
-            </div>
-
-            <div class="feature-mini-pill" onclick="switchToTab('tab-budget')" title="Click to view Currency & Budget">
-              <div class="pill-icon" style="color: #10b981;"><i data-lucide="coins"></i></div>
-              <div class="pill-body">
-                <strong>Currency & Budget</strong>
-                <span>Live multi-currency converter & travel expense estimator</span>
-              </div>
-            </div>
-
-            <div class="feature-mini-pill" onclick="switchToTab('tab-packing')" title="Click to view Packing Assistant">
-              <div class="pill-icon" style="color: #ec4899;"><i data-lucide="backpack"></i></div>
-              <div class="pill-body">
-                <strong>Smart Packing Assistant</strong>
-                <span>Weather-tailored packing lists with interactive check-offs</span>
-              </div>
-            </div>
-
-            <div class="feature-mini-pill" onclick="switchToTab('tab-phrasebook')" title="Click to view Audio Phrasebook">
-              <div class="pill-icon" style="color: #06b6d4;"><i data-lucide="languages"></i></div>
-              <div class="pill-body">
-                <strong>Audio Phrasebook & Voice</strong>
-                <span>Live speech translation, phonetic guides & native audio</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div class="section-header">
-          <div class="section-header-left">
-            <h1><i data-lucide="camera"></i> AI Photo & Landmark Scanner</h1>
-            <p>Upload a landmark photo, restaurant menu, or scenic view for instant AI analysis, history, and translations.</p>
-          </div>
+          <h1>AI Photo &amp; Landmark Scanner</h1>
+          <p>Upload a landmark photo, restaurant menu, or scenic view for instant AI recognition, historical context,
+            and culinary translations.</p>
         </div>
 
         <div class="grid-split">
-          <!-- Upload & Controls -->
+          <!-- Upload & Controls Card -->
           <div class="glass-card">
-            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">Visual Input</h3>
+            <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--ttw-ink);">Visual Input
+            </h3>
 
             <div class="dropzone" id="vision-dropzone">
               <input type="file" id="vision-file-input" accept="image/*" style="display: none;" />
               <div class="dropzone-icon">
-                <i data-lucide="upload-cloud"></i>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+                  <path d="M12 12v9" />
+                  <path d="m16 16-4-4-4 4" />
+                </svg>
               </div>
-              <h4 style="font-size: 1rem; color: #fff; margin-bottom: 0.25rem;">Drop landmark or menu photo here</h4>
-              <p style="font-size: 0.8rem; color: var(--text-muted);">Supports JPG, PNG, WEBP</p>
+              <h4 style="font-size: 1rem; color: var(--ttw-ink); margin-bottom: 0.25rem;">Drop landmark or menu photo
+                here</h4>
+              <p style="font-size: 0.82rem; color: var(--ttw-ink-muted);">Supports JPG, PNG, WEBP</p>
             </div>
 
             <div class="image-preview-box" id="vision-preview-box">
@@ -223,10 +905,10 @@
               <div class="form-group">
                 <label class="form-label">Analysis Mode</label>
                 <select id="vision-mode-select" class="form-control">
-                  <option value="landmark">Landmark & Heritage Identifier</option>
-                  <option value="menu">Restaurant Menu & Allergen Translator</option>
-                  <option value="luggage">Luggage & Outfit Checker</option>
-                  <option value="scene">Photography & Lighting Analysis</option>
+                  <option value="landmark">Landmark &amp; Heritage Identifier</option>
+                  <option value="menu">Restaurant Menu &amp; Allergen Translator</option>
+                  <option value="luggage">Luggage &amp; Outfit Checker</option>
+                  <option value="scene">Photography &amp; Lighting Analysis</option>
                 </select>
               </div>
 
@@ -235,28 +917,29 @@
                 <div class="input-with-mic">
                   <input type="text" id="vision-prompt" class="form-control"
                     placeholder="e.g. Is this dish gluten-free? What is the best photography angle?" />
-                  <button type="button" id="vision-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
-                    <i data-lucide="mic"></i>
+                  <button type="button" id="vision-mic-btn" class="input-mic-btn" title="Voice Input">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    </svg>
                   </button>
                 </div>
               </div>
 
               <div>
-                <label class="form-label" style="font-size: 0.75rem;">Quick Sample Testing</label>
+                <label class="form-label" style="font-size: 0.78rem;">Quick Sample Testing</label>
                 <div class="sample-chips">
-                  <span class="sample-chip" data-sample="Taj Mahal Agra"><i data-lucide="landmark"></i> Taj Mahal</span>
-                  <span class="sample-chip" data-sample="Eiffel Tower Paris"><i data-lucide="landmark"></i> Eiffel
-                    Tower</span>
-                  <span class="sample-chip" data-sample="Colosseum Rome"><i data-lucide="landmark"></i> Colosseum</span>
-                  <span class="sample-chip" data-sample="Mount Fuji Japan"><i data-lucide="mountain"></i> Mount
-                    Fuji</span>
-                  <span class="sample-chip" data-sample="Italian Trattoria Menu"><i data-lucide="file-text"></i>
-                    Trattoria Menu</span>
+                  <span class="sample-chip" data-sample="Taj Mahal Agra">Taj Mahal</span>
+                  <span class="sample-chip" data-sample="Eiffel Tower Paris">Eiffel Tower</span>
+                  <span class="sample-chip" data-sample="Colosseum Rome">Colosseum</span>
+                  <span class="sample-chip" data-sample="Mount Fuji Japan">Mount Fuji</span>
+                  <span class="sample-chip" data-sample="Italian Trattoria Menu">Trattoria Menu</span>
                 </div>
               </div>
 
-              <button id="vision-analyze-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.25rem;">
-                <i data-lucide="sparkles"></i> Run AI Multimodal Analysis
+              <button type="button" id="vision-analyze-btn" class="btn btn-primary"
+                style="width: 100%; margin-top: 1.25rem;">
+                Run AI Multimodal Analysis
               </button>
             </div>
           </div>
@@ -265,11 +948,16 @@
           <div id="vision-results">
             <div class="glass-card" style="text-align: center; padding: 4rem 2rem;">
               <div
-                style="width: 64px; height: 64px; border-radius: 50%; background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
-                <i data-lucide="scan" style="width: 32px; height: 32px;"></i>
+                style="width: 56px; height: 56px; border-radius: 50%; background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem;">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                  <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                  <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                  <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                </svg>
               </div>
-              <h3 style="font-size: 1.25rem; color: #fff; font-weight: 700;">Awaiting Visual Input</h3>
-              <p style="color: var(--text-secondary); max-width: 420px; margin: 0.5rem auto 0; font-size: 0.9rem;">
+              <h3 style="font-size: 1.25rem; color: var(--ttw-ink); font-weight: 700;">Awaiting Visual Input</h3>
+              <p style="color: var(--ttw-ink-muted); max-width: 420px; margin: 0.5rem auto 0; font-size: 0.9rem;">
                 Upload an image or select a sample landmark to trigger real-time AI recognition, cultural guides, and
                 culinary translations.
               </p>
@@ -279,123 +967,88 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- TAB 2: WEATHER & FORECAST (WITH USER WISABLE FROM-TO DATE PICKER)  -->
+      <!-- TAB 2: WEATHER & LIVE RADAR                                       -->
       <!-- ================================================================= -->
       <section id="tab-weather" class="tab-pane">
         <div class="section-header">
-          <div class="section-header-left">
-            <h1><i data-lucide="cloud-sun"></i> Global Weather & Travel Radar</h1>
-            <p>Atmospheric metrics, custom date-range forecast filter (From - To), and AI packing index.</p>
-          </div>
+          <h1>Global Weather &amp; Travel Radar</h1>
+          <p>Atmospheric metrics, custom date-range forecast filter (From - To), and AI packing index.</p>
         </div>
 
-        <!-- Weather Search & Date Range Toolbar -->
         <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
           <div style="display: flex; gap: 1rem; align-items: flex-end; flex-wrap: wrap;">
             <div style="flex: 1 1 220px;">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="map-pin"></i> Destination City
-              </label>
+              <label class="form-label">Destination City</label>
               <div class="input-with-mic">
                 <input type="text" id="weather-city-input" class="form-control" placeholder="City name..."
-                  value="Delhi" />
-                <button type="button" id="weather-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
-                  <i data-lucide="mic"></i>
+                  value="Tokyo" />
+                <button type="button" id="weather-mic-btn" class="input-mic-btn" title="Voice Input">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  </svg>
                 </button>
               </div>
             </div>
 
             <div style="flex: 1 1 160px;">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="calendar"></i> From Date
-              </label>
+              <label class="form-label">From Date</label>
               <input type="date" id="weather-from-date" class="form-control" />
             </div>
 
             <div style="flex: 1 1 160px;">
-              <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                <i data-lucide="calendar-range"></i> To Date
-              </label>
+              <label class="form-label">To Date</label>
               <input type="date" id="weather-to-date" class="form-control" />
             </div>
 
-            <button id="weather-search-btn" class="btn btn-primary" style="height: 44px;">
-              <i data-lucide="refresh-cw"></i> Check Weather Radar
+            <button type="button" id="open-calendar-modal-btn" class="btn btn-secondary" style="padding: 10px 14px;">
+              <span>Calendar</span>
             </button>
-          </div>
 
-          <!-- Quick Date Range Presets -->
-          <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <span
-              style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted); display:flex; align-items:center; gap:0.3rem;">
-              <i data-lucide="clock" style="width:13px; height:13px;"></i> Quick Date Ranges:
-            </span>
-            <button type="button" class="date-preset-chip" data-preset="today">Today</button>
-            <button type="button" class="date-preset-chip" data-preset="3days">Next 3 Days</button>
-            <button type="button" class="date-preset-chip active" data-preset="7days">Next 7 Days</button>
-            <button type="button" class="date-preset-chip" data-preset="14days">Next 14 Days</button>
-            <button type="button" class="date-preset-chip" data-preset="weekend">This Weekend</button>
-            <button type="button" id="open-calendar-modal-btn" class="date-preset-chip"
-              style="color:var(--accent-cyan); border-color:rgba(6,182,212,0.4); display:inline-flex; align-items:center; gap:0.35rem;">
-              <i data-lucide="calendar"></i> Choose from Calendar
+            <button type="button" id="weather-search-btn" class="btn btn-primary" style="padding: 10px 22px;">
+              Search Forecast
             </button>
           </div>
         </div>
 
         <!-- Interactive Calendar Range Picker Modal -->
-        <div id="calendar-range-modal" class="modal-overlay" style="display: none;">
-          <div class="glass-card modal-content"
-            style="max-width: 440px; width: 92%; padding: 1.5rem; position: relative;">
+        <div id="calendar-range-modal"
+          style="display: none; position: fixed; inset: 0; background: rgba(11, 18, 32, 0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center;">
+          <div class="glass-card"
+            style="max-width: 440px; width: 92%; padding: 1.5rem; position: relative; margin: auto;">
             <div
-              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.75rem;">
-              <h3
-                style="font-size: 1.15rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
-                <i data-lucide="calendar" style="color: var(--accent-cyan);"></i> Select Travel Date Range
-              </h3>
-              <button id="close-calendar-modal" class="btn btn-secondary"
-                style="padding: 0.2rem 0.5rem; font-size: 0.8rem; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;">
-                <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+              style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--ttw-line); padding-bottom: 0.75rem;">
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ttw-ink);">Select Travel Date Range</h3>
+              <button type="button" id="close-calendar-modal" class="ttw-icon-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             </div>
 
-            <!-- Calendar Month Header & Navigation -->
+            <!-- Calendar Navigation -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-              <button id="cal-prev-month" class="btn btn-secondary"
-                style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
-                <i data-lucide="chevron-left"></i>
-              </button>
-              <span id="cal-month-year-label" style="font-weight: 700; font-size: 1.05rem; color: #fff;">August
-                2026</span>
-              <button id="cal-next-month" class="btn btn-secondary"
-                style="padding: 0.35rem 0.65rem; font-size: 0.78rem;">
-                <i data-lucide="chevron-right"></i>
-              </button>
+              <button type="button" id="cal-prev-month" class="ttw-icon-btn">&larr;</button>
+              <span id="cal-month-year-label"
+                style="font-weight: 700; font-size: 1.05rem; color: var(--ttw-ink);">August 2026</span>
+              <button type="button" id="cal-next-month" class="ttw-icon-btn">&rarr;</button>
             </div>
 
-            <!-- Calendar Grid -->
-            <div class="calendar-grid-header">
-              <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
-            </div>
-            <div id="calendar-days-grid" class="calendar-days-grid">
-              <!-- Injected via JS -->
+            <div id="calendar-days-grid"
+              style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;">
+              <!-- Days injected via JS -->
             </div>
 
-            <!-- Selected Range Summary & Actions -->
             <div
-              style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-              <div>
-                <div style="font-size: 0.75rem; color: var(--text-muted);">Selected Window:</div>
-                <div id="cal-selected-range-text"
-                  style="font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan);">
-                  Click start & end dates
-                </div>
-              </div>
+              style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--ttw-line); display: flex; justify-content: space-between; align-items: center;">
+              <div id="cal-selected-range-text" style="font-size: 0.88rem; font-weight: 600; color: var(--ttw-ink);">
+                Click start &amp; end dates</div>
               <div style="display: flex; gap: 0.5rem;">
-                <button id="cal-reset-btn" class="btn btn-secondary"
-                  style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">Reset</button>
-                <button id="cal-apply-btn" class="btn btn-primary" style="font-size: 0.8rem; padding: 0.4rem 0.9rem;">
-                  <i data-lucide="check"></i> Apply Range
-                </button>
+                <button type="button" id="cal-reset-btn" class="btn btn-secondary"
+                  style="font-size: 0.8rem; padding: 6px 12px;">Reset</button>
+                <button type="button" id="cal-apply-btn" class="btn btn-primary"
+                  style="font-size: 0.8rem; padding: 6px 16px;">Apply</button>
               </div>
             </div>
           </div>
@@ -410,83 +1063,60 @@
       <!-- TAB 3: SMART ITINERARY PLANNER & MAP                              -->
       <!-- ================================================================= -->
       <section id="tab-itinerary" class="tab-pane">
-        <!-- SVG Gradient for Circular Progress -->
-        <svg style="width:0; height:0; position:absolute;" aria-hidden="true" focusable="false">
-          <defs>
-            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#06b6d4" />
-              <stop offset="50%" stop-color="#3b82f6" />
-              <stop offset="100%" stop-color="#10b981" />
-            </linearGradient>
-          </defs>
-        </svg>
-
         <div class="section-header">
-          <div class="section-header-left">
-            <h1><i data-lucide="map"></i> AI Smart Itinerary & Interactive Map</h1>
-            <p>Multi-day custom travel plans dynamically geocoded to your exact location query, optimized with
-              Nearest-Neighbor TSP routing and visited place tracking.</p>
-          </div>
+          <h1>AI Smart Itinerary &amp; Interactive Map</h1>
+          <p>Multi-day custom travel plans dynamically geocoded to your exact location query, optimized with
+            Nearest-Neighbor TSP routing and visited place tracking.</p>
         </div>
 
-        <!-- Visited Places Circular Progress Banner -->
-        <div id="itinerary-progress-banner" class="circular-progress-card">
+        <!-- Visited Places Progress Banner -->
+        <div id="itinerary-progress-banner" class="glass-card"
+          style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
           <div style="display: flex; align-items: center; gap: 1.25rem;">
-            <div class="circular-progress-wrapper">
-              <svg class="circle-progress-svg" viewBox="0 0 100 100">
-                <circle class="circle-progress-bg" cx="50" cy="50" r="40" />
-                <circle id="itinerary-circle-bar" class="circle-progress-bar" cx="50" cy="50" r="40" />
-              </svg>
-              <div class="circle-progress-text">
-                <span id="itinerary-circle-pct">0%</span>
-                <small>Visited</small>
-              </div>
+            <div>
+              <span id="itinerary-circle-pct" style="font-size: 1.8rem; font-weight: 800; color: #0284c7;">0%</span>
+              <small style="display: block; font-size: 0.75rem; color: var(--ttw-ink-muted);">Visited</small>
             </div>
             <div>
-              <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.25rem;">Trip Exploration
-                Progress</h3>
-              <p id="itinerary-circle-subtitle" style="font-size: 0.88rem; color: var(--text-secondary);">0 of 0
-                visiting spots covered</p>
-              <span id="itinerary-circle-status" class="brand-badge"
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 0.25rem;">Trip
+                Exploration Progress</h3>
+              <p id="itinerary-circle-subtitle" style="font-size: 0.88rem; color: var(--ttw-ink-muted);">0 of 0 visiting
+                spots covered</p>
+              <span id="itinerary-circle-status" class="ttw-include-tag"
                 style="margin-top: 0.4rem; display: inline-block;">Ready for Departure</span>
             </div>
           </div>
-          <div style="text-align: right;">
+          <div>
             <button type="button" id="mark-all-visited-btn" class="btn btn-secondary"
-              style="font-size: 0.78rem; padding: 0.35rem 0.75rem; margin-right: 0.5rem;">
-              <i data-lucide="check-check"></i> Mark All Visited
-            </button>
+              style="font-size: 0.8rem; padding: 6px 12px; margin-right: 0.5rem;">Mark All Visited</button>
             <button type="button" id="reset-visited-btn" class="btn btn-secondary"
-              style="font-size: 0.78rem; padding: 0.35rem 0.75rem;">
-              <i data-lucide="rotate-ccw"></i> Reset
-            </button>
+              style="font-size: 0.8rem; padding: 6px 12px;">Reset</button>
           </div>
         </div>
 
         <div class="grid-split">
-          <!-- Itinerary Controls & Custom Place Addition -->
+          <!-- Controls Column -->
           <div>
             <div class="glass-card" style="margin-bottom: 1.25rem;">
-              <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #fff;">Trip Parameters</h3>
+              <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--ttw-ink);">Trip
+                Parameters</h3>
 
               <div class="form-group">
-                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                  <i data-lucide="map-pin"></i> Destination Location
-                </label>
+                <label class="form-label">Destination Location</label>
                 <div class="input-with-mic">
                   <input type="text" id="itinerary-dest" class="form-control" value="Delhi, India"
-                    placeholder="e.g. Chennai, Paris, Tokyo, Bengaluru, Rome..." />
-                  <button type="button" id="itinerary-mic-btn" class="input-mic-btn"
-                    title="Voice Input (Speech to Text)">
-                    <i data-lucide="mic"></i>
+                    placeholder="e.g. Tokyo, Paris, Rome, Bali..." />
+                  <button type="button" id="itinerary-mic-btn" class="input-mic-btn" title="Voice Input">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    </svg>
                   </button>
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                  <i data-lucide="clock"></i> Duration (Days)
-                </label>
+                <label class="form-label">Duration (Days)</label>
                 <select id="itinerary-days" class="form-control">
                   <option value="1">1 Day Express</option>
                   <option value="2" selected>2 Days Weekend</option>
@@ -497,22 +1127,18 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                  <i data-lucide="compass"></i> Travel Style
-                </label>
+                <label class="form-label">Travel Style</label>
                 <select id="itinerary-style" class="form-control">
-                  <option value="Balanced" selected>Balanced (Sights & Food)</option>
-                  <option value="Cultural">Cultural & Historical</option>
-                  <option value="Adventure">Active & Adventure</option>
-                  <option value="Foodie">Culinary & Gastronomy</option>
-                  <option value="Luxury">Luxury & Relaxation</option>
+                  <option value="Balanced" selected>Balanced (Sights &amp; Food)</option>
+                  <option value="Cultural">Cultural &amp; Historical</option>
+                  <option value="Adventure">Active &amp; Adventure</option>
+                  <option value="Foodie">Culinary &amp; Gastronomy</option>
+                  <option value="Luxury">Luxury &amp; Relaxation</option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                  <i data-lucide="activity"></i> Pace
-                </label>
+                <label class="form-label">Pace</label>
                 <select id="itinerary-pace" class="form-control">
                   <option value="Relaxed">Relaxed</option>
                   <option value="Moderate" selected>Moderate</option>
@@ -521,9 +1147,7 @@
               </div>
 
               <div class="form-group">
-                <label class="form-label" style="display:flex; align-items:center; gap:0.35rem;">
-                  <i data-lucide="wallet"></i> Budget Tier
-                </label>
+                <label class="form-label">Budget Tier</label>
                 <select id="itinerary-budget" class="form-control">
                   <option value="Backpacker">Backpacker (Budget)</option>
                   <option value="Moderate" selected>Moderate (Standard)</option>
@@ -532,50 +1156,50 @@
                 </select>
               </div>
 
-              <button id="itinerary-generate-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
-                <i data-lucide="sparkles"></i> Generate AI Itinerary
+              <button type="button" id="itinerary-generate-btn" class="btn btn-primary"
+                style="width: 100%; margin-top: 0.5rem;">
+                Generate AI Masterplan
               </button>
             </div>
 
             <!-- Custom Visiting Spot Addition Form -->
-            <div class="glass-card custom-spot-box">
-              <h3
-                style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.45rem;">
-                <i data-lucide="map-pin-plus" style="color: var(--accent-cyan);"></i> Add Your Own Visiting Spot
-              </h3>
-              <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem;">
+            <div class="glass-card">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 0.85rem;">Add Your
+                Own Visiting Spot</h3>
+              <p style="font-size: 0.82rem; color: var(--ttw-ink-muted); margin-bottom: 1rem;">
                 Add any landmark or personal favorite. The AI route optimizer will re-sequence all stops in the
                 shortest, optimal path order.
               </p>
 
               <div class="form-group">
-                <label class="form-label" style="font-size: 0.8rem;">Place / Landmark Name</label>
+                <label class="form-label">Place / Landmark Name</label>
                 <div class="input-with-mic">
                   <input type="text" id="custom-spot-name" class="form-control"
-                    placeholder="e.g. Qutub Minar or Coffee Roastery..." />
+                    placeholder="e.g. Qutub Minar, Roastery Café..." />
                   <button type="button" id="custom-spot-mic-btn" class="input-mic-btn" title="Voice Input">
-                    <i data-lucide="mic"></i>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    </svg>
                   </button>
                 </div>
               </div>
 
-              <div class="grid-2" style="gap: 0.5rem;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                 <div class="form-group">
-                  <label class="form-label" style="font-size: 0.8rem;">Category</label>
-                  <select id="custom-spot-cat" class="form-control"
-                    style="padding: 0.45rem 0.75rem; font-size: 0.85rem;">
-                    <option value="Heritage" selected>Heritage & Monument</option>
-                    <option value="Food">Food & Café</option>
-                    <option value="Culture">Culture & Art</option>
-                    <option value="Nature">Nature & Viewpoint</option>
-                    <option value="Shopping">Shopping & Market</option>
+                  <label class="form-label">Category</label>
+                  <select id="custom-spot-cat" class="form-control">
+                    <option value="Heritage" selected>Heritage &amp; Monument</option>
+                    <option value="Food">Food &amp; Café</option>
+                    <option value="Culture">Culture &amp; Art</option>
+                    <option value="Nature">Nature &amp; Viewpoint</option>
+                    <option value="Shopping">Shopping &amp; Market</option>
                     <option value="Custom">Personal Spot</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label class="form-label" style="font-size: 0.8rem;">Assigned Day</label>
-                  <select id="custom-spot-day" class="form-control"
-                    style="padding: 0.45rem 0.75rem; font-size: 0.85rem;">
+                  <label class="form-label">Assigned Day</label>
+                  <select id="custom-spot-day" class="form-control">
                     <option value="1">Day 1</option>
                     <option value="2">Day 2</option>
                     <option value="3">Day 3</option>
@@ -583,42 +1207,31 @@
                 </div>
               </div>
 
-              <div class="grid-2" style="gap: 0.5rem;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                 <div class="form-group">
-                  <label class="form-label" style="font-size: 0.8rem;">Duration</label>
-                  <input type="text" id="custom-spot-duration" class="form-control" value="1.5 hrs"
-                    style="padding: 0.45rem 0.75rem; font-size: 0.85rem;" />
+                  <label class="form-label">Duration</label>
+                  <input type="text" id="custom-spot-duration" class="form-control" value="1.5 hrs" />
                 </div>
                 <div class="form-group">
-                  <label class="form-label" style="font-size: 0.8rem;">Est. Cost (INR)</label>
-                  <input type="number" id="custom-spot-cost" class="form-control" value="0"
-                    style="padding: 0.45rem 0.75rem; font-size: 0.85rem;" />
+                  <label class="form-label">Est. Cost (INR)</label>
+                  <input type="number" id="custom-spot-cost" class="form-control" value="0" />
                 </div>
               </div>
 
-              <button type="button" id="add-custom-spot-btn" class="btn btn-secondary"
-                style="width: 100%; border-color: rgba(6,182,212,0.4); color: var(--accent-cyan);">
-                <i data-lucide="plus-circle"></i> Add Spot & Optimize Path
+              <button type="button" id="add-custom-spot-btn" class="btn btn-secondary" style="width: 100%;">
+                Add Spot &amp; Optimize Path
               </button>
             </div>
           </div>
 
-          <!-- Itinerary Results & Interactive Map -->
+          <!-- Map & Itinerary Results Column -->
           <div>
-            <div class="map-card-wrapper">
-              <div class="map-header">
-                <span
-                  style="font-weight: 700; font-size: 0.92rem; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
-                  <i data-lucide="navigation" style="color: var(--accent-cyan);"></i> Live Geo-Routing Radar (TSP
-                  Optimal Route)
-                </span>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                  <button id="recenter-map-btn" class="btn btn-secondary"
-                    style="padding: 0.25rem 0.65rem; font-size: 0.75rem;">
-                    <i data-lucide="crosshair"></i> Recenter
-                  </button>
-                  <span id="map-status-badge" class="brand-badge">Map Active</span>
-                </div>
+            <div class="glass-card" style="margin-bottom: 1.25rem; padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <span style="font-weight: 700; font-size: 0.95rem; color: var(--ttw-ink);">Live Geo-Routing Radar (TSP
+                  Optimal Route)</span>
+                <button type="button" id="recenter-map-btn" class="btn btn-secondary"
+                  style="padding: 4px 10px; font-size: 0.75rem;">Recenter</button>
               </div>
               <div id="itinerary-map"></div>
             </div>
@@ -631,44 +1244,45 @@
       </section>
 
       <!-- ================================================================= -->
-      <!-- TAB 4: GASTRONOMY & FOOD EXPLORER                                 -->
+      <!-- TAB 4: GASTRONOMY & FOOD                                          -->
       <!-- ================================================================= -->
       <section id="tab-food" class="tab-pane">
         <div class="section-header">
-          <div class="section-header-left">
-            <h1><i data-lucide="utensils-crossed"></i> Gastronomy & Dining Guide</h1>
-            <p>Signature authentic dishes, pronunciations, curated eateries, and strict dietary filters.</p>
-          </div>
-          <div style="display: flex; gap: 0.75rem; align-items: center;">
-            <div class="input-with-mic" style="width: 230px;">
-              <input type="text" id="food-city-input" class="form-control" placeholder="City..." value="Delhi" />
-              <button type="button" id="food-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
-                <i data-lucide="mic"></i>
-              </button>
-            </div>
-            <button id="food-search-btn" class="btn btn-primary"><i data-lucide="search"></i> Explore</button>
-          </div>
+          <h1>Gastronomy &amp; Dining Guide</h1>
+          <p>Signature authentic dishes, pronunciations, curated eateries, and strict dietary filters.</p>
         </div>
 
         <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1rem 1.5rem;">
-          <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Dietary Filters:</span>
-            <label class="filter-label">
-              <input type="checkbox" class="diet-filter-cb" value="Non-Vegetarian" /> <i data-lucide="drumstick"></i> Non-Vegetarian
+          <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem;">
+            <div class="input-with-mic" style="width: 260px;">
+              <input type="text" id="food-city-input" class="form-control" placeholder="City..." value="Delhi" />
+              <button type="button" id="food-mic-btn" class="input-mic-btn" title="Voice Input">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                </svg>
+              </button>
+            </div>
+            <button type="button" id="food-search-btn" class="btn btn-primary">Explore Cuisine</button>
+          </div>
+
+          <div
+            style="display: flex; align-items: center; gap: 1.25rem; flex-wrap: wrap; font-size: 0.88rem; color: var(--ttw-ink-2);">
+            <span style="font-weight: 600;">Dietary Filters:</span>
+            <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <input type="checkbox" class="diet-filter-cb" value="Non-Vegetarian" /> Non-Vegetarian
             </label>
-            <label class="filter-label">
-              <input type="checkbox" class="diet-filter-cb" value="Vegetarian" /> <i data-lucide="leaf"></i> Vegetarian
+            <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <input type="checkbox" class="diet-filter-cb" value="Vegetarian" /> Vegetarian
             </label>
-            <label class="filter-label">
-              <input type="checkbox" class="diet-filter-cb" value="Vegan" /> <i data-lucide="sprout"></i> Vegan
+            <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <input type="checkbox" class="diet-filter-cb" value="Vegan" /> Vegan
             </label>
-            <label class="filter-label">
-              <input type="checkbox" class="diet-filter-cb" value="Gluten-Free" /> <i data-lucide="wheat"></i>
-              Gluten-Free
+            <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <input type="checkbox" class="diet-filter-cb" value="Gluten-Free" /> Gluten-Free
             </label>
-            <label class="filter-label">
-              <input type="checkbox" class="diet-filter-cb" value="Halal" /> <i data-lucide="shield-check"></i> Halal
-              Friendly
+            <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+              <input type="checkbox" class="diet-filter-cb" value="Halal" /> Halal Friendly
             </label>
           </div>
         </div>
@@ -683,25 +1297,23 @@
       <!-- ================================================================= -->
       <section id="tab-budget" class="tab-pane">
         <div class="section-header">
-          <div class="section-header-left">
-            <h1><i data-lucide="coins"></i> Currency FX & Travel Budgeter</h1>
-            <p>Live foreign exchange conversions and realistic daily travel expense estimators in INR (₹) and global
-              currencies.</p>
-          </div>
+          <h1>Currency FX &amp; Travel Budgeter</h1>
+          <p>Live foreign exchange conversions and realistic daily travel expense estimators in INR (₹) and global
+            currencies.</p>
         </div>
 
-        <div class="grid-2">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
           <!-- FX Converter -->
           <div class="glass-card">
-            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Live Currency
-              Converter</h3>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 1.25rem;">Live
+              Currency Converter</h3>
 
             <div class="form-group">
               <label class="form-label">Amount</label>
               <input type="number" id="currency-amount" class="form-control" value="1000" />
             </div>
 
-            <div class="grid-2">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
               <div class="form-group">
                 <label class="form-label">From Currency</label>
                 <select id="currency-from" class="form-control">
@@ -735,32 +1347,36 @@
               </div>
             </div>
 
-            <button id="currency-convert-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
-              <i data-lucide="repeat"></i> Convert Currency
+            <button type="button" id="currency-convert-btn" class="btn btn-primary"
+              style="width: 100%; margin-top: 0.5rem;">
+              Convert Currency
             </button>
 
             <div id="currency-result-box"
-              style="margin-top: 1.5rem; text-align: center; padding: 1.5rem; background: rgba(15, 23, 42, 0.6); border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
-              <div style="font-size: 0.88rem; color: var(--text-muted);">1,000 INR =</div>
-              <div
-                style="font-size: 2.2rem; font-weight: 800; color: var(--accent-cyan); line-height: 1.1; margin: 0.35rem 0;">
-                $11.98 <span style="font-size: 1rem; color: #fff;">USD</span></div>
-              <div style="font-size: 0.78rem; color: var(--text-secondary);">1 INR = 0.01198 USD</div>
+              style="margin-top: 1.5rem; text-align: center; padding: 1.5rem; background: #f8f8f5; border-radius: var(--ttw-radius-md); border: 1px solid var(--ttw-line);">
+              <div style="font-size: 0.88rem; color: var(--ttw-ink-muted);">1,000 INR =</div>
+              <div style="font-size: 2.2rem; font-weight: 800; color: #0284c7; line-height: 1.1; margin: 0.35rem 0;">
+                $11.98 <span style="font-size: 1rem; color: var(--ttw-ink);">USD</span>
+              </div>
+              <div style="font-size: 0.78rem; color: var(--ttw-ink-muted);">1 INR = 0.01198 USD</div>
             </div>
           </div>
 
           <!-- Trip Expense Breakdown Calculator -->
           <div class="glass-card">
-            <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Trip Expense
-              Estimator</h3>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 1.25rem;">Trip
+              Expense Estimator</h3>
 
-            <div class="grid-3" style="gap: 0.75rem;">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
               <div class="form-group">
                 <label class="form-label">Destination</label>
                 <div class="input-with-mic">
                   <input type="text" id="budget-city" class="form-control" value="Delhi" />
-                  <button type="button" id="budget-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
-                    <i data-lucide="mic"></i>
+                  <button type="button" id="budget-mic-btn" class="input-mic-btn" title="Voice Input">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -778,12 +1394,12 @@
               </div>
             </div>
 
-            <button id="budget-estimate-btn" class="btn btn-secondary" style="width: 100%;">
-              <i data-lucide="calculator"></i> Calculate Expense Breakdown
+            <button type="button" id="budget-estimate-btn" class="btn btn-secondary" style="width: 100%;">
+              Calculate Expense Breakdown
             </button>
 
             <div id="budget-breakdown-content" style="margin-top: 1.25rem;">
-              <div style="color: var(--text-muted); font-size: 0.88rem; text-align: center; padding: 1.5rem;">
+              <div style="color: var(--ttw-ink-muted); font-size: 0.88rem; text-align: center; padding: 1.5rem;">
                 Click calculate to see itemized hotel, food, transport, and tour breakdowns.
               </div>
             </div>
@@ -796,25 +1412,26 @@
       <!-- ================================================================= -->
       <section id="tab-packing" class="tab-pane">
         <div class="section-header">
-          <div class="section-header-left">
-            <h1><i data-lucide="backpack"></i> Smart Packing Assistant</h1>
-            <p>Generate an interactive luggage checklist tailored to your destination climate, season, and activities,
-              with custom item additions.
-            </p>
-          </div>
+          <h1>Smart Packing Assistant</h1>
+          <p>Generate an interactive luggage checklist tailored to your destination climate, season, and activities,
+            with custom item additions.</p>
         </div>
 
         <div class="grid-split">
           <div>
             <div class="glass-card" style="margin-bottom: 1.25rem;">
-              <h3 style="font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: 1.25rem;">Luggage Planner</h3>
+              <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 1.25rem;">Luggage
+                Planner</h3>
 
               <div class="form-group">
                 <label class="form-label">Destination</label>
                 <div class="input-with-mic">
                   <input type="text" id="packing-dest" class="form-control" value="Goa" />
-                  <button type="button" id="packing-mic-btn" class="input-mic-btn" title="Voice Input (Speech to Text)">
-                    <i data-lucide="mic"></i>
+                  <button type="button" id="packing-mic-btn" class="input-mic-btn" title="Voice Input">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    </svg>
                   </button>
                 </div>
               </div>
@@ -827,73 +1444,74 @@
               <div class="form-group">
                 <label class="form-label">Season</label>
                 <select id="packing-season" class="form-control">
-                  <option value="Spring">Spring (Mild & Breezy)</option>
-                  <option value="Summer" selected>Summer (Warm & Sunny)</option>
-                  <option value="Autumn">Autumn (Crisp & Cool)</option>
-                  <option value="Winter">Winter (Cold & Dry)</option>
+                  <option value="Spring">Spring (Mild &amp; Breezy)</option>
+                  <option value="Summer" selected>Summer (Warm &amp; Sunny)</option>
+                  <option value="Autumn">Autumn (Crisp &amp; Cool)</option>
+                  <option value="Winter">Winter (Cold &amp; Dry)</option>
                 </select>
               </div>
 
-              <button id="packing-generate-btn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;">
-                <i data-lucide="check-square"></i> Generate Packing Checklist
+              <button type="button" id="packing-generate-btn" class="btn btn-primary"
+                style="width: 100%; margin-top: 0.5rem;">
+                Generate Packing Checklist
               </button>
             </div>
 
             <!-- Add Custom Checklist Item Box -->
-            <div class="glass-card custom-spot-box">
-              <h3
-                style="font-size: 1.05rem; font-weight: 700; color: #fff; margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.45rem;">
-                <i data-lucide="plus-circle" style="color: var(--accent-cyan);"></i> Add Your Custom Luggage Item
-              </h3>
+            <div class="glass-card">
+              <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 0.85rem;">Add
+                Custom Luggage Item</h3>
               <div class="form-group">
-                <label class="form-label" style="font-size: 0.8rem;">Item Name</label>
+                <label class="form-label">Item Name</label>
                 <div class="input-with-mic">
                   <input type="text" id="custom-packing-item-name" class="form-control"
                     placeholder="e.g. Scuba Goggles, Noise-Cancelling Headphones..." />
                   <button type="button" id="custom-packing-mic-btn" class="input-mic-btn" title="Voice Input">
-                    <i data-lucide="mic"></i>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+                      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    </svg>
                   </button>
                 </div>
               </div>
               <div class="form-group">
-                <label class="form-label" style="font-size: 0.8rem;">Category</label>
+                <label class="form-label">Category</label>
                 <select id="custom-packing-cat" class="form-control">
                   <option value="Essentials" selected>Essentials</option>
-                  <option value="Clothing">Clothing & Apparel</option>
-                  <option value="Electronics">Electronics & Gadgets</option>
-                  <option value="Toiletries">Toiletries & Health</option>
+                  <option value="Clothing">Clothing &amp; Apparel</option>
+                  <option value="Electronics">Electronics &amp; Gadgets</option>
+                  <option value="Toiletries">Toiletries &amp; Health</option>
                   <option value="Documents">Travel Documents</option>
                   <option value="Custom">Custom / Gear</option>
                 </select>
               </div>
-              <button type="button" id="add-custom-packing-btn" class="btn btn-secondary"
-                style="width: 100%; border-color: rgba(6,182,212,0.4); color: var(--accent-cyan);">
-                <i data-lucide="plus"></i> Add Item to Checklist
+              <button type="button" id="add-custom-packing-btn" class="btn btn-secondary" style="width: 100%;">
+                Add Item to Checklist
               </button>
             </div>
           </div>
 
           <div id="packing-checklist-container">
             <div class="glass-card" style="text-align: center; padding: 3rem;">
-              <i data-lucide="briefcase"
-                style="width: 48px; height: 48px; color: var(--accent-cyan); margin-bottom: 1rem;"></i>
-              <h3 style="font-size: 1.2rem; color: #fff;">Click 'Generate' to build your dynamic checklist.</h3>
+              <h3 style="font-size: 1.2rem; color: var(--ttw-ink);">Click 'Generate' to build your dynamic checklist.
+              </h3>
             </div>
           </div>
         </div>
       </section>
 
       <!-- ================================================================= -->
-      <!-- TAB 7: AUDIO PHRASEBOOK & VOICE TRANSLATION STUDIO                -->
+      <!-- TAB 7: AUDIO PHRASEBOOK & VOICE STUDIO                            -->
       <!-- ================================================================= -->
       <section id="tab-phrasebook" class="tab-pane">
         <div class="section-header">
-          <div class="section-header-left">
-            <h1><i data-lucide="languages"></i> Multilingual Audio Phrasebook & Voice Translator</h1>
-            <p>Speak or type in any language (e.g. Tamil to English, English to Telugu) with speech recognition, neural
-              translation, phonetic guides, and native audio playback.</p>
-          </div>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center;">
+          <h1>Multilingual Audio Phrasebook &amp; Voice Translator</h1>
+          <p>Speak or type in any language (Tamil, Telugu, Hindi, Spanish, French, Japanese) with speech recognition,
+            phonetic guides, and native audio playback.</p>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.5rem;">
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; align-items: center; margin-bottom: 1rem;">
             <select id="phrasebook-lang" class="form-control" style="width: 180px;">
               <optgroup label="Indian Languages">
                 <option value="Hindi" selected>Hindi (हिन्दी)</option>
@@ -911,6 +1529,7 @@
                 <option value="German">German (Deutsch)</option>
               </optgroup>
             </select>
+
             <select id="phrasebook-cat" class="form-control" style="width: 160px;">
               <option value="All" selected>All Categories</option>
               <option value="Greetings">Greetings</option>
@@ -920,173 +1539,638 @@
               <option value="Emergency">Emergency</option>
               <option value="Directions">Directions</option>
             </select>
-            <button type="button" id="btn-toggle-translation-studio" class="studio-toggle-btn"
-              title="Open Live Voice & Speech Translation Studio"
-              style="height: 42px; padding: 0 1.25rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; background: rgba(15, 23, 42, 0.75); background-image: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(99, 102, 241, 0.1)); border: 1px solid rgba(6, 182, 212, 0.35); border-radius: var(--radius-md); color: #fff; font-size: 0.88rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);">
-              <i data-lucide="mic" style="color: var(--accent-cyan); width: 16px; height: 16px;"></i>
-              <span>Live Voice &amp; Speech Studio</span>
+
+            <button type="button" id="btn-toggle-translation-studio" class="btn btn-primary" style="padding: 9px 18px;">
+              Live Voice &amp; Speech Studio
             </button>
           </div>
         </div>
 
-        <!-- Live Voice & Speech Translation Studio -->
-        <div id="live-voice-translation-studio" class="translation-studio-card" style="display: none;">
-          <div
-            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
-            <div>
-              <h3
-                style="font-size: 1.2rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
-                <i data-lucide="mic" style="color: var(--accent-cyan);"></i> Live Voice & Speech Translation Studio
-              </h3>
-              <p style="font-size: 0.85rem; color: var(--text-secondary);">
-                Click the microphone to speak in your source language or type any travel phrase to translate.
-              </p>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span class="brand-badge"><i data-lucide="sparkles"
-                  style="width:12px; height:12px; margin-right:4px;"></i> AI Speech Matrix</span>
-              <button type="button" id="btn-close-translation-studio" class="studio-close-btn"
-                title="Close Studio & Return to Audio Phrasebook"
-                style="width: 32px; height: 32px; min-width: 32px; min-height: 32px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #94a3b8; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; outline: none; transition: all 0.2s ease;">
-                <i data-lucide="x" style="width: 16px; height: 16px;"></i>
-              </button>
-            </div>
+        <!-- Live Voice Translation Studio Modal / Inset -->
+        <div id="live-voice-translation-studio" class="glass-card"
+          style="display: none; margin-bottom: 1.5rem; border: 2px solid #0284c7;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--ttw-ink);">Live Voice &amp; Speech Translation
+              Studio</h3>
+            <button type="button" id="btn-close-translation-studio" class="ttw-icon-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
 
-          <!-- Language Selector Row with Swap Button -->
-          <div class="translation-controls-row">
-            <div style="flex: 1 1 200px;">
-              <label class="form-label" style="font-size: 0.78rem; margin-bottom: 0.35rem;">From (Spoken / Source
-                Language)</label>
+          <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem;">
+            <div style="flex: 1;">
+              <label class="form-label">From (Source)</label>
               <select id="translator-source-lang" class="form-control">
-                <option value="auto">Auto-Detect / Speech Input</option>
-                <optgroup label="Indian Languages">
-                  <option value="English" selected>English</option>
-                  <option value="Hindi">Hindi (हिन्दी)</option>
-                  <option value="Telugu">Telugu (తెలుగు)</option>
-                  <option value="Tamil">Tamil (தமிழ்)</option>
-                  <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
-                  <option value="Malayalam">Malayalam (മലയാളം)</option>
-                  <option value="Marathi">Marathi (मराठी)</option>
-                  <option value="Bengali">Bengali (বাংলা)</option>
-                  <option value="Gujarati">Gujarati (ગુજરાતી)</option>
-                  <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                  <option value="Urdu">Urdu (اردو)</option>
-                </optgroup>
-                <optgroup label="Global Languages">
-                  <option value="Spanish">Spanish (Español)</option>
-                  <option value="French">French (Français)</option>
-                  <option value="German">German (Deutsch)</option>
-                  <option value="Italian">Italian (Italiano)</option>
-                  <option value="Portuguese">Portuguese (Português)</option>
-                  <option value="Russian">Russian (Русский)</option>
-                  <option value="Arabic">Arabic (العربية)</option>
-                  <option value="Mandarin">Mandarin (中文)</option>
-                  <option value="Japanese">Japanese (日本語)</option>
-                  <option value="Korean">Korean (한국어)</option>
-                </optgroup>
+                <option value="auto">Auto-Detect Language</option>
+                <option value="English" selected>English (en)</option>
+                <option value="Hindi">Hindi (hi)</option>
+                <option value="Tamil">Tamil (ta)</option>
+                <option value="Telugu">Telugu (te)</option>
+                <option value="Spanish">Spanish (es)</option>
+                <option value="French">French (fr)</option>
               </select>
             </div>
 
-            <button type="button" id="translator-swap-btn" class="translation-swap-btn"
-              title="Swap Source & Target Languages">
-              <i data-lucide="arrow-left-right"></i>
+            <button type="button" id="translator-swap-btn" class="ttw-icon-btn" style="margin-top: 20px;"
+              title="Swap Languages">
+              &harr;
             </button>
 
-            <div style="flex: 1 1 200px;">
-              <label class="form-label" style="font-size: 0.78rem; margin-bottom: 0.35rem;">To (Target Translation
-                Language)</label>
+            <div style="flex: 1;">
+              <label class="form-label">To (Target)</label>
               <select id="translator-target-lang" class="form-control">
-                <optgroup label="Indian Languages">
-                  <option value="Tamil" selected>Tamil (தமிழ்)</option>
-                  <option value="Telugu">Telugu (తెలుగు)</option>
-                  <option value="Hindi">Hindi (हिन्दी)</option>
-                  <option value="English">English</option>
-                  <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
-                  <option value="Malayalam">Malayalam (മലയാളം)</option>
-                  <option value="Marathi">Marathi (मराठी)</option>
-                  <option value="Bengali">Bengali (বাংলা)</option>
-                  <option value="Gujarati">Gujarati (ગુજરાતી)</option>
-                  <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                  <option value="Urdu">Urdu (اردو)</option>
-                </optgroup>
-                <optgroup label="Global Languages">
-                  <option value="Spanish">Spanish (Español)</option>
-                  <option value="French">French (Français)</option>
-                  <option value="German">German (Deutsch)</option>
-                  <option value="Italian">Italian (Italiano)</option>
-                  <option value="Portuguese">Portuguese (Português)</option>
-                  <option value="Russian">Russian (Русский)</option>
-                  <option value="Arabic">Arabic (العربية)</option>
-                  <option value="Mandarin">Mandarin (中文)</option>
-                  <option value="Japanese">Japanese (日本語)</option>
-                  <option value="Korean">Korean (한국어)</option>
-                </optgroup>
+                <option value="Tamil" selected>Tamil (ta - தமிழ்)</option>
+                <option value="Telugu">Telugu (te - తెలుగు)</option>
+                <option value="Hindi">Hindi (hi - हिन्दी)</option>
+                <option value="English">English (en)</option>
+                <option value="Spanish">Spanish (es)</option>
+                <option value="French">French (fr)</option>
               </select>
             </div>
           </div>
 
-          <!-- Input Text Area with Speech Recognition Button -->
-          <div class="translation-input-box">
-            <textarea id="translator-input-text"
-              placeholder="Speak or type a sentence here (e.g. 'Where is the central railway station?' or 'வணக்கம் எனக்கு உதவி வேண்டும்')..."></textarea>
-            <button type="button" id="translator-mic-btn" class="translation-voice-btn"
-              title="Speak to Translate (Voice Input)">
-              <i data-lucide="mic"></i>
+          <div class="form-group">
+            <textarea id="translator-input-text" class="form-control" rows="3"
+              placeholder="Speak via microphone or type text to translate..."></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" id="translator-mic-btn" class="btn btn-secondary">
+              Record Speech
+            </button>
+            <button type="button" id="translate-action-btn" class="btn btn-primary">
+              Translate &amp; Listen
             </button>
           </div>
 
-          <!-- Action Buttons & Quick Conversion Presets -->
-          <div
-            style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
-            <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Quick Presets:</span>
-              <button type="button" class="translation-quick-chip" data-src="English" data-tgt="Tamil"
-                data-sample="Where is the train station?">English → Tamil</button>
-              <button type="button" class="translation-quick-chip" data-src="Tamil" data-tgt="English"
-                data-sample="சாப்பாடு மிகவும் சுவையாக இருக்கிறது">Tamil → English</button>
-              <button type="button" class="translation-quick-chip" data-src="English" data-tgt="Telugu"
-                data-sample="How much does this cost?">English → Telugu</button>
-              <button type="button" class="translation-quick-chip" data-src="Telugu" data-tgt="English"
-                data-sample="రైల్వే స్టేషన్ ఎక్కడ ఉంది?">Telugu → English</button>
-              <button type="button" class="translation-quick-chip" data-src="English" data-tgt="Hindi"
-                data-sample="Can you help me find a doctor?">English → Hindi</button>
-            </div>
-
-            <button type="button" id="translate-action-btn" class="btn btn-primary" style="padding: 0.55rem 1.25rem;">
-              <i data-lucide="sparkles"></i> Translate & Listen
-            </button>
+          <div id="translator-recording-bar" style="display: none; margin-top: 10px; color: #ef4444; font-weight: 600;">
+            <span id="recording-status-text">Recording audio in selected source language...</span>
+            <button type="button" id="translator-stop-rec-btn" class="btn btn-secondary"
+              style="margin-left: 10px; padding: 4px 10px; font-size: 0.75rem;">Stop</button>
           </div>
 
-          <!-- Translation Output Display -->
-          <div id="translation-result-container" style="display: none;">
-            <!-- Rendered dynamically -->
-          </div>
+          <div id="translation-result-container" style="display: none; margin-top: 1.25rem;"></div>
         </div>
 
-        <h3
-          style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 1rem; display:flex; align-items:center; gap:0.5rem;">
-          <i data-lucide="book-open" style="color: var(--accent-cyan);"></i> Curated Essential Travel Phrases
-        </h3>
-
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--ttw-ink); margin-bottom: 1rem;">Curated Essential
+          Travel Phrases</h3>
         <div id="phrasebook-content">
           <!-- Injected via JS -->
         </div>
       </section>
+    </div>
+  </section>
 
-    </main>
+  <!-- ==========================================================================
+       "So, where are we going?" Deciding CTA Section (The Tarzan Way Feature)
+       ========================================================================== -->
+  <section class="ttw-deciding-section" id="deciding-section">
+    <div class="ttw-container">
+      <div class="ttw-deciding-card">
+        <div class="ttw-deciding-top-cta">
+          <a href="/chat" class="ttw-deciding-pill" style="text-decoration: none;">
+            <span>Still deciding? Chat with TripMate</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+          <div class="ttw-deciding-sub">Planning is free. You only pay when you book.</div>
+        </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>VoyageAI Platform &copy; 2026. Built with FastAPI & Modern Multimodal Web Engineering. Ready for <a
-          href="https://render.com" target="_blank">Render</a> Cloud.</p>
-    </footer>
+        <div class="ttw-deciding-avatar-wrap">
+          <img src="/static/assets/tripmate-logo.jpg" alt="TripMate AI Assistant" class="ttw-deciding-avatar-img" />
+        </div>
 
+        <h2 class="ttw-deciding-title">So, where are <span class="ttw-serif">we going?</span></h2>
+        <p class="ttw-deciding-desc">No credit card. No commitment. Just tell TripMate your idea for a trip and see what
+          comes back in a few seconds.</p>
+
+        <a href="/chat" class="ttw-deciding-btn" style="text-decoration: none;">
+          <span>Chat with TripMate</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Google Reviews ("Loved on Google - 4.9 across 10,000+ trips")
+       ========================================================================== -->
+  <section class="ttw-reviews-section">
+    <div class="ttw-container">
+      <div class="ttw-reviews-head">
+        <div class="ttw-google-kicker">
+          <svg width="16" height="16" viewBox="0 0 48 48">
+            <path fill="#EA4335"
+              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+            <path fill="#4285F4"
+              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+            <path fill="#FBBC05"
+              d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+            <path fill="#34A853"
+              d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+          </svg>
+          <span>Loved on Google</span>
+        </div>
+        <h2 class="ttw-section-title">Real reviews from <span class="ttw-serif">real travellers.</span></h2>
+        <p style="font-size: 16px; color: var(--ttw-ink-muted); margin-top: 6px;">Rated <b>4.9</b> across 10,000+ trips.
+          Here's what travellers say about TripMate AI.</p>
+      </div>
+
+      <div class="ttw-reviews-grid">
+        <!-- Review 1 -->
+        <div class="ttw-review-card">
+          <div class="ttw-review-top">
+            <div class="ttw-stars">&starf;&starf;&starf;&starf;&starf;</div>
+            <span style="font-size: 12px; color: var(--ttw-ink-muted);">Google Review</span>
+          </div>
+          <p class="ttw-review-text">"Our honeymoon to Japan was truly the best decision - every detail, from transit
+            passes to radar weather timing and local restaurants, was handled seamlessly. Absolutely magical
+            experience."</p>
+          <div class="ttw-reviewer">
+            <div class="ttw-reviewer-avatar" style="background: #ec4899;">T</div>
+            <div class="ttw-reviewer-info">
+              <div class="ttw-reviewer-name">Twinkle Joshi</div>
+              <div class="ttw-reviewer-dest">Japan &middot; 9 Days</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="ttw-review-card">
+          <div class="ttw-review-top">
+            <div class="ttw-stars">&starf;&starf;&starf;&starf;&starf;</div>
+            <span style="font-size: 12px; color: var(--ttw-ink-muted);">Google Review</span>
+          </div>
+          <p class="ttw-review-text">"Our fully customized Maldives trip turned out far better than expected - smooth
+            boat transfers, perfect resort recommendations, and zero stress throughout. Pricing was transparent with no
+            markups."</p>
+          <div class="ttw-reviewer">
+            <div class="ttw-reviewer-avatar" style="background: #3b82f6;">A</div>
+            <div class="ttw-reviewer-info">
+              <div class="ttw-reviewer-name">Amish Gupta</div>
+              <div class="ttw-reviewer-dest">Maldives &middot; 5 Days</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="ttw-review-card">
+          <div class="ttw-review-top">
+            <div class="ttw-stars">&starf;&starf;&starf;&starf;&starf;</div>
+            <span style="font-size: 12px; color: var(--ttw-ink-muted);">Google Review</span>
+          </div>
+          <p class="ttw-review-text">"Amazing agility and trip planning - supported us throughout two weeks across 4
+            countries and 7 European cities. A fabulous platform that blends AI speed with authentic travel
+            sensibility."</p>
+          <div class="ttw-reviewer">
+            <div class="ttw-reviewer-avatar" style="background: #10b981;">N</div>
+            <div class="ttw-reviewer-info">
+              <div class="ttw-reviewer-name">Naveen Dadlani</div>
+              <div class="ttw-reviewer-dest">Europe &middot; 14 Days</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 4 -->
+        <div class="ttw-review-card">
+          <div class="ttw-review-top">
+            <div class="ttw-stars">&starf;&starf;&starf;&starf;&starf;</div>
+            <span style="font-size: 12px; color: var(--ttw-ink-muted);">Google Review</span>
+          </div>
+          <p class="ttw-review-text">"The Audio Phrasebook with voice playback and live currency calculator made
+            navigating Vietnam so effortless. Highly recommended for couples and families alike!"</p>
+          <div class="ttw-reviewer">
+            <div class="ttw-reviewer-avatar" style="background: #f59e0b;">M</div>
+            <div class="ttw-reviewer-info">
+              <div class="ttw-reviewer-name">Minal Dhoble</div>
+              <div class="ttw-reviewer-dest">Vietnam &middot; 6 Days</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Frequently Asked Questions (Accordion)
+       ========================================================================== -->
+  <section class="ttw-faq-section">
+    <div class="ttw-container">
+      <div class="ttw-faq-head">
+        <h2>Frequently Asked <span class="ttw-serif">Questions.</span></h2>
+      </div>
+
+      <div class="ttw-faq-list">
+        <!-- FAQ 1 -->
+        <div class="ttw-faq-item open">
+          <div class="ttw-faq-question" onclick="toggleFaq(this)">
+            <span>What exactly is TripMate AI?</span>
+            <span class="ttw-faq-icon">&darr;</span>
+          </div>
+          <div class="ttw-faq-answer">
+            TripMate AI combines the rapid speed of multimodal artificial intelligence with real-world travel curation.
+            It builds custom, geocoded day-by-day itineraries, forecasts weather with atmospheric radar, translates
+            local menus via vision scanning, and computes live currency conversions in seconds.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="ttw-faq-item">
+          <div class="ttw-faq-question" onclick="toggleFaq(this)">
+            <span>How is TripMate AI different from ChatGPT for travel?</span>
+            <span class="ttw-faq-icon">&darr;</span>
+          </div>
+          <div class="ttw-faq-answer">
+            Generic chatbots provide raw text ideas without real geographic verification. TripMate AI computes exact
+            Haversine distances, runs TSP nearest-neighbor route optimization, checks live precipitation radar, renders
+            interactive Leaflet map pins, and delivers real-time currency conversions.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="ttw-faq-item">
+          <div class="ttw-faq-question" onclick="toggleFaq(this)">
+            <span>Can I customize the itinerary after it is generated?</span>
+            <span class="ttw-faq-icon">&darr;</span>
+          </div>
+          <div class="ttw-faq-answer">
+            Everything is customizable. You can add your own custom visiting spots, change trip durations, switch travel
+            styles from Backpacker to Luxury, toggle dietary food filters, and mark places as visited on the interactive
+            map.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="ttw-faq-item">
+          <div class="ttw-faq-question" onclick="toggleFaq(this)">
+            <span>Is there any upfront fee or booking pressure?</span>
+            <span class="ttw-faq-icon">&darr;</span>
+          </div>
+          <div class="ttw-faq-answer">
+            There is zero upfront fee to plan. TripMate AI is completely free to customize and explore. You only pay for
+            what you decide to book, with transparent pricing and no hidden markups.
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="ttw-faq-item">
+          <div class="ttw-faq-question" onclick="toggleFaq(this)">
+            <span>Does the Audio Phrasebook support Indian languages?</span>
+            <span class="ttw-faq-icon">&darr;</span>
+          </div>
+          <div class="ttw-faq-answer">
+            Yes. The Audio Phrasebook and Voice Translation Studio natively support Hindi, Tamil, Telugu, Bengali,
+            Marathi, and Urdu, alongside international languages like Japanese, French, and Spanish with phonetic guides
+            and native browser audio synthesis.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       Deep Navy Footer (The Tarzan Way Structure)
+       ========================================================================== -->
+  <footer class="ttw-footer">
+    <div class="ttw-container">
+      <div class="ttw-footer-grid">
+        <!-- Brand & Contact Col -->
+        <div class="ttw-footer-col">
+          <a href="/" class="ttw-brand" style="color: #ffffff;" aria-label="TripMate Homepage">
+            <div class="ttw-brand-mark ttw-brand-mark-logo"
+              style="background: #ffffff; border-radius: 10px; overflow: hidden; padding: 2px;">
+              <img src="/static/assets/tripmate-logo.jpg" alt="TripMate AI" width="38" height="38"
+                style="object-fit: cover; border-radius: 8px;" />
+            </div>
+            <div class="ttw-brand-text">
+              <span class="ttw-brand-name" style="color: #ffffff;">Trip<span
+                  style="color: var(--ttw-yellow);">Mate</span></span>
+              <span class="ttw-brand-tagline" style="color: rgba(255, 255, 255, 0.65);">Plan Smarter. Travel
+                Happier.</span>
+            </div>
+          </a>
+          <p class="ttw-footer-blurb">
+            A production-ready multimodal travel intelligence platform with AI vision, real-time weather radar, smart
+            itinerary builder, gastronomy guide, and currency budgeting.
+          </p>
+          <div class="ttw-footer-contact">
+            <a href="mailto:hello@tripmate.ai">hello@tripmate.ai</a>
+            <a href="tel:+917827441548">+91 12345 41548</a>
+          </div>
+        </div>
+
+        <!-- Col 2: Destinations -->
+        <div class="ttw-footer-col">
+          <h4>Destinations</h4>
+          <ul>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Tokyo, Japan', '7')">Japan</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Bali, Indonesia', '7')">Bali</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Paris, France', '5')">France</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Zurich, Switzerland', '6')">Switzerland</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Dubai, UAE', '4')">Dubai</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Phu Quoc, Vietnam', '6')">Vietnam</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: AI Engines -->
+        <div class="ttw-footer-col">
+          <h4>AI Features</h4>
+          <ul>
+            <li><a href="#ai-studio" onclick="switchToTab('tab-vision')">Photo &amp; Menu Scanner</a></li>
+            <li><a href="#ai-studio" onclick="switchToTab('tab-weather')">Weather Radar &amp; UV</a></li>
+            <li><a href="#ai-studio" onclick="switchToTab('tab-itinerary')">TSP Route Optimizer</a></li>
+            <li><a href="#ai-studio" onclick="switchToTab('tab-food')">Gastronomy Guide</a></li>
+            <li><a href="#ai-studio" onclick="switchToTab('tab-budget')">Live Currency FX</a></li>
+            <li><a href="#ai-studio" onclick="switchToTab('tab-phrasebook')">Audio Phrasebook</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4: Connected Trips -->
+        <div class="ttw-footer-col">
+          <h4>Curated Trips</h4>
+          <ul>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Bali, Indonesia', '7')">Honeymoon in Bali</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Tokyo, Japan', '9')">The Soul of Japan</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Zurich, Switzerland', '8')">European Daydream</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Bangkok, Thailand', '5')">Bangkok Beaches</a></li>
+            <li><a href="#ai-studio" onclick="quickPlanTrip('Dubai, UAE', '4')">Dubai Vibes</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 5: Company -->
+        <div class="ttw-footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="/docs" target="_blank">API Documentation</a></li>
+            <li><a href="/healthz" target="_blank">System Health</a></li>
+            <li><a href="https://thetarzanway.com" target="_blank" rel="noreferrer">Inspired by TTW</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="ttw-footer-bottom">
+        <div>TripMate AI Platform &copy; 2026. All rights reserved. Plan Smarter. Travel Happier.</div>
+        <div>Clean design inspired by The Tarzan Way. Zero underscores, professional SVG icons.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       Floating AI Chat Planning Widget
+       ========================================================================== -->
+  <!-- Floating Chat Trigger Button -->
+  <button type="button" id="chat-fab" class="ttw-chat-fab" aria-label="Open AI Trip Planner Chat"
+    title="Chat with TripMate AI">
+    <svg class="ttw-chat-fab-icon ttw-chat-icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path
+        d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z" />
+    </svg>
+    <svg class="ttw-chat-fab-icon ttw-chat-icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+    <span class="ttw-chat-fab-label">Plan a Trip</span>
+    <span class="ttw-chat-fab-dot"></span>
+  </button>
+
+  <!-- AI Chat Panel -->
+  <div id="ttw-chat-panel" class="ttw-chat-panel" role="dialog" aria-label="AI Trip Planning Chat" aria-hidden="true">
+    <!-- Chat Header -->
+    <div class="ttw-chat-header">
+      <div class="ttw-chat-header-avatar" style="overflow: hidden; padding: 0; background: #fff; border-radius: 50%;">
+        <img src="/static/assets/tripmate-logo.jpg" alt="TripMate AI"
+          style="width: 100%; height: 100%; object-fit: cover;" />
+      </div>
+      <div class="ttw-chat-header-info">
+        <div class="ttw-chat-header-name">TripMate AI</div>
+        <div class="ttw-chat-header-status">
+          <span class="ttw-chat-status-dot"></span>
+          <span>Online · replies in ~2s</span>
+        </div>
+      </div>
+      <div class="ttw-chat-header-actions">
+        <a href="/chat" class="ttw-chat-header-btn" title="Open full-screen trip planning wizard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </a>
+        <button type="button" id="chat-clear-btn" class="ttw-chat-header-btn" title="Clear conversation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
+        <button type="button" id="chat-close-btn" class="ttw-chat-header-btn" title="Close chat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div class="ttw-chat-messages" id="ttw-chat-messages">
+      <!-- Welcome message injected by JS -->
+    </div>
+
+    <!-- Suggested Prompts Row (Professional SVG Icons, No Emojis) -->
+    <div class="ttw-chat-suggestions" id="ttw-chat-suggestions">
+      <button type="button" class="ttw-chat-suggestion-pill"
+        data-prompt="Plan a 7-day Japan trip for 2 people with ₹1.8L budget">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon>
+        </svg>
+        <span>Japan 7 days</span>
+      </button>
+      <button type="button" class="ttw-chat-suggestion-pill"
+        data-prompt="Best budget trip to Bali from India under ₹60,000">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+        <span>Bali budget</span>
+      </button>
+      <button type="button" class="ttw-chat-suggestion-pill" data-prompt="Plan a Europe honeymoon trip for 10 days">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z">
+          </path>
+        </svg>
+        <span>Europe honeymoon</span>
+      </button>
+      <button type="button" class="ttw-chat-suggestion-pill" data-prompt="Dubai 4 days itinerary under ₹80,000">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 21h18M6 18V4h12v14M10 8h4M10 12h4"></path>
+        </svg>
+        <span>Dubai 4 days</span>
+      </button>
+      <button type="button" class="ttw-chat-suggestion-pill"
+        data-prompt="What are visa requirements for Thailand from India?">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <span>Thailand visa</span>
+      </button>
+      <button type="button" class="ttw-chat-suggestion-pill" data-prompt="Best time to visit Santorini and travel tips">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"></circle>
+          <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41">
+          </path>
+        </svg>
+        <span>Santorini tips</span>
+      </button>
+    </div>
+
+    <!-- Chat Input Area -->
+    <div class="ttw-chat-input-area">
+      <div class="ttw-chat-input-wrap">
+        <textarea id="ttw-chat-input" class="ttw-chat-input"
+          placeholder="Ask about any destination, budget, itinerary..." rows="1" maxlength="1000"
+          aria-label="Chat message"></textarea>
+        <div class="ttw-chat-input-actions">
+          <button type="button" id="ttw-chat-mic-btn" class="ttw-chat-action-btn" title="Voice input">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+              <line x1="12" y1="19" x2="12" y2="22" />
+            </svg>
+          </button>
+          <button type="button" id="ttw-chat-send-btn" class="ttw-chat-send-btn" title="Send message">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="ttw-chat-footer-note">TripMate AI · Travel planning powered by AI</div>
+    </div>
   </div>
 
+  <!-- Sticky Floating Bottom CTA Bar (The Tarzan Way Feature) -->
+  <div class="ttw-sticky-cta-bar" id="ttw-sticky-cta-bar">
+    <span class="ttw-sticky-cta-text">Craft your personalized itinerary now!</span>
+    <div class="ttw-sticky-cta-actions">
+      <a href="/chat" class="ttw-sticky-cta-btn" style="text-decoration: none;">
+        <span>Chat with TripMate</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="7" y1="17" x2="17" y2="7"></line>
+          <polyline points="7 7 17 7 17 17"></polyline>
+        </svg>
+      </a>
+      <button type="button" class="ttw-sticky-cta-close"
+        onclick="document.getElementById('ttw-sticky-cta-bar').style.display='none'" title="Dismiss">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Notification Toast Container -->
+  <div id="voyage-toast-container" class="voyage-toast-container"></div>
+
+
   <!-- Scripts -->
-  <script src="/static/js/api.js?v=1.0.5"></script>
-  <script src="/static/js/app.js?v=1.0.5"></script>
+  <script src="/static/js/api.js?v=2.0.0"></script>
+  <script src="/static/js/app.js?v=2.0.0"></script>
+
+  <!-- Interactive Inline Helper Scripts for Tarzan Way UX -->
+  <script>
+    function toggleFaq(el) {
+      const parent = el.parentElement;
+      parent.classList.toggle('open');
+    }
+
+    function filterTrips(cat, btn) {
+      const buttons = document.querySelectorAll('.ttw-filter-btn');
+      buttons.forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.ttw-trip-card');
+      cards.forEach(card => {
+        const c = card.getAttribute('data-category') || '';
+        if (cat === 'all' || c.includes(cat)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function quickPlanTrip(destination, days) {
+      const destInput = document.getElementById('itinerary-dest');
+      const daysInput = document.getElementById('itinerary-days');
+      const globalInput = document.getElementById('global-city-search');
+
+      if (destInput) destInput.value = destination;
+      if (globalInput) globalInput.value = destination;
+      if (daysInput && days) daysInput.value = days;
+
+      // Switch to itinerary tab
+      if (typeof switchToTab === 'function') {
+        switchToTab('tab-itinerary');
+      }
+
+      // Scroll smoothly to studio
+      const studio = document.getElementById('ai-studio');
+      if (studio) {
+        studio.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      // Automatically trigger itinerary generation
+      setTimeout(() => {
+        const genBtn = document.getElementById('itinerary-generate-btn');
+        if (genBtn) genBtn.click();
+      }, 300);
+    }
+
+    function openTripMateChat(prompt) {
+      if (prompt) {
+        window.location.href = '/chat?q=' + encodeURIComponent(prompt);
+      } else {
+        window.location.href = '/chat';
+      }
+    }
+    window.openVoyageChat = openTripMateChat;
+  </script>
 </body>
 
 </html>

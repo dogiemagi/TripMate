@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings(BaseSettings):
-    APP_NAME: str = "VoyageAI - Multimodal Travel Intelligence"
+    APP_NAME: str = "TripMate AI - Plan Smarter. Travel Happier."
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
     HOST: str = "0.0.0.0"

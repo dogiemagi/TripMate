@@ -4,6 +4,7 @@ import re
 import html
 import json
 import os
+import io
 from typing import Dict, Any, List, Optional, Tuple
 from app.models.schemas import PhrasebookQuery, TranslationRequest
 
@@ -1357,6 +1358,31 @@ class PhrasebookService:
             }
 
         # -------------------------------------------------------------
+        # 0. Explicit Manual Source Selection (Strictly Bypasses Auto-Detect)
+        # -------------------------------------------------------------
+        if user_hint and user_hint.strip().lower() not in ["auto", ""]:
+            clean_hint = user_hint.strip()
+            hint_code = cls._resolve_lang_code(clean_hint, default="")
+            if hint_code:
+                hint_name = CODE_TO_LANG_NAME.get(hint_code, clean_hint.title())
+                has_latin = bool(re.search(r'[a-zA-Z]', raw))
+                is_non_latin_lang = hint_code in [
+                    "te", "hi", "ta", "kn", "ml", "mr", "bn", "gu", "pa", "ur",
+                    "zh", "ja", "ko", "ar", "ru"
+                ]
+                is_rom = bool(is_non_latin_lang and has_latin)
+                translit_std = TRANSLITERATION_STANDARDS.get(hint_code, "ISO 15919 (Indic)") if is_rom else "None"
+                return {
+                    "code": hint_code,
+                    "name": hint_name,
+                    "is_romanized": is_rom,
+                    "confidence": 1.0,
+                    "candidates": [{"language": hint_name, "code": hint_code, "confidence": 1.0}],
+                    "is_ambiguous": False,
+                    "transliteration_standard": translit_std
+                }
+
+        # -------------------------------------------------------------
         # 1. Native Unicode Script Detection (100% Deterministic & Exact)
         # -------------------------------------------------------------
         if re.search(r'[ఀ-౿]', raw):
@@ -1725,6 +1751,30 @@ class PhrasebookService:
         is_ambiguous = detect_res["is_ambiguous"]
         translit_std = detect_res["transliteration_standard"]
 
+        # If source and target languages are identical, return original directly
+        if source_code == target_code:
+            speech_lang_code = cls._resolve_speech_code(target_code, req.target_language)
+            return {
+                "status": "success",
+                "original_text": raw_text,
+                "transliterated_input": raw_text,
+                "transliteration_standard": "None",
+                "translated_text": raw_text,
+                "detected_source_lang": source_name,
+                "detected_source_code": source_code,
+                "is_romanized": is_romanized,
+                "confidence": 1.0,
+                "candidates": [{"language": source_name, "code": source_code, "confidence": 1.0}],
+                "is_ambiguous": False,
+                "suggested_clarifications": [],
+                "source_language": req.source_language if req.source_language != "auto" else source_name,
+                "target_language": req.target_language,
+                "target_lang_code": target_code,
+                "speech_lang_code": speech_lang_code,
+                "romanized": raw_text,
+                "audio_text": raw_text
+            }
+
         # Step 2: Whole-Sentence Transliteration from Romanized Input to Authentic Native Script
         transliterated_input = raw_text
         if is_romanized and source_code not in ["en", "es", "fr", "de", "it", "pt"]:
@@ -1882,3 +1932,94 @@ class PhrasebookService:
             "romanized": romanized or translated_text,
             "audio_text": translated_text
         }
+
+    @classmethod
+    async def transcribe_audio(cls, audio_bytes: bytes, source_language: str = "en") -> str:
+        """
+        Open-Source Speech-to-Text Transcription Engine.
+        Uses manual source language hint to bypass STT auto-detect.
+        Supports WAV, FLAC, OGG, and raw PCM audio.
+        """
+        if not audio_bytes or len(audio_bytes) < 64:
+            raise ValueError("Audio recording is empty or insufficient audio data received.")
+
+        # Resolve explicit speech recognition locale (e.g. 'en' -> 'en-US', 'ta' -> 'ta-IN')
+        clean_src = source_language.strip().lower() if source_language else "auto"
+        if clean_src == "auto":
+            speech_code = "en-US"
+        else:
+            source_code = cls._resolve_lang_code(source_language, default="en")
+            speech_code = cls._resolve_speech_code(source_code, source_language)
+
+        import speech_recognition as sr
+        r = sr.Recognizer()
+        r.energy_threshold = 300
+        r.dynamic_energy_threshold = True
+
+        audio_data = None
+        audio_io = io.BytesIO(audio_bytes)
+
+        # 1. Try reading as standard WAV/AIFF/FLAC
+        try:
+            with sr.AudioFile(audio_io) as source:
+                audio_data = r.record(source)
+        except Exception as e_wav:
+            logger.debug(f"Direct AudioFile read notice: {e_wav}. Attempting soundfile decoding.")
+            # 2. Try soundfile decoding (handles OGG, FLAC, RAW, WAV)
+            try:
+                import soundfile as sf
+                audio_io.seek(0)
+                data, samplerate = sf.read(audio_io)
+                wav_io = io.BytesIO()
+                sf.write(wav_io, data, samplerate, format='WAV', subtype='PCM_16')
+                wav_io.seek(0)
+                with sr.AudioFile(wav_io) as source:
+                    audio_data = r.record(source)
+            except Exception as e_sf:
+                logger.debug(f"Soundfile decode notice: {e_sf}")
+
+        if not audio_data:
+            raise ValueError("Unsupported or corrupted audio format. Please provide a valid WAV, FLAC, or OGG audio recording.")
+
+        # Recognize with explicit forced language code
+        try:
+            transcript = r.recognize_google(audio_data, language=speech_code)
+            if transcript and transcript.strip():
+                return transcript.strip()
+            raise ValueError(f"No audible speech detected for language '{source_language}'.")
+        except sr.UnknownValueError:
+            raise ValueError(f"Speech recognition could not understand audio in '{source_language}'. Please speak clearly.")
+        except sr.RequestError as re:
+            raise ValueError(f"Speech recognition engine network error: {re}")
+
+    @classmethod
+    async def translate_voice_phrase(
+        cls,
+        audio_bytes: bytes,
+        source_language: str,
+        target_language: str
+    ) -> Dict[str, Any]:
+        """
+        Voice-to-Text-to-Translation Pipeline:
+        1. Transcribes audio input with explicit source language (or auto-detect).
+        2. Translates transcribed text to target language.
+        3. Returns transcription, translation, phonetic guide, and speech synthesis link.
+        """
+        if not source_language:
+            source_language = "auto"
+        if not target_language:
+            raise ValueError("Target language must be specified.")
+
+        # Step 1: Transcribe with manual language parameter
+        transcribed_text = await cls.transcribe_audio(audio_bytes, source_language)
+
+        # Step 2: Translate to target language
+        req = TranslationRequest(
+            text=transcribed_text,
+            source_language=source_language,
+            target_language=target_language
+        )
+        res = await cls.translate_phrase(req)
+        res["transcribed_text"] = transcribed_text
+        res["audio_input_processed"] = True
+        return res
