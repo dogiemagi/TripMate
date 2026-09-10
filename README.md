@@ -1,7 +1,7 @@
 # VoyageAI - Multimodal Travel Intelligence Platform
 
 
-🌐 **Live Application:** [https://voyage-ai-platform.onrender.com/](https://tripmate-xqei.onrender.com/)
+🌐 **Live Application:** [https://tripmate-xqei.onrender.com/](https://tripmate-xqei.onrender.com/)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-voyage--ai--platform.onrender.com-06b6d4?style=for-the-badge&logo=render&logoColor=white)](https://voyage-ai-platform.onrender.com/)
 [![API Docs](https://img.shields.io/badge/API%20Docs-Swagger%20UI-3b82f6?style=for-the-badge&logo=fastapi&logoColor=white)](https://voyage-ai-platform.onrender.com/docs)
